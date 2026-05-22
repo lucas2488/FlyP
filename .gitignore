@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+*.db
+*.sqlite
+.DS_Store
+firebase-service-account.json
+*.json.key
