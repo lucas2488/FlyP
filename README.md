@@ -1,52 +1,65 @@
 # FlyP Backend
 
-Stack: FastAPI + n8n + PostgreSQL + Nginx + Certbot
+Backend propio de **FlyPromociones** — reemplaza el servidor n8n.cordevs.com que se cayó.
+
+## Qué hace
+
+Cada vez que un usuario abre la app Android o busca un vuelo, el app envía el perfil del usuario a este backend. El backend guarda esos datos en PostgreSQL y los usa para:
+
+- **Guardar perfiles de usuarios**: token FCM, dispositivo, última búsqueda, cantidad de búsquedas, país, moneda seleccionada
+- **Crear price watches automáticos**: cuando el usuario busca BUE → MIA, queda registrado para monitoreo de precios
+- **Registrar affiliate links**: cuando el usuario abre un link de Skyscanner/Impact, se loguea la URL
+- **n8n para workflows**: automatizaciones internas, emails, integraciones con APIs externas
+
+En el futuro (próximos pasos):
+- Detectar bajadas de precio y enviar push notifications al FCM token del usuario
+- Enviar promociones personalizadas basadas en el historial de búsquedas
 
 ## Servicios
 
-| Servicio | Local | Producción |
+| Servicio | URL | Para qué |
 |---|---|---|
-| API Python | http://localhost/api/ | https://api.DOMAIN |
-| n8n | http://localhost/n8n/ | https://n8n.DOMAIN |
-| PostgreSQL | localhost:5432 | interno (no expuesto) |
+| Python API | https://api.flypromociones.com | App Android |
+| n8n | https://n8n.cordevs.com | Workflows internos |
+| PostgreSQL | interno | Base de datos compartida |
 
 ---
 
 ## Levantar local
 
 ```bash
-cp .env.example .env     # editar con tus valores
-docker compose up -d     # aplica docker-compose.override.yml automáticamente
+cp .env.example .env     # completar valores
+docker compose up -d     # aplica docker-compose.override.yml automáticamente (HTTP, sin SSL)
 ```
 
 Verificar:
 ```bash
 curl http://localhost/api/v1/health
-# → {"status":"ok","service":"fly-backend"}
-
 open http://localhost/n8n/
 ```
 
 ---
 
-## Levantar en producción
+## Deploy en producción (VPS)
 
-**Requisitos previos:**
-- Los DNS de `n8n.DOMAIN` y `api.DOMAIN` apuntan al IP del servidor
-- Docker y Docker Compose instalados
+Ver **[DEPLOY.md](DEPLOY.md)** para la guía completa paso a paso.
 
+Resumen:
 ```bash
-# 1. Clonar y configurar
-git clone https://github.com/lucas2488/FlyP.git
-cd FlyP
-cp .env.example .env
-nano .env   # completar DOMAIN, CERTBOT_EMAIL y passwords
+# 1. Instalar Docker en el servidor
+curl -fsSL https://get.docker.com | sh
 
-# 2. Obtener certificados SSL (solo la primera vez)
-chmod +x scripts/*.sh
-./scripts/init-ssl.sh
+# 2. Configurar el proyecto
+cp .env.example .env && nano .env
 
-# 3. Levantar el stack completo
+# 3. Obtener certificados SSL (primera vez)
+docker compose -f docker-compose.yml up -d postgres n8n api certbot
+docker run --rm -p 80:80 -v flyp_certbot_certs:/etc/letsencrypt \
+  certbot/certbot certonly --standalone \
+  --email info@cordevs.com --agree-tos --no-eff-email \
+  -d n8n.cordevs.com -d api.flypromociones.com
+
+# 4. Levantar todo
 docker compose -f docker-compose.yml up -d
 ```
 
@@ -54,104 +67,47 @@ docker compose -f docker-compose.yml up -d
 
 ## Comandos útiles
 
-### Ver logs
 ```bash
-docker compose logs -f              # todos los servicios
-docker compose logs -f api          # solo la API
-docker compose logs -f n8n          # solo n8n
-docker compose logs -f nginx        # solo nginx
-```
+# Estado de los contenedores
+docker compose -f docker-compose.yml ps
 
-### Reiniciar un servicio
-```bash
-docker compose restart api
-docker compose restart n8n
-```
+# Logs en vivo
+docker compose -f docker-compose.yml logs -f api
+docker compose -f docker-compose.yml logs -f n8n
 
-### Ver estado
-```bash
-docker compose ps
-```
-
-### Actualizar la API (nuevo deploy)
-```bash
-git pull
-docker compose -f docker-compose.yml build api
-docker compose -f docker-compose.yml up -d api
+# Reiniciar un servicio
+docker compose -f docker-compose.yml restart api
 ```
 
 ---
 
-## Backup y restore
+## Backups
 
-### Hacer backup
+Los backups son dumps de PostgreSQL comprimidos con gzip.
+
 ```bash
+# Hacer backup manual
 ./scripts/backup.sh
-# Guarda en ./backups/fly_db_YYYYMMDD_HHMMSS.sql.gz
-# Los backups de +30 días se borran automáticamente
-```
+# → guarda en ./backups/fly_db_YYYYMMDD_HHMMSS.sql.gz
+# → borra automáticamente los de más de 30 días
 
-### Restaurar backup
-```bash
+# Restaurar
 ./scripts/restore.sh backups/fly_db_20260101_120000.sql.gz
 ```
 
-### Backup automático (cron en el servidor)
+### Backup automático diario (recomendado en producción)
+
 ```bash
-# Agregar al crontab: backup diario a las 3am
 crontab -e
-# 0 3 * * * cd /ruta/FlyP && ./scripts/backup.sh >> /var/log/fly-backup.log 2>&1
+# Agregar:
+0 3 * * * cd /root/FlyP && ./scripts/backup.sh >> /var/log/fly-backup.log 2>&1
 ```
 
 ---
 
 ## Agregar un nuevo servicio (ejemplo: Spring Boot)
 
-**1. Agregar al `docker-compose.yml`:**
-```yaml
-  spring-app:
-    image: tu-imagen:latest   # o build: ./spring-app
-    restart: unless-stopped
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
-      SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-    depends_on:
-      postgres:
-        condition: service_healthy
-```
-
-**2. Agregar el subdominio en `nginx/templates/default.conf.template`:**
-```nginx
-server {
-    listen 443 ssl;
-    server_name app.${DOMAIN};
-
-    ssl_certificate     /etc/letsencrypt/live/app.${DOMAIN}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/app.${DOMAIN}/privkey.pem;
-
-    location / {
-        proxy_pass http://spring-app:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-**3. Obtener certificado para el nuevo subdominio:**
-```bash
-docker compose run --rm certbot certonly \
-  --webroot -w /var/www/certbot \
-  --email $CERTBOT_EMAIL --agree-tos --no-eff-email \
-  -d app.DOMAIN
-
-docker compose restart nginx
-```
-
-**4. Levantar:**
-```bash
-docker compose -f docker-compose.yml up -d spring-app
-```
+Ver la sección correspondiente en [DEPLOY.md](DEPLOY.md#agregar-un-nuevo-servicio).
 
 ---
 
