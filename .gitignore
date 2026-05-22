@@ -12,3 +12,4 @@ build/
 .DS_Store
 firebase-service-account.json
 *.json.key
+backups/*.sql.gz
