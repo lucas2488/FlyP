@@ -6,9 +6,12 @@ services:
   n8n:
     environment:
       WEBHOOK_URL: http://localhost/n8n/
+      N8N_EDITOR_BASE_URL: http://localhost/n8n/
       N8N_HOST: localhost
       N8N_PROTOCOL: http
       NODE_ENV: development
+      # SMTP desactivado en local — comentar para probar emails
+      N8N_EMAIL_MODE: ""
 
   nginx:
     volumes:

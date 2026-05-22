@@ -19,20 +19,34 @@ services:
     image: n8nio/n8n:latest
     restart: unless-stopped
     environment:
+      # Base de datos
       DB_TYPE: postgresdb
       DB_POSTGRESDB_HOST: postgres
       DB_POSTGRESDB_PORT: 5432
       DB_POSTGRESDB_DATABASE: ${DB_NAME}
       DB_POSTGRESDB_USER: ${DB_USER}
       DB_POSTGRESDB_PASSWORD: ${DB_PASSWORD}
+      # Auth
       N8N_BASIC_AUTH_ACTIVE: "true"
       N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER}
       N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
-      WEBHOOK_URL: https://n8n.${DOMAIN}/
-      N8N_HOST: n8n.${DOMAIN}
+      # URLs — crítico para que los webhooks y OAuth funcionen
+      WEBHOOK_URL: https://${N8N_DOMAIN}/
+      N8N_EDITOR_BASE_URL: https://${N8N_DOMAIN}/
+      N8N_HOST: ${N8N_DOMAIN}
       N8N_PROTOCOL: https
-      NODE_ENV: production
+      N8N_PORT: 5678
+      # Email (SMTP) para notificaciones y recordatorios
+      N8N_EMAIL_MODE: smtp
+      N8N_SMTP_HOST: ${SMTP_HOST}
+      N8N_SMTP_PORT: ${SMTP_PORT}
+      N8N_SMTP_USER: ${SMTP_USER}
+      N8N_SMTP_PASS: ${SMTP_PASS}
+      N8N_SMTP_SENDER: ${SMTP_SENDER}
+      N8N_SMTP_SSL: "false"
+      # General
       GENERIC_TIMEZONE: America/Argentina/Buenos_Aires
+      NODE_ENV: production
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:
@@ -58,7 +72,8 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      DOMAIN: ${DOMAIN}
+      N8N_DOMAIN: ${N8N_DOMAIN}
+      API_DOMAIN: ${API_DOMAIN}
     volumes:
       - ./nginx/templates:/etc/nginx/templates:ro
       - certbot_certs:/etc/letsencrypt:ro

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Obtiene los certificados SSL por primera vez en producción.
 # Correr UNA sola vez antes de levantar el stack completo.
-# Requisito: los subdominios deben apuntar al IP del servidor antes de correr esto.
+# Requisito: N8N_DOMAIN y API_DOMAIN deben apuntar al IP del servidor.
 
 set -e
 
@@ -12,8 +12,8 @@ fi
 
 source .env
 
-if [ -z "$DOMAIN" ] || [ -z "$CERTBOT_EMAIL" ]; then
-  echo "Error: DOMAIN y CERTBOT_EMAIL son requeridos en .env"
+if [ -z "$N8N_DOMAIN" ] || [ -z "$API_DOMAIN" ] || [ -z "$CERTBOT_EMAIL" ]; then
+  echo "Error: N8N_DOMAIN, API_DOMAIN y CERTBOT_EMAIL son requeridos en .env"
   exit 1
 fi
 
@@ -23,21 +23,21 @@ docker compose -f docker-compose.yml up -d nginx
 echo "▶ Esperando que nginx esté listo..."
 sleep 5
 
-echo "▶ Obteniendo certificado para n8n.${DOMAIN}..."
+echo "▶ Obteniendo certificado para ${N8N_DOMAIN}..."
 docker compose -f docker-compose.yml run --rm certbot certonly \
   --webroot -w /var/www/certbot \
   --email "$CERTBOT_EMAIL" \
   --agree-tos \
   --no-eff-email \
-  -d "n8n.${DOMAIN}"
+  -d "$N8N_DOMAIN"
 
-echo "▶ Obteniendo certificado para api.${DOMAIN}..."
+echo "▶ Obteniendo certificado para ${API_DOMAIN}..."
 docker compose -f docker-compose.yml run --rm certbot certonly \
   --webroot -w /var/www/certbot \
   --email "$CERTBOT_EMAIL" \
   --agree-tos \
   --no-eff-email \
-  -d "api.${DOMAIN}"
+  -d "$API_DOMAIN"
 
 echo "▶ Reiniciando nginx con SSL habilitado..."
 docker compose -f docker-compose.yml restart nginx
