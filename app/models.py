@@ -49,6 +49,12 @@ class PriceWatch(Base):
     last_checked: Mapped[datetime | None] = mapped_column(DateTime)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    # Motor de oportunidad
+    last_search_best_price: Mapped[float | None] = mapped_column(Float)
+    last_selected_price: Mapped[float | None] = mapped_column(Float)
+    last_notified_at: Mapped[datetime | None] = mapped_column(DateTime)
+    interest_score: Mapped[int] = mapped_column(Integer, default=0)
+    notification_count: Mapped[int] = mapped_column(Integer, default=0)
 
 
 class PriceHistory(Base):
@@ -82,3 +88,71 @@ class ImpactLinkLog(Base):
     user_id: Mapped[str | None] = mapped_column(String)
     url: Mapped[str] = mapped_column(Text)
     clicked_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class AirportCache(Base):
+    """
+    Cache de aeropuertos vistos en búsquedas de usuarios.
+    Se hace upsert cada vez que llega un POST /profile con IATA codes.
+    Sirve para construir una base de datos local de aeropuertos con sus
+    códigos de Skyscanner (iata, geoId, placeId) sin depender de APIs externas.
+    """
+    __tablename__ = "airport_cache"
+
+    iata_code: Mapped[str] = mapped_column(String(10), primary_key=True)
+    name: Mapped[str | None] = mapped_column(String(200))
+    city: Mapped[str | None] = mapped_column(String(100))
+    country: Mapped[str | None] = mapped_column(String(10))
+    geo_id: Mapped[str | None] = mapped_column(String(50))
+    place_id: Mapped[str | None] = mapped_column(String(100))
+    first_seen_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
+    times_searched: Mapped[int] = mapped_column(Integer, default=1)
+
+
+class PriceSnapshot(Base):
+    __tablename__ = "price_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(String, index=True)
+    origin: Mapped[str] = mapped_column(String(10))
+    destination: Mapped[str] = mapped_column(String(10))
+    trip_type: Mapped[str] = mapped_column(String(20))
+    snapshot_date: Mapped[str] = mapped_column(String(10))  # "2026-06-15"
+    price_raw: Mapped[float] = mapped_column(Float)
+    price_group: Mapped[str] = mapped_column(String(10))    # "low"
+    currency: Mapped[str] = mapped_column(String(3))
+    received_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class SearchEvent(Base):
+    __tablename__ = "search_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(String, index=True)
+    origin: Mapped[str] = mapped_column(String(10))
+    destination: Mapped[str] = mapped_column(String(10))
+    trip_type: Mapped[str | None] = mapped_column(String(20))
+    best_price: Mapped[float | None] = mapped_column(Float)
+    currency: Mapped[str | None] = mapped_column(String(3))
+    event_type: Mapped[str] = mapped_column(String(30))    # "search_result" | "flight_selected"
+    event_data: Mapped[str | None] = mapped_column(Text)   # JSON string (airline, date, etc.)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class NotificationQueue(Base):
+    __tablename__ = "notification_queue"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(String, index=True)
+    origin: Mapped[str] = mapped_column(String(10))
+    destination: Mapped[str] = mapped_column(String(10))
+    price_raw: Mapped[float] = mapped_column(Float)
+    currency: Mapped[str] = mapped_column(String(3))
+    pct_drop: Mapped[float] = mapped_column(Float)
+    reference_price: Mapped[float] = mapped_column(Float)
+    trip_type: Mapped[str] = mapped_column(String(20))
+    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|sent|failed|skipped
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime)
+    error_msg: Mapped[str | None] = mapped_column(Text)

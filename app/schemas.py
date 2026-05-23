@@ -38,3 +38,40 @@ class WebhookResponse(BaseModel):
     success: bool
     message: Optional[str] = None
     userId: Optional[str] = None
+
+
+# --- Motor de Oportunidad ---
+
+class DayPriceDTO(BaseModel):
+    day: str          # "2026-06-15"
+    group: str        # "low" | "medium" | "high"
+    price: float
+
+
+class PriceSnapshotRequest(BaseModel):
+    user_id: str
+    origin: str
+    destination: str
+    trip_type: str
+    currency: str
+    prices: list[DayPriceDTO]
+
+
+class SearchResultEvent(BaseModel):
+    user_id: str
+    origin: str
+    destination: str
+    trip_type: Optional[str] = "ONE_WAY"
+    best_price: float
+    currency: str
+
+
+class FlightSelectedEvent(BaseModel):
+    user_id: str
+    origin: str
+    destination: str
+    price: float
+    currency: str
+    trip_type: Optional[str] = "ONE_WAY"
+    airline: Optional[str] = None
+    departure_date: Optional[str] = None

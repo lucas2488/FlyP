@@ -61,6 +61,11 @@ services:
       SYNC_DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       ENVIRONMENT: production
       API_SECRET_KEY: ${API_SECRET_KEY}
+      FIREBASE_CREDENTIALS_PATH: /app/firebase-service-account.json
+      NOTIFICATION_COOLDOWN_HOURS: 48
+      MAX_NOTIFICATIONS_PER_USER_PER_DAY: 2
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     depends_on:
       postgres:
         condition: service_healthy

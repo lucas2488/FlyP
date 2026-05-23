@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
-from app.models import UserProfile, PriceWatch
+from app.models import UserProfile, PriceWatch, AirportCache
 from app.schemas import UserProfileData, WebhookResponse
 
 router = APIRouter()
@@ -80,13 +80,27 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
         if skyscanner_headers:
             profile.skyscanner_headers = skyscanner_headers
 
-    # Si hay búsqueda, crear/activar un price watch para esta ruta
+    # Si hay búsqueda, crear/activar price watch + cachear aeropuertos
     if data.lastSearchOriginIata and data.lastSearchDestinationIata:
         await _upsert_price_watch(
             db=db,
             user_id=data.userId,
             origin=data.lastSearchOriginIata,
             destination=data.lastSearchDestinationIata,
+        )
+        await _upsert_airport(
+            db=db,
+            iata_code=data.lastSearchOriginIata,
+            name=data.lastSearchOrigin,
+            country=data.lastSearchOriginCountry,
+            geo_id=data.lastSearchOriginGeoId,
+        )
+        await _upsert_airport(
+            db=db,
+            iata_code=data.lastSearchDestinationIata,
+            name=data.lastSearchDestination,
+            country=data.lastSearchDestinationCountry,
+            geo_id=data.lastSearchDestinationGeoId,
         )
 
     await db.commit()
@@ -106,3 +120,38 @@ async def _upsert_price_watch(db: AsyncSession, user_id: str, origin: str, desti
         db.add(PriceWatch(user_id=user_id, origin=origin, destination=destination, trip_type="ONE_WAY"))
     else:
         watch.is_active = True
+
+
+async def _upsert_airport(
+    db: AsyncSession,
+    iata_code: str,
+    name: str | None = None,
+    country: str | None = None,
+    geo_id: str | None = None,
+    place_id: str | None = None,
+):
+    """Upsert de aeropuerto. Acumula búsquedas para tener un registro local de todos los airports vistos."""
+    result = await db.execute(
+        select(AirportCache).where(AirportCache.iata_code == iata_code)
+    )
+    airport = result.scalar_one_or_none()
+    if airport is None:
+        db.add(AirportCache(
+            iata_code=iata_code,
+            name=name,
+            country=country,
+            geo_id=geo_id,
+            place_id=place_id,
+            times_searched=1,
+        ))
+    else:
+        airport.times_searched = (airport.times_searched or 0) + 1
+        # Actualizar campos si llegaron con más info
+        if name and not airport.name:
+            airport.name = name
+        if country and not airport.country:
+            airport.country = country
+        if geo_id and not airport.geo_id:
+            airport.geo_id = geo_id
+        if place_id and not airport.place_id:
+            airport.place_id = place_id
