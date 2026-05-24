@@ -76,7 +76,7 @@ async def execute_campaign(campaign_id: int) -> None:
         try:
             sent, failed, skipped = await _send_to_segment(db, campaign)
             campaign.status = "sent"
-            campaign.sent_at = datetime.now(tz=timezone.utc)
+            campaign.sent_at = datetime.utcnow()
             await db.commit()
             logger.info(
                 f"campaign_engine: campaña {campaign_id} completada — "
@@ -203,7 +203,7 @@ async def _send_to_user(db: AsyncSession, campaign: Campaign, user: UserProfile)
             },
         )
         cs.status = "sent"
-        cs.sent_at = datetime.now(tz=timezone.utc)
+        cs.sent_at = datetime.utcnow()
         cs.fcm_response = "ok"
         await db.commit()
         return "sent"
@@ -297,7 +297,7 @@ async def get_excluded_routes(db: AsyncSession, user_id: str) -> set[tuple[str, 
       • Rutas en campaign_sends de los últimos 14 días
       • Rutas en notification_log (price-drops) de los últimos 7 días
     """
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.utcnow()
     excluded: set[tuple[str, str]] = set()
 
     # 1. Rutas de campañas recientes
@@ -342,7 +342,7 @@ async def get_fallback_category(db: AsyncSession, user_id: str) -> str | None:
     Actualmente mapea destinos populares a categorías conocidas.
     """
     # Destino más buscado en los últimos 30 días
-    cutoff = datetime.now(tz=timezone.utc) - timedelta(days=30)
+    cutoff = datetime.utcnow() - timedelta(days=30)
     result = await db.execute(
         select(SearchEvent.destination, func.count().label("cnt"))
         .where(

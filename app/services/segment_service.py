@@ -29,7 +29,7 @@ async def recalculate_segments() -> None:
     Se llama desde APScheduler, por eso crea su propia sesión.
     """
     logger.info("segment_service: iniciando recálculo de segmentos")
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.utcnow()
     cutoff_30d = now - timedelta(days=30)
     cutoff_7d = now - timedelta(days=7)
 
@@ -84,8 +84,11 @@ async def _compute_segment(
     """
     # ── new_user: creado hace menos de 7 días ─────────────────────────────
     created = user.created_at
-    if created and (created.replace(tzinfo=timezone.utc) if created.tzinfo is None else created) > cutoff_7d:
-        return "new_user", 10.0
+    # Normalizar a naive para comparar (DB guarda TIMESTAMP WITHOUT TIME ZONE)
+    if created:
+        created_naive = created.replace(tzinfo=None)
+        if created_naive > cutoff_7d:
+            return "new_user", 10.0
 
     # ── búsquedas en los últimos 30 días ──────────────────────────────────
     searches_30d_result = await db.execute(
@@ -102,7 +105,8 @@ async def _compute_segment(
     last_open_ms: int | None = user.last_app_open
     days_since_open: float = 999.0
     if last_open_ms:
-        last_open_dt = datetime.fromtimestamp(last_open_ms / 1000, tz=timezone.utc)
+        # utcfromtimestamp devuelve naive UTC, compatible con now = datetime.utcnow()
+        last_open_dt = datetime.utcfromtimestamp(last_open_ms / 1000)
         days_since_open = (now - last_open_dt).total_seconds() / 86400
 
     # ── engagement_score: búsquedas + recencia ────────────────────────────

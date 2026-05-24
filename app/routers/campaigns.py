@@ -22,6 +22,7 @@ Calendario / cooldown (para el dashboard):
 import asyncio
 import logging
 from datetime import date, datetime, timedelta, timezone
+# Nota: usar datetime.utcnow() (naive) para comparar con columnas TIMESTAMP WITHOUT TIME ZONE
 
 from fastapi import APIRouter, Depends, HTTPException, Security
 from fastapi.security import APIKeyHeader
@@ -163,7 +164,8 @@ async def get_cooldown_routes(
       - Enviadas como price-drops en los últimos 7 días
     Agregado por ruta, no por usuario.
     """
-    now = datetime.now(tz=timezone.utc)
+    # Usar datetime naive (sin timezone) — las columnas son TIMESTAMP WITHOUT TIME ZONE
+    now = datetime.utcnow()
     campaign_cutoff = now - timedelta(days=14)
     pd_cutoff = now - timedelta(days=7)
 
