@@ -56,6 +56,9 @@ class PriceWatch(Base):
     last_search_best_price: Mapped[float | None] = mapped_column(Float)
     last_selected_price: Mapped[float | None] = mapped_column(Float)
     last_notified_at: Mapped[datetime | None] = mapped_column(DateTime)
+    last_notified_soft_at: Mapped[datetime | None] = mapped_column(DateTime)
+    last_notified_strong_at: Mapped[datetime | None] = mapped_column(DateTime)
+    last_notified_urgent_at: Mapped[datetime | None] = mapped_column(DateTime)
     interest_score: Mapped[int] = mapped_column(Integer, default=0)
     notification_count: Mapped[int] = mapped_column(Integer, default=0)
 
@@ -141,6 +144,7 @@ class SearchEvent(Base):
     event_type: Mapped[str] = mapped_column(String(30))    # "search_result" | "flight_selected"
     event_data: Mapped[str | None] = mapped_column(Text)   # JSON string (airline, date, etc.)
     occurred_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    notified_reengagement_at: Mapped[datetime | None] = mapped_column(DateTime)
 
 
 class NotificationQueue(Base):
@@ -159,3 +163,21 @@ class NotificationQueue(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     sent_at: Mapped[datetime | None] = mapped_column(DateTime)
     error_msg: Mapped[str | None] = mapped_column(Text)
+    drop_level: Mapped[str | None] = mapped_column(String(10))          # soft|strong|urgent
+    notification_type: Mapped[str] = mapped_column(String(20), default="price_drop")
+    opened_at: Mapped[datetime | None] = mapped_column(DateTime)
+
+
+class UserFavorite(Base):
+    """
+    Rutas favoritas sincronizadas desde el Android (FavoriteSSDao).
+    Se hace full-replace en cada POST /api/v1/favorites:
+    se eliminan todas las del usuario y se insertan las nuevas.
+    """
+    __tablename__ = "user_favorites"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(String, index=True)
+    origin_iata: Mapped[str] = mapped_column(String(10))
+    destination_iata: Mapped[str] = mapped_column(String(10))
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

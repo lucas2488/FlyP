@@ -78,3 +78,15 @@ class FlightSelectedEvent(BaseModel):
     trip_type: Optional[str] = "ONE_WAY"
     airline: Optional[str] = None
     departure_date: Optional[str] = None
+
+
+# --- Favoritos ---
+
+class FavoriteRouteDTO(BaseModel):
+    origin: str
+    destination: str
+
+
+class SyncFavoritesRequest(BaseModel):
+    user_id: str
+    routes: list[FavoriteRouteDTO]

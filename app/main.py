@@ -16,8 +16,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
 from app.config import settings
-from app.routers import profile, impact, events, analytics
+from app.routers import profile, impact, events, analytics, notifications, favorites
 from app.services.notification_dispatcher import process_notification_queue
+from app.services.reengagement_service import process_reengagement_queue
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -50,8 +51,18 @@ async def lifespan(app: FastAPI):
         id="notification_dispatcher",
         replace_existing=True,
     )
+    scheduler.add_job(
+        process_reengagement_queue,
+        "interval",
+        minutes=settings.reengagement_check_interval_minutes,
+        id="reengagement_dispatcher",
+        replace_existing=True,
+    )
     scheduler.start()
-    logger.info("APScheduler started (notification dispatcher every 30 min)")
+    logger.info(
+        f"APScheduler started — notification dispatcher every 30 min, "
+        f"reengagement dispatcher every {settings.reengagement_check_interval_minutes} min"
+    )
 
     yield
 
@@ -78,6 +89,8 @@ app.include_router(profile.router, prefix="/api/v1")
 app.include_router(impact.router, prefix="/api/v1")
 app.include_router(events.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
+app.include_router(notifications.router, prefix="/api/v1")
+app.include_router(favorites.router, prefix="/api/v1")
 
 
 @app.get("/api/v1/health")

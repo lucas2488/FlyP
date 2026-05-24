@@ -9,6 +9,7 @@ from app.database import Base
 from app.models import (  # noqa: F401
     UserProfile, PriceWatch, PriceHistory, NotificationLog,
     ImpactLinkLog, AirportCache, PriceSnapshot, SearchEvent, NotificationQueue,
+    UserFavorite,
 )
 from app.config import settings
 
