@@ -74,7 +74,12 @@ async def execute_campaign(campaign_id: int) -> None:
         await db.commit()
 
         try:
-            sent, failed, skipped = await _send_to_segment(db, campaign)
+            if campaign.target_topic:
+                # Campaña de feriado/efeméride → broadcast por FCM topic
+                sent, failed, skipped = await _send_to_topic(db, campaign)
+            else:
+                # Campaña semanal → envío per-user con ruta personalizada
+                sent, failed, skipped = await _send_to_segment(db, campaign)
             campaign.status = "sent"
             campaign.sent_at = datetime.utcnow()
             await db.commit()
@@ -128,6 +133,35 @@ async def _send_to_segment(db: AsyncSession, campaign: Campaign) -> tuple[int, i
     return sent, failed, skipped
 
 
+async def _send_to_topic(db: AsyncSession, campaign: Campaign) -> tuple[int, int, int]:
+    """
+    Envía la campaña como broadcast al FCM topic del campaign (ej: flypromociones_AR).
+    Una sola llamada a Firebase entrega a todos los dispositivos suscritos.
+    Usado para feriados y efemérides — el mensaje es el mismo para todos.
+    """
+    title = campaign.custom_title or "✈️ FlyPromociones"
+    body = campaign.custom_body or ""
+    data = {
+        "type": "campaign",
+        "campaign_id": str(campaign.id),
+        "click_action": "OPEN_SEARCH",
+        "origin_iata": "",
+        "destination_iata": "",
+    }
+    success = firebase_service.send_to_topic(campaign.target_topic, title, body, data)
+    if success:
+        logger.info(
+            f"campaign_engine: topic '{campaign.target_topic}' — "
+            f"mensaje enviado: {title!r}"
+        )
+        return 1, 0, 0
+    else:
+        logger.error(
+            f"campaign_engine: topic send falló para '{campaign.target_topic}'"
+        )
+        return 0, 1, 0
+
+
 async def _send_to_user(db: AsyncSession, campaign: Campaign, user: UserProfile) -> str:
     """
     Envía la notificación a un usuario individual.
@@ -166,27 +200,39 @@ async def _send_to_user(db: AsyncSession, campaign: Campaign, user: UserProfile)
     origin_name = names.get(origin, origin)
     destination_name = names.get(destination, destination)
 
-    # Seleccionar template de campaña
-    template = await _pick_template(db, user, campaign)
-    if not template:
-        cs.status = "skipped"
-        await db.commit()
-        return "skipped"
-
-    # Formatear mensaje
     fmt = {
         "origin": origin_name,
         "destination": destination_name,
         "origin_iata": origin,
         "destination_iata": destination,
     }
-    try:
-        title = template.title_template.format(**fmt)
-        body = template.body_template.format(**fmt)
-    except KeyError:
-        # Template tiene variables que no están disponibles para campaigns
-        title = template.title_template
-        body = template.body_template
+
+    if campaign.custom_body:
+        # Campaña temática (feriado / efeméride / fecha especial):
+        # usar el mensaje personalizado guardado en el draft.
+        # Las variables {origin}/{destination} son opcionales — si el operador
+        # las incluyó en el texto, se sustituyen; si no, el texto va tal cual.
+        title_raw = campaign.custom_title or "✈️ FlyPromociones"
+        try:
+            title = title_raw.format(**fmt)
+            body = campaign.custom_body.format(**fmt)
+        except (KeyError, ValueError):
+            title = title_raw
+            body = campaign.custom_body
+    else:
+        # Campaña genérica (slot semanal sin contexto especial):
+        # elegir template aleatorio del pool drop_level='campaign'.
+        template = await _pick_template(db, user, campaign)
+        if not template:
+            cs.status = "skipped"
+            await db.commit()
+            return "skipped"
+        try:
+            title = template.title_template.format(**fmt)
+            body = template.body_template.format(**fmt)
+        except KeyError:
+            title = template.title_template
+            body = template.body_template
 
     # Enviar FCM
     try:

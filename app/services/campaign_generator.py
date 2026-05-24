@@ -60,49 +60,53 @@ async def generate_month_campaigns(
     for h in official_holidays:
         d = date(year, month, h["dia"])
         if _is_clear(d, existing_dates, drafts_map):
+            body = f"🇦🇷 {h['motivo']}: ¡feriado largo para volar! ✈️"
             drafts_map[d] = {
                 "source": "feriado_oficial",
                 "nombre": f"{h['motivo']} {year}",
-                "mensaje_sugerido": f"🇦🇷 {h['motivo']}: ¡feriado largo para volar! ✈️",
                 "tipo": "feriado",
                 "anticipacion_dias": 3,
+                # Mensaje temático → se persiste en campaign.custom_title/custom_body
+                "custom_title": f"🇦🇷 {h['motivo']} {year}",
+                "custom_body": body,
+                # Topic broadcast: Firebase entrega a todos los suscriptores del topic
+                "target_topic": "flypromociones_AR",
             }
 
     # Fechas especiales de la DB — sobreescriben si más relevantes
     for sd in db_special:
         trigger = sd.fecha - timedelta(days=sd.anticipacion_dias)
-        # Usar la fecha de trigger para el draft, no la fecha del evento
         target = trigger if trigger.month == month else sd.fecha
+        custom_title = _build_title(sd.tipo, sd.nombre)
+        custom_body = sd.mensaje_sugerido or f"✈️ {sd.nombre}: ¡aprovechá para volar!"
+        info = {
+            "source": "special_date",
+            "nombre": f"{sd.nombre} — {segment.replace('_', ' ').title()}",
+            "tipo": sd.tipo,
+            "anticipacion_dias": sd.anticipacion_dias,
+            "special_date_id": sd.id,
+            "custom_title": custom_title,
+            "custom_body": custom_body,
+            "target_topic": "flypromociones_AR",
+        }
         if _is_clear(target, existing_dates, drafts_map):
-            drafts_map[target] = {
-                "source": "special_date",
-                "nombre": f"{sd.nombre} — {segment.replace('_', ' ').title()}",
-                "mensaje_sugerido": sd.mensaje_sugerido or f"✈️ {sd.nombre}: ¡aprovechá para volar!",
-                "tipo": sd.tipo,
-                "anticipacion_dias": sd.anticipacion_dias,
-                "special_date_id": sd.id,
-            }
+            drafts_map[target] = info
         elif sd.fecha.month == month and _is_clear(sd.fecha, existing_dates, drafts_map):
-            # Si el trigger cayó en otro mes, usar la fecha del evento igual
-            drafts_map[sd.fecha] = {
-                "source": "special_date",
-                "nombre": f"{sd.nombre} — {segment.replace('_', ' ').title()}",
-                "mensaje_sugerido": sd.mensaje_sugerido or f"✈️ {sd.nombre}",
-                "tipo": sd.tipo,
-                "anticipacion_dias": sd.anticipacion_dias,
-                "special_date_id": sd.id,
-            }
+            drafts_map[sd.fecha] = info
 
-    # Slots semanales — completan el mes
+    # Slots semanales — completan el mes (sin mensaje personalizado → usa template genérico)
     for slot_date in weekly_slots:
         if _is_clear(slot_date, existing_dates, drafts_map):
             day_name = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][slot_date.weekday()]
             drafts_map[slot_date] = {
                 "source": "weekly_slot",
                 "nombre": f"Campaña semanal {day_name} {slot_date.strftime('%d/%m')} — {segment.replace('_', ' ').title()}",
-                "mensaje_sugerido": "✈️ ¿A dónde querés volar esta semana?",
                 "tipo": "semanal",
                 "anticipacion_dias": 0,
+                # Sin custom_title/custom_body/target_topic → engine usa template genérico per-user
+                "custom_title": None,
+                "custom_body": None,
+                "target_topic": None,
             }
 
     # 6. Crear Campaign drafts en la DB
@@ -115,6 +119,9 @@ async def generate_month_campaigns(
             status="draft",
             scheduled_at=scheduled_dt,
             campaign_type="top_auto",
+            custom_title=info.get("custom_title"),
+            custom_body=info.get("custom_body"),
+            target_topic=info.get("target_topic"),
         )
         db.add(campaign)
         await db.flush()
@@ -127,7 +134,9 @@ async def generate_month_campaigns(
             "campaign_type": campaign.campaign_type,
             "source": info["source"],
             "tipo": info["tipo"],
-            "mensaje_sugerido": info["mensaje_sugerido"],
+            "custom_title": info.get("custom_title"),
+            "custom_body": info.get("custom_body"),
+            "target_topic": info.get("target_topic"),
             "route_origin": None,
             "route_destination": None,
             "category_tag": None,
@@ -211,6 +220,22 @@ async def _get_db_special_dates(db: AsyncSession, year: int, month: int) -> list
         ).order_by(SpecialDate.fecha)
     )
     return list(result.scalars().all())
+
+
+def _build_title(tipo: str, nombre: str) -> str:
+    """
+    Genera un título corto y temático para el push de una fecha especial.
+    El tipo determina el emoji/tono del mensaje.
+    """
+    emoji_map = {
+        "feriado":    "🗓",
+        "comercial":  "🛍",
+        "vacaciones": "☀️",
+    }
+    emoji = emoji_map.get(tipo, "✈️")
+    # Truncar a 50 chars para que quede bien en la notificación
+    nombre_short = nombre[:50] if len(nombre) > 50 else nombre
+    return f"{emoji} {nombre_short}"
 
 
 async def _get_weekly_slots_for_month(db: AsyncSession, year: int, month: int) -> list[date]:

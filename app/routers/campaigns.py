@@ -73,6 +73,9 @@ class CampaignCreate(BaseModel):
     route_destination: str | None = Field(None, max_length=10)
     category_tag: str | None = Field(None, max_length=100)
     scheduled_at: datetime | None = None
+    custom_title: str | None = Field(None, max_length=300)
+    custom_body: str | None = None
+    target_topic: str | None = Field(None, max_length=100)
 
 
 class CampaignUpdate(BaseModel):
@@ -83,6 +86,9 @@ class CampaignUpdate(BaseModel):
     route_destination: str | None = Field(None, max_length=10)
     category_tag: str | None = Field(None, max_length=100)
     scheduled_at: datetime | None = None
+    custom_title: str | None = Field(None, max_length=300)
+    custom_body: str | None = None
+    target_topic: str | None = Field(None, max_length=100)
 
 
 class SpecialDateCreate(BaseModel):
@@ -119,6 +125,9 @@ def _campaign_to_dict(c: Campaign) -> dict:
         "route_origin": c.route_origin,
         "route_destination": c.route_destination,
         "category_tag": c.category_tag,
+        "custom_title": c.custom_title,
+        "custom_body": c.custom_body,
+        "target_topic": c.target_topic,
         "created_at": c.created_at.isoformat() if c.created_at else None,
     }
 
@@ -180,6 +189,9 @@ async def create_campaign(
         route_destination=body.route_destination,
         category_tag=body.category_tag,
         scheduled_at=body.scheduled_at,
+        custom_title=body.custom_title,
+        custom_body=body.custom_body,
+        target_topic=body.target_topic,
     )
     db.add(c)
     await db.commit()
@@ -514,6 +526,12 @@ async def update_campaign(
     if body.scheduled_at is not None:
         c.scheduled_at = body.scheduled_at
         c.status = "scheduled"
+    if body.custom_title is not None:
+        c.custom_title = body.custom_title
+    if body.custom_body is not None:
+        c.custom_body = body.custom_body
+    if body.target_topic is not None:
+        c.target_topic = body.target_topic
 
     await db.commit()
     await db.refresh(c)

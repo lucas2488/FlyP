@@ -230,6 +230,14 @@ class Campaign(Base):
     route_origin: Mapped[str | None] = mapped_column(String(10))
     route_destination: Mapped[str | None] = mapped_column(String(10))
     category_tag: Mapped[str | None] = mapped_column(String(100))
+    # Mensaje personalizado para feriados/efemérides/fechas especiales.
+    # Si está presente → el engine lo usa directamente.
+    # Si es None → el engine elige un template genérico (drop_level='campaign').
+    custom_title: Mapped[str | None] = mapped_column(String(300))
+    custom_body: Mapped[str | None] = mapped_column(Text)
+    # Si está seteado → enviar como FCM topic broadcast (1 llamada, todos los suscriptores).
+    # Si es None     → envío per-user con ruta personalizada.
+    target_topic: Mapped[str | None] = mapped_column(String(100))
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
