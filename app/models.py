@@ -173,8 +173,9 @@ class UserFavorite(Base):
     Rutas favoritas sincronizadas desde el Android (FavoriteSSDao).
     Se hace full-replace en cada POST /api/v1/favorites:
     se eliminan todas las del usuario y se insertan las nuevas.
+    Nota: usa flyp_user_favorites para evitar colisión con tablas de n8n.
     """
-    __tablename__ = "user_favorites"
+    __tablename__ = "flyp_user_favorites"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[str] = mapped_column(String, index=True)
