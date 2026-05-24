@@ -16,14 +16,14 @@ El backend fue construido para reemplazar un servidor n8n que se cayó y perdió
 
 ### Backend (`FlyBackend`) — Python/FastAPI
 - **Repo GitHub:** `github.com/lucas2488/FlyP`
-- **Servidor:** VPS Ubuntu ARM64 — `178.105.195.245`
+- **Servidor:** VPS Ubuntu ARM64 (IP interna — consultar al equipo)
 - **Docker:** FastAPI + PostgreSQL 16 + n8n + Nginx + Certbot
 - **Dominio API:** `https://api.flypromociones.com`
 
 ### Dashboard de Marketing (`FlyMarketingDashboard`) — React/Vite/TS
 - **Repo GitHub:** `github.com/lucas2488/FlyMarketingDashboard`
-- **Deploy:** Firebase Hosting — `https://admob-app-id-2456247859.web.app`
-- **API Key dashboard:** `29d06217db3e21c5ad62dc76ac6ec6914f9a67ced22c6add655335ce8a29407b`
+- **Deploy:** Firebase Hosting (URL interna — consultar al equipo)
+- **API Key dashboard:** configurada en `.env` del servidor — NO compartir en texto plano
 
 ### App Android (`FlyAndroid`)
 - Conecta a `https://api.flypromociones.com/` via Retrofit
@@ -122,8 +122,8 @@ app/
 DB_USER / DB_PASSWORD / DB_NAME
 
 # API
-API_SECRET_KEY
-ANALYTICS_API_KEY=29d06217db3e21c5ad62dc76ac6ec6914f9a67ced22c6add655335ce8a29407b
+API_SECRET_KEY=<secret>
+ANALYTICS_API_KEY=<secret — ver .env del servidor>
 CORS_ORIGINS=*
 
 # Notificaciones
