@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     reengagement_window_max_minutes: int = 25   # y como máximo N min
     max_reengagements_per_user_per_day: int = 1
 
+    # OpenAI — para generación de templates con IA
+    openai_api_key: str = ""
+    openai_model: str = "gpt-4o-mini"
+
     class Config:
         env_file = ".env"
         extra = "ignore"

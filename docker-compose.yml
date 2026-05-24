@@ -64,6 +64,8 @@ services:
       FIREBASE_CREDENTIALS_PATH: /app/firebase-service-account.json
       NOTIFICATION_COOLDOWN_HOURS: 48
       MAX_NOTIFICATIONS_PER_USER_PER_DAY: 2
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANALYTICS_API_KEY: ${ANALYTICS_API_KEY}
     volumes:
       - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     depends_on:

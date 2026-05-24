@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
 from app.config import settings
-from app.routers import profile, impact, events, analytics, notifications, favorites
+from app.routers import profile, impact, events, analytics, notifications, favorites, admin
 from app.services.notification_dispatcher import process_notification_queue
 from app.services.reengagement_service import process_reengagement_queue
 
@@ -91,6 +91,7 @@ app.include_router(events.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
 app.include_router(favorites.router, prefix="/api/v1")
+app.include_router(admin.router, prefix="/api/v1")
 
 
 @app.get("/api/v1/health")

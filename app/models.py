@@ -182,3 +182,26 @@ class UserFavorite(Base):
     origin_iata: Mapped[str] = mapped_column(String(10))
     destination_iata: Mapped[str] = mapped_column(String(10))
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class NotificationTemplate(Base):
+    """
+    Templates pre-generados de notificaciones con jerga local por país.
+    Se selecciona uno al azar al momento del envío, filtrando por
+    selected_country del usuario y drop_level de la notificación.
+
+    country_code: AR | MX | CO | CL | ES | * (genérico, fallback)
+    drop_level:   soft | strong | urgent | reengagement
+
+    Variables disponibles en los templates:
+      {origin}, {destination}, {pct}, {price}, {currency}
+    """
+    __tablename__ = "notification_templates"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    country_code: Mapped[str] = mapped_column(String(5), index=True)
+    drop_level: Mapped[str] = mapped_column(String(20))
+    title_template: Mapped[str] = mapped_column(Text)
+    body_template: Mapped[str] = mapped_column(Text)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
