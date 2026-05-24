@@ -11,7 +11,6 @@ logging.basicConfig(
 import firebase_admin
 from firebase_admin import credentials
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from sqlalchemy import text
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -26,21 +25,11 @@ scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 1. Crear tablas nuevas (no toca las existentes)
+    # Crear tablas que no existan (safety net para instalaciones nuevas).
+    # Las migraciones de esquema las maneja Alembic (corre antes del startup vía Dockerfile).
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-
-        # 2. Migrar columnas nuevas en price_watches (idempotente)
-        migrations = [
-            "ALTER TABLE price_watches ADD COLUMN IF NOT EXISTS last_search_best_price FLOAT",
-            "ALTER TABLE price_watches ADD COLUMN IF NOT EXISTS last_selected_price FLOAT",
-            "ALTER TABLE price_watches ADD COLUMN IF NOT EXISTS last_notified_at TIMESTAMP WITH TIME ZONE",
-            "ALTER TABLE price_watches ADD COLUMN IF NOT EXISTS interest_score INTEGER DEFAULT 0",
-            "ALTER TABLE price_watches ADD COLUMN IF NOT EXISTS notification_count INTEGER DEFAULT 0",
-        ]
-        for migration in migrations:
-            await conn.execute(text(migration))
-        logger.info("DB migrations applied")
+    logger.info("DB ready")
 
     # 3. Firebase Admin SDK
     if settings.firebase_credentials_path:

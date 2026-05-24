@@ -32,6 +32,9 @@ class UserProfileData(BaseModel):
     skyscannerCurrency: Optional[str] = None
     skyscannerLocale: Optional[str] = None
     skyscannerMarket: Optional[str] = None
+    # Segmentación calculada por el Android
+    userSegment: Optional[str] = None       # heavy_searcher | casual | inactive | new_user | …
+    engagementScore: Optional[float] = None  # 0.0 – 100.0
 
 
 class WebhookResponse(BaseModel):

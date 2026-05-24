@@ -50,6 +50,8 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
             total_flight_status_clicks=data.totalFlightStatusClicks,
             total_checkin_clicks=data.totalCheckinClicks,
             skyscanner_headers=skyscanner_headers,
+            user_segment=data.userSegment,
+            engagement_score=data.engagementScore,
         )
         db.add(profile)
     else:
@@ -79,6 +81,10 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
         profile.total_checkin_clicks = data.totalCheckinClicks
         if skyscanner_headers:
             profile.skyscanner_headers = skyscanner_headers
+        if data.userSegment is not None:
+            profile.user_segment = data.userSegment
+        if data.engagementScore is not None:
+            profile.engagement_score = data.engagementScore
 
     # Si hay búsqueda, crear/activar price watch + cachear aeropuertos
     if data.lastSearchOriginIata and data.lastSearchDestinationIata:

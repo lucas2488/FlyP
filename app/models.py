@@ -33,6 +33,9 @@ class UserProfile(Base):
     total_flight_status_clicks: Mapped[int] = mapped_column(Integer, default=0)
     total_checkin_clicks: Mapped[int] = mapped_column(Integer, default=0)
     skyscanner_headers: Mapped[str | None] = mapped_column(Text)  # JSON string
+    # Segmentación — calculada por el Android, enviada en cada POST /profile
+    user_segment: Mapped[str | None] = mapped_column(String(50))   # heavy_searcher | casual | inactive | …
+    engagement_score: Mapped[float | None] = mapped_column(Float)  # 0.0 – 100.0
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
