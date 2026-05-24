@@ -13,7 +13,9 @@ Lógica de `generate_month_campaigns(year, month, db)`:
 Devuelve lista de dict (no ORM objects) para serialización limpia.
 """
 
+import asyncio
 import calendar
+import json
 import logging
 from datetime import date, datetime, timedelta
 
@@ -56,29 +58,51 @@ async def generate_month_campaigns(
     # 5. Construir el mapa de borradores: date → draft_info
     drafts_map: dict[date, dict] = {}
 
-    # Feriados oficiales — prioridad alta
-    for h in official_holidays:
-        d = date(year, month, h["dia"])
-        if _is_clear(d, existing_dates, drafts_map):
-            body = f"🇦🇷 {h['motivo']}: ¡feriado largo para volar! ✈️"
+    # Feriados oficiales — prioridad alta.
+    # Nolaborables no trae mensaje propio → siempre generamos con IA.
+    # Hacemos las llamadas en paralelo para no bloquear por cada feriado.
+    feriado_tasks = [
+        (h, date(year, month, h["dia"]))
+        for h in official_holidays
+    ]
+    feriado_tasks = [(h, d) for h, d in feriado_tasks if _is_clear(d, existing_dates, drafts_map)]
+
+    if feriado_tasks:
+        ai_results = await asyncio.gather(
+            *[_generate_message_with_ai(h["motivo"], "feriado") for h, _ in feriado_tasks],
+            return_exceptions=True,
+        )
+        for (h, d), ai in zip(feriado_tasks, ai_results):
+            if isinstance(ai, Exception):
+                ai = (None, None)
+            ai_title, ai_body = ai
             drafts_map[d] = {
                 "source": "feriado_oficial",
                 "nombre": f"{h['motivo']} {year}",
                 "tipo": "feriado",
                 "anticipacion_dias": 3,
-                # Mensaje temático → se persiste en campaign.custom_title/custom_body
-                "custom_title": f"🇦🇷 {h['motivo']} {year}",
-                "custom_body": body,
-                # Topic broadcast: Firebase entrega a todos los suscriptores del topic
+                "custom_title": ai_title or f"🇦🇷 {h['motivo']}",
+                "custom_body":  ai_body  or f"🇦🇷 {h['motivo']}: ¡feriado largo para volar! ✈️",
                 "target_topic": "flypromociones_AR",
             }
 
-    # Fechas especiales de la DB — sobreescriben si más relevantes
+    # Fechas especiales de la DB.
+    # Si ya tienen mensaje_sugerido → lo usamos directamente.
+    # Si no tienen mensaje → generamos con IA.
     for sd in db_special:
         trigger = sd.fecha - timedelta(days=sd.anticipacion_dias)
         target = trigger if trigger.month == month else sd.fecha
-        custom_title = _build_title(sd.tipo, sd.nombre)
-        custom_body = sd.mensaje_sugerido or f"✈️ {sd.nombre}: ¡aprovechá para volar!"
+
+        if sd.mensaje_sugerido:
+            # Mensaje ya definido por el operador → respetarlo
+            custom_title = _build_title(sd.tipo, sd.nombre)
+            custom_body  = sd.mensaje_sugerido
+        else:
+            # Sin mensaje → IA genera con jerga argentina
+            ai_title, ai_body = await _generate_message_with_ai(sd.nombre, sd.tipo)
+            custom_title = ai_title or _build_title(sd.tipo, sd.nombre)
+            custom_body  = ai_body  or f"✈️ {sd.nombre}: ¡aprovechá para volar!"
+
         info = {
             "source": "special_date",
             "nombre": f"{sd.nombre} — {segment.replace('_', ' ').title()}",
@@ -86,7 +110,7 @@ async def generate_month_campaigns(
             "anticipacion_dias": sd.anticipacion_dias,
             "special_date_id": sd.id,
             "custom_title": custom_title,
-            "custom_body": custom_body,
+            "custom_body":  custom_body,
             "target_topic": "flypromociones_AR",
         }
         if _is_clear(target, existing_dates, drafts_map):
@@ -220,6 +244,60 @@ async def _get_db_special_dates(db: AsyncSession, year: int, month: int) -> list
         ).order_by(SpecialDate.fecha)
     )
     return list(result.scalars().all())
+
+
+async def _generate_message_with_ai(event_name: str, tipo: str) -> tuple[str | None, str | None]:
+    """
+    Genera título + cuerpo de notificación push usando OpenAI.
+    Se llama solo cuando el evento no tiene mensaje_sugerido en la DB.
+
+    Devuelve (None, None) si:
+      - OPENAI_API_KEY no está configurada
+      - La llamada falla por cualquier motivo (timeout, error de red, etc.)
+    El caller debe tener un fallback hardcodeado.
+    """
+    from app.config import settings
+    if not settings.openai_api_key:
+        logger.debug("campaign_generator: OPENAI_API_KEY no configurada, saltando generación IA")
+        return None, None
+
+    tipo_label = {
+        "feriado":    "feriado nacional",
+        "comercial":  "fecha comercial importante",
+        "vacaciones": "período de vacaciones",
+    }.get(tipo, "fecha especial")
+
+    prompt = (
+        f'Sos el community manager de FlyPromociones, una app argentina de alertas de vuelos baratos.\n'
+        f'Generá un mensaje de notificación push para la fecha: "{event_name}" ({tipo_label}).\n\n'
+        f'Reglas:\n'
+        f'- Título: máximo 45 caracteres, con emoji temático, jerga argentina, que enganche\n'
+        f'- Cuerpo: máximo 90 caracteres, propuesta clara (volar barato / aprovechar el feriado), jerga argentina\n'
+        f'- Tono: entusiasta, coloquial, argentino\n'
+        f'- No incluyas nombres de aerolíneas ni precios inventados\n\n'
+        f'Respondé SOLO con JSON: {{"title": "...", "body": "..."}}'
+    )
+
+    try:
+        from openai import AsyncOpenAI
+        client = AsyncOpenAI(api_key=settings.openai_api_key)
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=120,
+            temperature=0.85,
+            response_format={"type": "json_object"},
+        )
+        raw = response.choices[0].message.content or "{}"
+        data = json.loads(raw)
+        title = (data.get("title") or "").strip()[:45] or None
+        body  = (data.get("body")  or "").strip()[:90] or None
+        logger.info(f"campaign_generator: IA generó mensaje para '{event_name}': {title!r}")
+        return title, body
+
+    except Exception as exc:
+        logger.warning(f"campaign_generator: OpenAI falló para '{event_name}': {exc}")
+        return None, None
 
 
 def _build_title(tipo: str, nombre: str) -> str:
