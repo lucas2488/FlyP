@@ -163,9 +163,10 @@ class NotificationQueue(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     sent_at: Mapped[datetime | None] = mapped_column(DateTime)
     error_msg: Mapped[str | None] = mapped_column(Text)
-    drop_level: Mapped[str | None] = mapped_column(String(10))          # soft|strong|urgent
+    drop_level: Mapped[str | None] = mapped_column(String(10))          # soft|strong|urgent|welcome
     notification_type: Mapped[str] = mapped_column(String(20), default="price_drop")
     opened_at: Mapped[datetime | None] = mapped_column(DateTime)
+    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime)     # None = enviar de inmediato
 
 
 class UserFavorite(Base):

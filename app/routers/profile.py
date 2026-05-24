@@ -5,6 +5,7 @@ from sqlalchemy import select
 from app.database import get_db
 from app.models import UserProfile, PriceWatch, AirportCache
 from app.schemas import UserProfileData, WebhookResponse
+from app.services.welcome_service import enqueue_welcome_notification
 
 router = APIRouter()
 
@@ -54,6 +55,8 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
             engagement_score=data.engagementScore,
         )
         db.add(profile)
+        # Encolar notificación de bienvenida (se enviará 24h después)
+        await enqueue_welcome_notification(db, data.userId)
     else:
         profile.fcm_token = data.fcmToken
         profile.app_version = data.appVersion

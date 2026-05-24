@@ -1,8 +1,8 @@
 import logging
 import random
-from datetime import datetime, timezone
+from datetime import datetime
 
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import AsyncSessionLocal
@@ -125,10 +125,20 @@ async def process_notification_queue() -> None:
     Crea su propia sesión DB. Procesa hasta batch_size items pending.
     """
     logger.info("notification_dispatcher: processing queue...")
+    now = datetime.utcnow()
     async with AsyncSessionLocal() as db:
         result = await db.execute(
             select(NotificationQueue)
-            .where(NotificationQueue.status == "pending")
+            .where(
+                NotificationQueue.status == "pending",
+                # welcomes se procesan en welcome_service, no aquí
+                NotificationQueue.notification_type != "welcome",
+                # respetar scheduled_at si está seteado (ej: items con delay futuro)
+                or_(
+                    NotificationQueue.scheduled_at.is_(None),
+                    NotificationQueue.scheduled_at <= now,
+                ),
+            )
             .order_by(NotificationQueue.created_at)
             .limit(settings.notification_queue_batch_size)
         )
@@ -163,7 +173,7 @@ async def _process_single(db: AsyncSession, item: NotificationQueue) -> None:
 
     # Verificar max notificaciones por día
     from sqlalchemy import func as sqlfunc
-    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     count_result = await db.execute(
         select(sqlfunc.count(NotificationQueue.id)).where(
             and_(
@@ -193,7 +203,7 @@ async def _process_single(db: AsyncSession, item: NotificationQueue) -> None:
     title, body, data = _build_notification_payload(item, template, origin_name, destination_name)
     success = firebase_service.send_notification(user.fcm_token, title, body, data)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     if success:
         item.status = "sent"
         item.sent_at = now
