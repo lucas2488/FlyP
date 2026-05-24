@@ -246,6 +246,28 @@ class CampaignSend(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
+class SpecialDate(Base):
+    """
+    Fechas especiales para el generador de campañas del mes.
+    Distinto de campaign_calendar (que controla cuándo se disparan):
+    este modelo describe QUÉ fechas son especiales y sugiere el mensaje.
+
+    tipo: 'feriado' | 'comercial' | 'vacaciones'
+    anticipacion_dias: días antes de la fecha en que se debe notificar
+    mensaje_sugerido: texto de ayuda para el creador de campañas
+    """
+    __tablename__ = "special_dates"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nombre: Mapped[str] = mapped_column(String(200))
+    fecha: Mapped[date] = mapped_column(Date, index=True)
+    tipo: Mapped[str] = mapped_column(String(30), default="feriado")  # feriado | comercial | vacaciones
+    anticipacion_dias: Mapped[int] = mapped_column(Integer, default=3)
+    mensaje_sugerido: Mapped[str | None] = mapped_column(Text)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
 class CampaignCalendar(Base):
     """
     Calendario de slots de envío de campañas.

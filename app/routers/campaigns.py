@@ -3,6 +3,10 @@ Router de campañas de marketing.
 
 Todos los endpoints requieren X-API-Key (mismo key que analytics/admin).
 
+Regla de orden de rutas:
+  Los paths estáticos (calendar, cooldown-routes, special-dates, generate-month)
+  DEBEN estar antes que /{campaign_id} porque FastAPI resuelve por orden de registro.
+
 Endpoints CRUD:
   GET    /admin/campaigns                      — listar (filtros: status, segment)
   POST   /admin/campaigns                      — crear (draft)
@@ -17,6 +21,17 @@ Acciones:
 Calendario / cooldown (para el dashboard):
   GET    /admin/campaigns/calendar             — próximas 4 semanas + fechas especiales próximas
   GET    /admin/campaigns/cooldown-routes      — rutas en cooldown (14d campaign + 7d price-drop)
+
+Fechas especiales:
+  GET    /admin/campaigns/special-dates        — listar (filtros: year, month, tipo, activo)
+  POST   /admin/campaigns/special-dates        — crear
+  PATCH  /admin/campaigns/special-dates/{id}   — actualizar
+  DELETE /admin/campaigns/special-dates/{id}   — eliminar
+
+Generador mensual:
+  POST   /admin/campaigns/generate-month       — genera borradores del mes (requiere ?year=&month=)
+                                                 Llama a nolaborables.com.ar, cruza con special_dates
+                                                 y slots Lun/Mié/Vie. Crea drafts SIN confirmar.
 """
 
 import asyncio
@@ -27,12 +42,12 @@ from datetime import date, datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, Security
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select, delete
+from sqlalchemy import extract, func, select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.database import get_db
-from app.models import Campaign, CampaignCalendar, CampaignSend, NotificationLog, UserProfile
+from app.models import Campaign, CampaignCalendar, CampaignSend, NotificationLog, SpecialDate, UserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +85,24 @@ class CampaignUpdate(BaseModel):
     scheduled_at: datetime | None = None
 
 
+class SpecialDateCreate(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=200)
+    fecha: date
+    tipo: str = Field("feriado", pattern="^(feriado|comercial|vacaciones)$")
+    anticipacion_dias: int = Field(3, ge=0, le=60)
+    mensaje_sugerido: str | None = None
+    activo: bool = True
+
+
+class SpecialDateUpdate(BaseModel):
+    nombre: str | None = Field(None, min_length=2, max_length=200)
+    fecha: date | None = None
+    tipo: str | None = Field(None, pattern="^(feriado|comercial|vacaciones)$")
+    anticipacion_dias: int | None = Field(None, ge=0, le=60)
+    mensaje_sugerido: str | None = None
+    activo: bool | None = None
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -90,149 +123,22 @@ def _campaign_to_dict(c: Campaign) -> dict:
     }
 
 
-# ---------------------------------------------------------------------------
-# GET /admin/campaigns/calendar  ← ANTES que /{id} para que no haya conflicto
-# ---------------------------------------------------------------------------
-
-@router.get("/calendar")
-async def get_campaign_calendar(
-    db: AsyncSession = Depends(get_db),
-    _: str = Depends(verify_api_key),
-) -> dict:
-    """
-    Devuelve los slots del calendario para las próximas 4 semanas.
-    Incluye slots semanales y fechas especiales próximas (30 días).
-    """
-    today = date.today()
-    result = await db.execute(
-        select(CampaignCalendar).where(CampaignCalendar.is_active.is_(True))
-    )
-    slots = result.scalars().all()
-
-    weekly = []
-    special = []
-    cutoff_30d = today + timedelta(days=30)
-
-    for slot in slots:
-        if slot.slot_type == "weekly":
-            # Calcular próxima ocurrencia
-            days_ahead = (slot.day_of_week - today.weekday()) % 7
-            next_date = today + timedelta(days=days_ahead)
-            weekly.append({
-                "id": slot.id,
-                "slot_type": "weekly",
-                "day_of_week": slot.day_of_week,
-                "send_hour_ar": slot.send_hour_ar,
-                "label": slot.label,
-                "next_date": next_date.isoformat(),
-            })
-        elif slot.slot_type == "special" and slot.special_date:
-            trigger = slot.special_date - timedelta(days=slot.advance_days)
-            if trigger >= today and slot.special_date <= cutoff_30d + timedelta(days=60):
-                special.append({
-                    "id": slot.id,
-                    "slot_type": "special",
-                    "special_date": slot.special_date.isoformat(),
-                    "trigger_date": trigger.isoformat(),
-                    "send_hour_ar": slot.send_hour_ar,
-                    "label": slot.label,
-                    "advance_days": slot.advance_days,
-                })
-
-    # Ordenar especiales por fecha
-    special.sort(key=lambda x: x["trigger_date"])
-
+def _sd_to_dict(sd: SpecialDate) -> dict:
     return {
-        "weekly_slots": weekly,
-        "upcoming_special": special[:10],  # max 10 fechas especiales próximas
-        "generated_at": datetime.now(tz=timezone.utc).isoformat(),
+        "id": sd.id,
+        "nombre": sd.nombre,
+        "fecha": sd.fecha.isoformat() if sd.fecha else None,
+        "tipo": sd.tipo,
+        "anticipacion_dias": sd.anticipacion_dias,
+        "mensaje_sugerido": sd.mensaje_sugerido,
+        "activo": sd.activo,
+        "created_at": sd.created_at.isoformat() if sd.created_at else None,
     }
 
 
-# ---------------------------------------------------------------------------
-# GET /admin/campaigns/cooldown-routes  ← ANTES que /{id}
-# ---------------------------------------------------------------------------
-
-@router.get("/cooldown-routes")
-async def get_cooldown_routes(
-    db: AsyncSession = Depends(get_db),
-    _: str = Depends(verify_api_key),
-) -> list[dict]:
-    """
-    Rutas que están en cooldown (no disponibles esta semana):
-      - Enviadas como campañas en los últimos 14 días
-      - Enviadas como price-drops en los últimos 7 días
-    Agregado por ruta, no por usuario.
-    """
-    # Usar datetime naive (sin timezone) — las columnas son TIMESTAMP WITHOUT TIME ZONE
-    now = datetime.utcnow()
-    campaign_cutoff = now - timedelta(days=14)
-    pd_cutoff = now - timedelta(days=7)
-
-    # Rutas de campañas recientes
-    cs_result = await db.execute(
-        select(
-            Campaign.route_origin,
-            Campaign.route_destination,
-            func.max(CampaignSend.sent_at).label("last_sent"),
-        )
-        .join(CampaignSend, CampaignSend.campaign_id == Campaign.id)
-        .where(
-            CampaignSend.status == "sent",
-            CampaignSend.sent_at >= campaign_cutoff,
-            Campaign.route_origin.isnot(None),
-            Campaign.route_destination.isnot(None),
-        )
-        .group_by(Campaign.route_origin, Campaign.route_destination)
-    )
-
-    cooldown_map: dict[tuple, dict] = {}
-    for row in cs_result.all():
-        key = (row.route_origin, row.route_destination)
-        last_sent = row.last_sent
-        releases = last_sent + timedelta(days=14)
-        days_remaining = max(0, (releases.date() - now.date()).days)
-        cooldown_map[key] = {
-            "origin": row.route_origin,
-            "destination": row.route_destination,
-            "cooldown_type": "campaign",
-            "last_sent_at": last_sent.isoformat() if last_sent else None,
-            "releases_at": releases.isoformat(),
-            "days_remaining": days_remaining,
-        }
-
-    # Rutas de price-drops recientes
-    pd_result = await db.execute(
-        select(
-            NotificationLog.origin,
-            NotificationLog.destination,
-            func.max(NotificationLog.sent_at).label("last_sent"),
-        )
-        .where(
-            NotificationLog.type != "reengagement",
-            NotificationLog.sent_at >= pd_cutoff,
-            NotificationLog.origin.isnot(None),
-            NotificationLog.destination.isnot(None),
-        )
-        .group_by(NotificationLog.origin, NotificationLog.destination)
-    )
-    for row in pd_result.all():
-        key = (row.origin, row.destination)
-        if key not in cooldown_map:
-            last_sent = row.last_sent
-            releases = last_sent + timedelta(days=7)
-            days_remaining = max(0, (releases.date() - now.date()).days)
-            cooldown_map[key] = {
-                "origin": row.origin,
-                "destination": row.destination,
-                "cooldown_type": "price_drop",
-                "last_sent_at": last_sent.isoformat() if last_sent else None,
-                "releases_at": releases.isoformat(),
-                "days_remaining": days_remaining,
-            }
-
-    return sorted(cooldown_map.values(), key=lambda x: x["days_remaining"], reverse=True)
-
+# ===========================================================================
+# RUTAS ESTÁTICAS — deben ir ANTES que /{campaign_id}
+# ===========================================================================
 
 # ---------------------------------------------------------------------------
 # GET /admin/campaigns
@@ -280,6 +186,285 @@ async def create_campaign(
     await db.refresh(c)
     return _campaign_to_dict(c)
 
+
+# ---------------------------------------------------------------------------
+# GET /admin/campaigns/calendar
+# ---------------------------------------------------------------------------
+
+@router.get("/calendar")
+async def get_campaign_calendar(
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    """
+    Devuelve los slots del calendario para las próximas 4 semanas.
+    Incluye slots semanales y fechas especiales próximas (30 días).
+    """
+    today = date.today()
+    result = await db.execute(
+        select(CampaignCalendar).where(CampaignCalendar.is_active.is_(True))
+    )
+    slots = result.scalars().all()
+
+    weekly = []
+    special = []
+    cutoff_30d = today + timedelta(days=30)
+
+    for slot in slots:
+        if slot.slot_type == "weekly":
+            days_ahead = (slot.day_of_week - today.weekday()) % 7
+            next_date = today + timedelta(days=days_ahead)
+            weekly.append({
+                "id": slot.id,
+                "slot_type": "weekly",
+                "day_of_week": slot.day_of_week,
+                "send_hour_ar": slot.send_hour_ar,
+                "label": slot.label,
+                "next_date": next_date.isoformat(),
+            })
+        elif slot.slot_type == "special" and slot.special_date:
+            trigger = slot.special_date - timedelta(days=slot.advance_days)
+            if trigger >= today and slot.special_date <= cutoff_30d + timedelta(days=60):
+                special.append({
+                    "id": slot.id,
+                    "slot_type": "special",
+                    "special_date": slot.special_date.isoformat(),
+                    "trigger_date": trigger.isoformat(),
+                    "send_hour_ar": slot.send_hour_ar,
+                    "label": slot.label,
+                    "advance_days": slot.advance_days,
+                })
+
+    special.sort(key=lambda x: x["trigger_date"])
+
+    return {
+        "weekly_slots": weekly,
+        "upcoming_special": special[:10],
+        "generated_at": datetime.utcnow().isoformat(),
+    }
+
+
+# ---------------------------------------------------------------------------
+# GET /admin/campaigns/cooldown-routes
+# ---------------------------------------------------------------------------
+
+@router.get("/cooldown-routes")
+async def get_cooldown_routes(
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> list[dict]:
+    """
+    Rutas que están en cooldown (no disponibles esta semana):
+      - Enviadas como campañas en los últimos 14 días
+      - Enviadas como price-drops en los últimos 7 días
+    """
+    now = datetime.utcnow()
+    campaign_cutoff = now - timedelta(days=14)
+    pd_cutoff = now - timedelta(days=7)
+
+    cs_result = await db.execute(
+        select(
+            Campaign.route_origin,
+            Campaign.route_destination,
+            func.max(CampaignSend.sent_at).label("last_sent"),
+        )
+        .join(CampaignSend, CampaignSend.campaign_id == Campaign.id)
+        .where(
+            CampaignSend.status == "sent",
+            CampaignSend.sent_at >= campaign_cutoff,
+            Campaign.route_origin.isnot(None),
+            Campaign.route_destination.isnot(None),
+        )
+        .group_by(Campaign.route_origin, Campaign.route_destination)
+    )
+
+    cooldown_map: dict[tuple, dict] = {}
+    for row in cs_result.all():
+        key = (row.route_origin, row.route_destination)
+        last_sent = row.last_sent
+        releases = last_sent + timedelta(days=14)
+        days_remaining = max(0, (releases.date() - now.date()).days)
+        cooldown_map[key] = {
+            "origin": row.route_origin,
+            "destination": row.route_destination,
+            "cooldown_type": "campaign",
+            "last_sent_at": last_sent.isoformat() if last_sent else None,
+            "releases_at": releases.isoformat(),
+            "days_remaining": days_remaining,
+        }
+
+    pd_result = await db.execute(
+        select(
+            NotificationLog.origin,
+            NotificationLog.destination,
+            func.max(NotificationLog.sent_at).label("last_sent"),
+        )
+        .where(
+            NotificationLog.type != "reengagement",
+            NotificationLog.sent_at >= pd_cutoff,
+            NotificationLog.origin.isnot(None),
+            NotificationLog.destination.isnot(None),
+        )
+        .group_by(NotificationLog.origin, NotificationLog.destination)
+    )
+    for row in pd_result.all():
+        key = (row.origin, row.destination)
+        if key not in cooldown_map:
+            last_sent = row.last_sent
+            releases = last_sent + timedelta(days=7)
+            days_remaining = max(0, (releases.date() - now.date()).days)
+            cooldown_map[key] = {
+                "origin": row.origin,
+                "destination": row.destination,
+                "cooldown_type": "price_drop",
+                "last_sent_at": last_sent.isoformat() if last_sent else None,
+                "releases_at": releases.isoformat(),
+                "days_remaining": days_remaining,
+            }
+
+    return sorted(cooldown_map.values(), key=lambda x: x["days_remaining"], reverse=True)
+
+
+# ---------------------------------------------------------------------------
+# GET /admin/campaigns/special-dates
+# ---------------------------------------------------------------------------
+
+@router.get("/special-dates")
+async def list_special_dates(
+    year: int | None = None,
+    month: int | None = None,
+    tipo: str | None = None,
+    activo: bool | None = None,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> list[dict]:
+    """Lista fechas especiales con filtros opcionales."""
+    q = select(SpecialDate).order_by(SpecialDate.fecha)
+    if year is not None:
+        q = q.where(extract("year", SpecialDate.fecha) == year)
+    if month is not None:
+        q = q.where(extract("month", SpecialDate.fecha) == month)
+    if tipo is not None:
+        q = q.where(SpecialDate.tipo == tipo)
+    if activo is not None:
+        q = q.where(SpecialDate.activo.is_(activo))
+
+    result = await db.execute(q)
+    return [_sd_to_dict(sd) for sd in result.scalars().all()]
+
+
+# ---------------------------------------------------------------------------
+# POST /admin/campaigns/special-dates
+# ---------------------------------------------------------------------------
+
+@router.post("/special-dates", status_code=201)
+async def create_special_date(
+    body: SpecialDateCreate,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    sd = SpecialDate(
+        nombre=body.nombre,
+        fecha=body.fecha,
+        tipo=body.tipo,
+        anticipacion_dias=body.anticipacion_dias,
+        mensaje_sugerido=body.mensaje_sugerido,
+        activo=body.activo,
+    )
+    db.add(sd)
+    await db.commit()
+    await db.refresh(sd)
+    return _sd_to_dict(sd)
+
+
+# ---------------------------------------------------------------------------
+# PATCH /admin/campaigns/special-dates/{sd_id}
+# ---------------------------------------------------------------------------
+
+@router.patch("/special-dates/{sd_id}")
+async def update_special_date(
+    sd_id: int,
+    body: SpecialDateUpdate,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    sd = await db.get(SpecialDate, sd_id)
+    if not sd:
+        raise HTTPException(404, "special_date_not_found")
+    if body.nombre is not None:
+        sd.nombre = body.nombre
+    if body.fecha is not None:
+        sd.fecha = body.fecha
+    if body.tipo is not None:
+        sd.tipo = body.tipo
+    if body.anticipacion_dias is not None:
+        sd.anticipacion_dias = body.anticipacion_dias
+    if body.mensaje_sugerido is not None:
+        sd.mensaje_sugerido = body.mensaje_sugerido
+    if body.activo is not None:
+        sd.activo = body.activo
+    await db.commit()
+    await db.refresh(sd)
+    return _sd_to_dict(sd)
+
+
+# ---------------------------------------------------------------------------
+# DELETE /admin/campaigns/special-dates/{sd_id}
+# ---------------------------------------------------------------------------
+
+@router.delete("/special-dates/{sd_id}")
+async def delete_special_date(
+    sd_id: int,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    sd = await db.get(SpecialDate, sd_id)
+    if not sd:
+        raise HTTPException(404, "special_date_not_found")
+    await db.delete(sd)
+    await db.commit()
+    return {"success": True, "deleted_id": sd_id}
+
+
+# ---------------------------------------------------------------------------
+# POST /admin/campaigns/generate-month
+# ---------------------------------------------------------------------------
+
+@router.post("/generate-month", status_code=201)
+async def generate_month(
+    year: int,
+    month: int,
+    segment: str = "heavy_searcher",
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    """
+    Genera borradores de campañas para el mes indicado.
+    Cruza feriados oficiales (nolaborables.com.ar), special_dates de la DB
+    y slots semanales Lun/Mié/Vie.
+    Crea Campaign con status='draft' — NO confirma ni envía nada.
+    El operador revisa y descarta/aprueba desde el dashboard.
+    """
+    if not (1 <= month <= 12):
+        raise HTTPException(400, "month_must_be_1_to_12")
+    if year < 2026 or year > 2030:
+        raise HTTPException(400, "year_out_of_range")
+
+    from app.services.campaign_generator import generate_month_campaigns
+    drafts = await generate_month_campaigns(year=year, month=month, db=db, segment=segment)
+
+    return {
+        "generated": len(drafts),
+        "year": year,
+        "month": month,
+        "segment": segment,
+        "drafts": drafts,
+    }
+
+
+# ===========================================================================
+# RUTAS DINÁMICAS — después de las estáticas
+# ===========================================================================
 
 # ---------------------------------------------------------------------------
 # GET /admin/campaigns/{id}
@@ -377,7 +562,6 @@ async def send_campaign(
     if c.status not in ("draft", "scheduled"):
         raise HTTPException(409, f"campaign_status_is_{c.status}")
 
-    # Disparar async (no bloquea el request)
     from app.services.campaign_engine import execute_campaign
     asyncio.create_task(execute_campaign(campaign_id))
 
@@ -398,7 +582,6 @@ async def get_campaign_stats(
     if not c:
         raise HTTPException(404, "campaign_not_found")
 
-    # Contar por status
     result = await db.execute(
         select(
             CampaignSend.status,
@@ -413,7 +596,6 @@ async def get_campaign_stats(
     failed = counts.get("failed", 0)
     skipped = counts.get("skipped", 0)
 
-    # Contar abiertos
     opened_result = await db.execute(
         select(func.count())
         .select_from(CampaignSend)

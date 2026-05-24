@@ -10,7 +10,7 @@ from app.models import (  # noqa: F401
     UserProfile, PriceWatch, PriceHistory, NotificationLog,
     ImpactLinkLog, AirportCache, PriceSnapshot, SearchEvent, NotificationQueue,
     UserFavorite, NotificationTemplate,
-    Campaign, CampaignSend, CampaignCalendar,
+    Campaign, CampaignSend, CampaignCalendar, SpecialDate,
 )
 from app.config import settings
 
