@@ -16,9 +16,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
 from app.config import settings
-from app.routers import profile, impact, events, analytics, notifications, favorites, admin
+from app.routers import profile, impact, events, analytics, notifications, favorites, admin, campaigns, internal
 from app.services.notification_dispatcher import process_notification_queue
 from app.services.reengagement_service import process_reengagement_queue
+from app.services.segment_service import recalculate_segments
+from app.services.campaign_scheduler import check_scheduled_campaigns
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -58,10 +60,30 @@ async def lifespan(app: FastAPI):
         id="reengagement_dispatcher",
         replace_existing=True,
     )
+    # Recálculo de segmentos — diario a las 3am Argentina
+    scheduler.add_job(
+        recalculate_segments,
+        "cron",
+        hour=3,
+        minute=0,
+        timezone="America/Argentina/Buenos_Aires",
+        id="segment_recalculator",
+        replace_existing=True,
+    )
+    # Dispatcher de campañas automáticas — cada hora
+    scheduler.add_job(
+        check_scheduled_campaigns,
+        "interval",
+        hours=1,
+        id="campaign_scheduler",
+        replace_existing=True,
+    )
     scheduler.start()
     logger.info(
         f"APScheduler started — notification dispatcher every 30 min, "
-        f"reengagement dispatcher every {settings.reengagement_check_interval_minutes} min"
+        f"reengagement dispatcher every {settings.reengagement_check_interval_minutes} min, "
+        f"segment recalculator daily 3am AR, "
+        f"campaign scheduler every 1h"
     )
 
     yield
@@ -92,6 +114,8 @@ app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
 app.include_router(favorites.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
+app.include_router(campaigns.router, prefix="/api/v1")
+app.include_router(internal.router, prefix="/api/v1")
 
 
 @app.get("/api/v1/health")

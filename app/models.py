@@ -1,5 +1,5 @@
-from datetime import datetime
-from sqlalchemy import BigInteger, Boolean, Float, Integer, String, Text, DateTime, func
+from datetime import date, datetime
+from sqlalchemy import BigInteger, Boolean, Date, Float, ForeignKey, Integer, String, Text, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
@@ -205,3 +205,60 @@ class NotificationTemplate(Base):
     body_template: Mapped[str] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+# ---------------------------------------------------------------------------
+# Sistema de campañas de marketing
+# ---------------------------------------------------------------------------
+
+class Campaign(Base):
+    """
+    Campaña de notificaciones masivas por segmento.
+    status: draft → scheduled → sending → sent | failed
+    campaign_type: 'route' (ruta específica) | 'top_auto' (top rutas automático) | 'category' (tag)
+    """
+    __tablename__ = "campaigns"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(200))
+    segment: Mapped[str | None] = mapped_column(String(50))        # heavy_searcher | casual | …
+    status: Mapped[str] = mapped_column(String(20), default="draft")
+    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime)
+    campaign_type: Mapped[str | None] = mapped_column(String(30))  # route | top_auto | category
+    route_origin: Mapped[str | None] = mapped_column(String(10))
+    route_destination: Mapped[str | None] = mapped_column(String(10))
+    category_tag: Mapped[str | None] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class CampaignSend(Base):
+    """Registro individual de envío de una campaña a un usuario."""
+    __tablename__ = "campaign_sends"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    campaign_id: Mapped[int] = mapped_column(Integer, ForeignKey("campaigns.id"), index=True)
+    user_id: Mapped[str] = mapped_column(String, index=True)
+    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|sent|failed|skipped
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime)
+    opened_at: Mapped[datetime | None] = mapped_column(DateTime)
+    fcm_response: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class CampaignCalendar(Base):
+    """
+    Calendario de slots de envío de campañas.
+    slot_type='weekly': usa day_of_week (0=Lun..6=Dom) + send_hour_ar
+    slot_type='special': usa special_date + advance_days (notificar X días antes)
+    """
+    __tablename__ = "campaign_calendar"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    slot_type: Mapped[str] = mapped_column(String(20))              # weekly | special
+    day_of_week: Mapped[int | None] = mapped_column(Integer)        # 0=Lun .. 6=Dom
+    send_hour_ar: Mapped[int] = mapped_column(Integer, default=10)  # hora en Argentina
+    special_date: Mapped[date | None] = mapped_column(Date)
+    label: Mapped[str | None] = mapped_column(String(200))
+    advance_days: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)

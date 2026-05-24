@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"
 
+    # Campaña interna — para webhook n8n y triggers externos
+    internal_secret: str = "internal-changeme"
+
     class Config:
         env_file = ".env"
         extra = "ignore"
