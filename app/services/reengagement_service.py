@@ -10,20 +10,69 @@ Lógica:
   1. Buscar search_result events ocurridos entre 20 y 25 min atrás, no re-engageados aún.
   2. Para cada uno, verificar que NO existe un flight_selected posterior en la misma ruta.
   3. Verificar cap diario (max 1 re-engagement por usuario por día).
-  4. Enviar FCM y registrar en notification_log.
+  4. Elegir template según país del usuario (tabla notification_templates).
+  5. Enviar FCM y registrar en notification_log.
 """
 import logging
+import random
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select, and_, func as sqlfunc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import AsyncSessionLocal
-from app.models import SearchEvent, UserProfile, NotificationLog
+from app.models import SearchEvent, UserProfile, NotificationLog, NotificationTemplate
 from app.services import firebase_service
+from app.services.airport_resolver import resolve_airports
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+# Fallback si la BD no tiene templates de reengagement
+_FALLBACK_REENGAGEMENT = {
+    "title": "¿Todavía pensás en volar a {destination}? 🛫",
+    "body":  "El precio más bajo era {price} {currency}.",
+}
+
+
+async def _pick_reengagement_template(
+    db: AsyncSession,
+    country_code: str | None,
+) -> dict[str, str]:
+    """
+    Selecciona un template de re-engagement aleatorio.
+
+    Prioridad:
+      1. País específico del usuario
+      2. Argentina ("AR") — fallback regional / mercado principal
+      3. Genérico ("*")
+      4. Hardcodeado en memoria
+    """
+    _non_spanish = frozenset({"BR"})
+
+    codes_to_try: list[str] = []
+    if country_code:
+        codes_to_try.append(country_code)
+    if country_code not in _non_spanish and country_code != "AR":
+        codes_to_try.append("AR")
+    codes_to_try.append("*")
+
+    for code in codes_to_try:
+        result = await db.execute(
+            select(NotificationTemplate).where(
+                and_(
+                    NotificationTemplate.country_code == code,
+                    NotificationTemplate.drop_level == "reengagement",
+                    NotificationTemplate.is_active.is_(True),
+                )
+            )
+        )
+        templates = result.scalars().all()
+        if templates:
+            chosen = random.choice(templates)
+            return {"title": chosen.title_template, "body": chosen.body_template}
+
+    return _FALLBACK_REENGAGEMENT
 
 
 async def process_reengagement_queue() -> None:
@@ -105,7 +154,7 @@ async def _process_candidate(db: AsyncSession, event: SearchEvent, now: datetime
         )
         return
 
-    # 3. Obtener FCM token
+    # 3. Obtener perfil (FCM token + país para selección de template)
     user_result = await db.execute(
         select(UserProfile).where(UserProfile.user_id == event.user_id)
     )
@@ -115,12 +164,26 @@ async def _process_candidate(db: AsyncSession, event: SearchEvent, now: datetime
         logger.debug(f"Reengagement skip (no FCM token): user={event.user_id}")
         return
 
-    # 4. Construir y enviar FCM
+    # 4. Seleccionar template según país del usuario
+    template = await _pick_reengagement_template(db, user.selected_country)
+
     price_str = f"${event.best_price:,.0f}" if event.best_price else "un gran precio"
     currency = event.currency or ""
 
-    title = f"¿Todavía pensás en volar a {event.destination}? 🛫"
-    body = f"El precio más bajo era {price_str} {currency}".strip()
+    # Resolver nombres legibles de aeropuertos (ej: "PSS" → "Posadas")
+    airport_names    = await resolve_airports(db, [event.origin, event.destination])
+    origin_name      = airport_names[event.origin]
+    destination_name = airport_names[event.destination]
+
+    fmt = dict(
+        origin=origin_name,
+        destination=destination_name,
+        price=price_str,
+        currency=currency,
+    )
+    title = template["title"].format(**fmt)
+    body = template["body"].format(**fmt)
+
     data = {
         "origin": event.origin,
         "destination": event.destination,
@@ -148,7 +211,7 @@ async def _process_candidate(db: AsyncSession, event: SearchEvent, now: datetime
 
     if success:
         logger.info(
-            f"Reengagement sent: user={event.user_id} "
+            f"Reengagement sent: user={event.user_id} [{user.selected_country or '*'}] "
             f"{event.origin}->{event.destination} price={price_str}"
         )
     else:

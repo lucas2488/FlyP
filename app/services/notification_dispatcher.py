@@ -1,18 +1,21 @@
 import logging
+import random
 from datetime import datetime, timezone
 
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import AsyncSessionLocal
-from app.models import NotificationQueue, NotificationLog, UserProfile, PriceWatch
+from app.models import NotificationQueue, NotificationLog, UserProfile, PriceWatch, NotificationTemplate
 from app.services import firebase_service
+from app.services.airport_resolver import resolve_airports
 from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Templates de mensajes por nivel de bajada
-_TEMPLATES = {
+# Fallback hardcodeado — usado si la tabla notification_templates está vacía
+# o si hubo un error de BD.
+_FALLBACK_TEMPLATES: dict[str, dict[str, str]] = {
     "soft": {
         "title": "{origin} → {destination} bajó {pct}% ✈️",
         "body":  "Hoy desde {price} {currency}. ¡Buen momento para volar!",
@@ -26,10 +29,63 @@ _TEMPLATES = {
         "body":  "¡Solo {price} {currency}! Esta oportunidad no dura.",
     },
 }
-_DEFAULT_TEMPLATE = _TEMPLATES["soft"]
 
 
-def _build_notification_payload(item: NotificationQueue) -> tuple[str, str, dict]:
+async def _pick_template(
+    db: AsyncSession,
+    country_code: str | None,
+    drop_level: str,
+) -> dict[str, str]:
+    """
+    Selecciona un template aleatorio de la BD filtrando por país y nivel.
+
+    Orden de prioridad:
+      1. Templates activos para el país específico del usuario (ej: "MX")
+      2. Templates en español rioplatense de Argentina ("AR") — fallback regional
+         (se omite si ya era AR o si ya se intentó)
+      3. Templates genéricos ("*")
+      4. Fallback hardcodeado en memoria (si la BD no tiene ninguno)
+
+    Esto asegura que usuarios sin país configurado reciben mensajes en jerga
+    argentina, que es el mercado principal de la app.
+    """
+    # Países no hispanohablantes — no usar AR como fallback intermedio
+    _non_spanish = frozenset({"BR"})
+
+    codes_to_try: list[str] = []
+    if country_code:
+        codes_to_try.append(country_code)
+    # Para países hispanohablantes (o sin país), caer a AR (mercado principal)
+    # antes del genérico. Para países no hispanohablantes (ej: BR) ir directo a *.
+    if country_code not in _non_spanish and country_code != "AR":
+        codes_to_try.append("AR")
+    codes_to_try.append("*")
+
+    for code in codes_to_try:
+        result = await db.execute(
+            select(NotificationTemplate).where(
+                and_(
+                    NotificationTemplate.country_code == code,
+                    NotificationTemplate.drop_level == drop_level,
+                    NotificationTemplate.is_active.is_(True),
+                )
+            )
+        )
+        templates = result.scalars().all()
+        if templates:
+            chosen = random.choice(templates)
+            return {"title": chosen.title_template, "body": chosen.body_template}
+
+    # Fallback a templates hardcodeados en memoria
+    return _FALLBACK_TEMPLATES.get(drop_level, _FALLBACK_TEMPLATES["soft"])
+
+
+def _build_notification_payload(
+    item: NotificationQueue,
+    template: dict[str, str],
+    origin_name: str,
+    destination_name: str,
+) -> tuple[str, str, dict]:
     """
     Construye title, body y data dict para el FCM message.
     El data dict matchea FlightNotification.kt del Android:
@@ -40,21 +96,15 @@ def _build_notification_payload(item: NotificationQueue) -> tuple[str, str, dict
     currency_symbol = item.currency
     price_formatted = f"${item.price_raw:,.0f}"
 
-    template = _TEMPLATES.get(item.drop_level or "soft", _DEFAULT_TEMPLATE)
-    title = template["title"].format(
-        origin=item.origin,
-        destination=item.destination,
+    fmt = dict(
+        origin=origin_name,
+        destination=destination_name,
         pct=pct,
         price=price_formatted,
         currency=currency_symbol,
     )
-    body = template["body"].format(
-        origin=item.origin,
-        destination=item.destination,
-        pct=pct,
-        price=price_formatted,
-        currency=currency_symbol,
-    )
+    title = template["title"].format(**fmt)
+    body = template["body"].format(**fmt)
 
     data = {
         "link": f"https://www.flypromociones.com/search?origin={item.origin}&destination={item.destination}",
@@ -98,8 +148,8 @@ async def process_notification_queue() -> None:
 
 
 async def _process_single(db: AsyncSession, item: NotificationQueue) -> None:
-    """Procesa un item de la queue: obtiene token, envía y actualiza estado."""
-    # Obtener FCM token
+    """Procesa un item de la queue: obtiene token, elige template, envía y actualiza estado."""
+    # Obtener perfil de usuario (FCM token + país para selección de template)
     user_result = await db.execute(
         select(UserProfile).where(UserProfile.user_id == item.user_id)
     )
@@ -130,8 +180,17 @@ async def _process_single(db: AsyncSession, item: NotificationQueue) -> None:
         logger.info(f"Skipped {item.id}: daily limit for user {item.user_id}")
         return
 
+    # Seleccionar template según país del usuario y nivel de bajada
+    drop_level = item.drop_level or "soft"
+    template = await _pick_template(db, user.selected_country, drop_level)
+
+    # Resolver nombres legibles de aeropuertos (ej: "EZE" → "Buenos Aires")
+    airport_names    = await resolve_airports(db, [item.origin, item.destination])
+    origin_name      = airport_names[item.origin]
+    destination_name = airport_names[item.destination]
+
     # Construir y enviar
-    title, body, data = _build_notification_payload(item)
+    title, body, data = _build_notification_payload(item, template, origin_name, destination_name)
     success = firebase_service.send_notification(user.fcm_token, title, body, data)
 
     now = datetime.now(timezone.utc)
@@ -153,17 +212,17 @@ async def _process_single(db: AsyncSession, item: NotificationQueue) -> None:
         if watch:
             watch.last_notified_at = now
             watch.notification_count = (watch.notification_count or 0) + 1
-            if item.drop_level == "soft":
+            if drop_level == "soft":
                 watch.last_notified_soft_at = now
-            elif item.drop_level == "strong":
+            elif drop_level == "strong":
                 watch.last_notified_strong_at = now
-            elif item.drop_level == "urgent":
+            elif drop_level == "urgent":
                 watch.last_notified_urgent_at = now
 
         # Registrar en notification_log (para analytics)
         db.add(NotificationLog(
             user_id=item.user_id,
-            type=item.drop_level or "price_drop",
+            type=drop_level,
             origin=item.origin,
             destination=item.destination,
             price=item.price_raw,
@@ -171,8 +230,9 @@ async def _process_single(db: AsyncSession, item: NotificationQueue) -> None:
         ))
 
         logger.info(
-            f"Sent [{item.drop_level}] notification {item.id} "
-            f"to user {item.user_id}: {item.origin}->{item.destination}"
+            f"Sent [{drop_level}] notification {item.id} "
+            f"to user {item.user_id} [{user.selected_country or '*'}]: "
+            f"{item.origin}->{item.destination}"
         )
     else:
         item.status = "failed"

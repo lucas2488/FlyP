@@ -323,3 +323,40 @@ async def get_price_watches(
         "total_all":    total_all or 0,
         "top_routes":   top_routes,
     }
+
+
+# ---------------------------------------------------------------------------
+# GET /analytics/airports
+# Cache de aeropuertos vistos en búsquedas — incluye geo_id/place_id para
+# deep-linking futuro a Skyscanner.
+# ---------------------------------------------------------------------------
+@router.get("/airports")
+async def get_airports(
+    search: str | None = None,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> list:
+    from app.models import AirportCache
+    q = select(AirportCache).order_by(AirportCache.times_searched.desc())
+    if search:
+        like = f"%{search}%"
+        q = q.where(
+            AirportCache.iata_code.ilike(like)
+            | AirportCache.name.ilike(like)
+            | AirportCache.country.ilike(like)
+        )
+    q = q.limit(min(limit, 500))
+    result = await db.execute(q)
+    return [
+        {
+            "iata_code":      a.iata_code,
+            "name":           a.name,
+            "country":        a.country,
+            "geo_id":         a.geo_id,
+            "place_id":       a.place_id,
+            "times_searched": a.times_searched,
+            "last_seen_at":   a.last_seen_at.isoformat() if a.last_seen_at else None,
+        }
+        for a in result.scalars().all()
+    ]
