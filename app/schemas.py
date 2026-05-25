@@ -82,5 +82,5 @@ class FavoriteRouteDTO(BaseModel):
 
 
 class SyncFavoritesRequest(BaseModel):
-    user_id: str
+    fcm_token: str
     routes: list[FavoriteRouteDTO]
