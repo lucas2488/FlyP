@@ -359,6 +359,26 @@ async def get_segment_counts(
 
 
 # ---------------------------------------------------------------------------
+# POST /admin/campaigns/recalculate-segments
+# ---------------------------------------------------------------------------
+
+@router.post("/recalculate-segments")
+async def trigger_recalculate_segments(
+    _: str = Depends(verify_api_key),
+) -> dict:
+    """
+    Dispara el recálculo de segmentos de usuarios en background.
+    Útil para forzar una recalculación fuera del horario nocturno (3am AR).
+    Retorna inmediatamente; el proceso corre en segundo plano (~1-5 min).
+    """
+    import asyncio
+    from app.services.segment_service import recalculate_segments
+    asyncio.create_task(recalculate_segments())
+    logger.info("campaigns router: recálculo de segmentos disparado manualmente")
+    return {"started": True, "message": "Recálculo de segmentos iniciado en background. Tomará 1-5 minutos."}
+
+
+# ---------------------------------------------------------------------------
 # GET /admin/campaigns/special-dates
 # ---------------------------------------------------------------------------
 
