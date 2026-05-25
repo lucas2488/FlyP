@@ -115,14 +115,17 @@ async def get_top_routes(
     db: AsyncSession = Depends(get_db),
     _: str = Depends(verify_api_key),
 ) -> list:
+    # Nota: last_search_best_price viene de POST /events/search-result (Android).
+    # last_price era del cron de Skyscanner — no existe. Usar last_search_best_price.
+    # last_seen usa MAX(created_at) como proxy de actividad reciente en esa ruta.
     result = await db.execute(
         select(
             PriceWatch.origin,
             PriceWatch.destination,
             func.count(func.distinct(PriceWatch.user_id)).label("search_count"),
-            func.min(PriceWatch.last_price).label("min_price"),
-            func.avg(PriceWatch.last_price).label("avg_price"),
-            func.max(PriceWatch.last_checked).label("last_seen"),
+            func.min(PriceWatch.last_search_best_price).label("min_price"),
+            func.avg(PriceWatch.last_search_best_price).label("avg_price"),
+            func.max(PriceWatch.created_at).label("last_seen"),
         )
         .where(PriceWatch.is_active.is_(True))
         .group_by(PriceWatch.origin, PriceWatch.destination)
