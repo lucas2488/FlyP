@@ -338,6 +338,27 @@ async def get_cooldown_routes(
 
 
 # ---------------------------------------------------------------------------
+# GET /admin/campaigns/segment-counts
+# ---------------------------------------------------------------------------
+
+@router.get("/segment-counts")
+async def get_segment_counts(
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    """Cantidad de usuarios con FCM token activo por segmento."""
+    result = await db.execute(
+        select(UserProfile.user_segment, func.count().label("count"))
+        .where(
+            UserProfile.fcm_token.isnot(None),
+            UserProfile.fcm_token != "",
+        )
+        .group_by(UserProfile.user_segment)
+    )
+    return {(row.user_segment or "unknown"): row.count for row in result.all()}
+
+
+# ---------------------------------------------------------------------------
 # GET /admin/campaigns/special-dates
 # ---------------------------------------------------------------------------
 

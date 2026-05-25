@@ -96,7 +96,12 @@ async def _maybe_create_and_fire(
     Si no existe, crea una Campaign draft y la dispara.
     Retorna 1 si disparó, 0 si ya existía.
     """
-    label = slot.label or f"Campaña automática {today_ar}"
+    _DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+    day_name = _DAY_NAMES[today_ar.weekday()]
+    if slot.slot_type == "weekly":
+        label = f"Campaña semanal {day_name} {today_ar.strftime('%d/%m')} — Heavy Searcher"
+    else:
+        label = slot.label or f"Campaña especial {today_ar}"
 
     # Idempotencia: buscar campaña con mismo nombre y fecha de hoy
     existing = await db.execute(
