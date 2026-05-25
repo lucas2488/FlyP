@@ -52,7 +52,7 @@ class DayPriceDTO(BaseModel):
 
 
 class PriceCalendarRequest(BaseModel):
-    user_id: str
+    fcm_token: str        # identificador del dispositivo
     origin_iata: str
     destination_iata: str
     currency: str
@@ -67,8 +67,7 @@ class MonthPriceDTO(BaseModel):
 
 
 class MonthCalendarRequest(BaseModel):
-    user_id: str
-    origin_iata: str
+    origin_iata: str      # sin user — es dato de ruta, no de usuario
     destination_iata: str
     currency: str
     months: list[MonthPriceDTO]

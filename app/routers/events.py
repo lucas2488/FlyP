@@ -2,10 +2,10 @@ import logging
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.database import get_db
-from app.models import PriceSnapshot, PriceWatch, PriceMonth
+from app.models import PriceSnapshot, PriceWatch, PriceMonth, UserProfile
 from app.schemas import PriceCalendarRequest, MonthCalendarRequest
 from app.services import notification_engine
 
@@ -15,8 +15,8 @@ router = APIRouter()
 
 # ---------------------------------------------------------------------------
 # POST /events/price-calendar
-# Recibido desde fetchPriceCalendar (se llama dos veces: origin→dest y dest→origin)
-# Almacena precios diarios, actualiza price_watch y evalúa bajadas de precio.
+# Recibido desde fetchPriceCalendar. Identificador: fcm_token.
+# Guarda precios diarios, actualiza price_watch y evalúa bajadas de precio.
 # ---------------------------------------------------------------------------
 @router.post("/events/price-calendar")
 async def receive_price_calendar(
@@ -27,10 +27,24 @@ async def receive_price_calendar(
     if not low_days:
         return {"success": True, "queued": False, "reason": "no_low_prices"}
 
+    # Buscar usuario por FCM token
+    user_result = await db.execute(
+        select(UserProfile).where(UserProfile.fcm_token == data.fcm_token)
+        .order_by(UserProfile.updated_at.desc())
+    )
+    user = user_result.scalars().first()
+    if not user:
+        logger.warning(f"price-calendar: fcm_token no encontrado, guardando igualmente sin user")
+        user_id = data.fcm_token  # fallback: usar token como id
+    else:
+        user_id = user.user_id
+
+    min_price = min(d.price for d in low_days)
+
     # 1. Insertar snapshots (solo días "low")
     for dp in low_days:
         db.add(PriceSnapshot(
-            user_id=data.user_id,
+            user_id=user_id,
             origin=data.origin_iata,
             destination=data.destination_iata,
             snapshot_date=dp.day,
@@ -43,18 +57,17 @@ async def receive_price_calendar(
     watch_result = await db.execute(
         select(PriceWatch).where(
             and_(
-                PriceWatch.user_id == data.user_id,
+                PriceWatch.user_id == user_id,
                 PriceWatch.origin == data.origin_iata,
                 PriceWatch.destination == data.destination_iata,
             )
         )
     )
     watch = watch_result.scalar_one_or_none()
-    min_price = min(d.price for d in low_days)
 
     if watch is None:
         watch = PriceWatch(
-            user_id=data.user_id,
+            user_id=user_id,
             origin=data.origin_iata,
             destination=data.destination_iata,
             is_active=True,
@@ -64,17 +77,16 @@ async def receive_price_calendar(
         )
         db.add(watch)
         await db.flush()
-        queued = False  # primera vez, sin referencia previa
+        queued = False
     else:
         watch.is_active = True
         reference_price = watch.last_search_best_price
 
-        # 3. Evaluar caída de precio si hay referencia
         queued = False
         if reference_price and reference_price > 0:
             queued = await notification_engine.evaluate_price_drop(
                 db=db,
-                user_id=data.user_id,
+                user_id=user_id,
                 origin=data.origin_iata,
                 destination=data.destination_iata,
                 new_price=min_price,
@@ -82,14 +94,13 @@ async def receive_price_calendar(
                 currency=data.currency,
             )
 
-        # 4. Actualizar referencia si el nuevo precio es más bajo
         if reference_price is None or min_price < reference_price:
             watch.last_search_best_price = min_price
 
     await db.commit()
 
     logger.info(
-        f"price-calendar: {data.user_id} {data.origin_iata}->{data.destination_iata} "
+        f"price-calendar: {data.origin_iata}->{data.destination_iata} "
         f"min={min_price:.0f} {data.currency} queued={queued}"
     )
     return {"success": True, "queued": queued, "min_price": min_price}
@@ -97,8 +108,7 @@ async def receive_price_calendar(
 
 # ---------------------------------------------------------------------------
 # POST /events/month-calendar
-# Recibido desde fetchMonthPriceCalendar (se llama una vez por búsqueda).
-# Almacena precios mensuales como contexto de tendencia. No dispara alertas.
+# Datos de tendencia mensual por ruta. Sin identificador de usuario.
 # ---------------------------------------------------------------------------
 @router.post("/events/month-calendar")
 async def receive_month_calendar(
@@ -108,13 +118,11 @@ async def receive_month_calendar(
     if not data.months:
         return {"success": True, "saved": 0}
 
-    # Upsert por (user_id, origin, destination, year, month)
     saved = 0
     for m in data.months:
         existing = await db.execute(
             select(PriceMonth).where(
                 and_(
-                    PriceMonth.user_id == data.user_id,
                     PriceMonth.origin == data.origin_iata,
                     PriceMonth.destination == data.destination_iata,
                     PriceMonth.year == m.year,
@@ -125,7 +133,6 @@ async def receive_month_calendar(
         row = existing.scalar_one_or_none()
         if row is None:
             db.add(PriceMonth(
-                user_id=data.user_id,
                 origin=data.origin_iata,
                 destination=data.destination_iata,
                 year=m.year,
@@ -143,7 +150,6 @@ async def receive_month_calendar(
     await db.commit()
 
     logger.info(
-        f"month-calendar: {data.user_id} {data.origin_iata}->{data.destination_iata} "
-        f"{saved} meses guardados"
+        f"month-calendar: {data.origin_iata}->{data.destination_iata} {saved} meses"
     )
     return {"success": True, "saved": saved}

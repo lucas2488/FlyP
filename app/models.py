@@ -172,13 +172,13 @@ class NotificationQueue(Base):
 class PriceMonth(Base):
     """
     Precios mensuales por ruta enviados desde fetchMonthPriceCalendar.
-    Sirve como contexto de tendencia (no dispara alertas directamente).
+    Dato de ruta, no de usuario — upsert por (origin, destination, year, month).
     price_category: PRICE_CATEGORY_LOW | PRICE_CATEGORY_LOWEST | PRICE_CATEGORY_HIGH | PRICE_CATEGORY_UNSPECIFIED
     """
     __tablename__ = "price_months"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String, index=True)
+    user_id: Mapped[str | None] = mapped_column(String, index=True)  # nullable — dato de ruta
     origin: Mapped[str] = mapped_column(String(10))
     destination: Mapped[str] = mapped_column(String(10))
     year: Mapped[int] = mapped_column(Integer)
