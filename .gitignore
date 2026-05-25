@@ -13,3 +13,6 @@ build/
 firebase-service-account.json
 *.json.key
 backups/*.sql.gz
+.playwright-mcp/
+*.png
+chatgptchat.txt
