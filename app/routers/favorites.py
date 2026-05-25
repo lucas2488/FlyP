@@ -28,8 +28,9 @@ async def sync_favorites(
     # Buscar usuario por FCM token
     result = await db.execute(
         select(UserProfile).where(UserProfile.fcm_token == data.fcm_token)
+        .order_by(UserProfile.updated_at.desc())
     )
-    user = result.scalar_one_or_none()
+    user = result.scalars().first()
     if not user:
         logger.warning(f"favorites: fcm_token no encontrado: {data.fcm_token[:20]}...")
         raise HTTPException(status_code=404, detail="User not found")
