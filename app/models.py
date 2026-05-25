@@ -47,7 +47,7 @@ class PriceWatch(Base):
     user_id: Mapped[str] = mapped_column(String, index=True)
     origin: Mapped[str] = mapped_column(String(10))
     destination: Mapped[str] = mapped_column(String(10))
-    trip_type: Mapped[str] = mapped_column(String(20))
+    trip_type: Mapped[str | None] = mapped_column(String(20))
     last_price: Mapped[float | None] = mapped_column(Float)
     last_checked: Mapped[datetime | None] = mapped_column(DateTime)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -123,7 +123,7 @@ class PriceSnapshot(Base):
     user_id: Mapped[str] = mapped_column(String, index=True)
     origin: Mapped[str] = mapped_column(String(10))
     destination: Mapped[str] = mapped_column(String(10))
-    trip_type: Mapped[str] = mapped_column(String(20))
+    trip_type: Mapped[str | None] = mapped_column(String(20))
     snapshot_date: Mapped[str] = mapped_column(String(10))  # "2026-06-15"
     price_raw: Mapped[float] = mapped_column(Float)
     price_group: Mapped[str] = mapped_column(String(10))    # "low"
@@ -158,7 +158,7 @@ class NotificationQueue(Base):
     currency: Mapped[str] = mapped_column(String(3))
     pct_drop: Mapped[float] = mapped_column(Float)
     reference_price: Mapped[float] = mapped_column(Float)
-    trip_type: Mapped[str] = mapped_column(String(20))
+    trip_type: Mapped[str | None] = mapped_column(String(20))
     status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|sent|failed|skipped
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     sent_at: Mapped[datetime | None] = mapped_column(DateTime)
@@ -167,6 +167,26 @@ class NotificationQueue(Base):
     notification_type: Mapped[str] = mapped_column(String(20), default="price_drop")
     opened_at: Mapped[datetime | None] = mapped_column(DateTime)
     scheduled_at: Mapped[datetime | None] = mapped_column(DateTime)     # None = enviar de inmediato
+
+
+class PriceMonth(Base):
+    """
+    Precios mensuales por ruta enviados desde fetchMonthPriceCalendar.
+    Sirve como contexto de tendencia (no dispara alertas directamente).
+    price_category: PRICE_CATEGORY_LOW | PRICE_CATEGORY_LOWEST | PRICE_CATEGORY_HIGH | PRICE_CATEGORY_UNSPECIFIED
+    """
+    __tablename__ = "price_months"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(String, index=True)
+    origin: Mapped[str] = mapped_column(String(10))
+    destination: Mapped[str] = mapped_column(String(10))
+    year: Mapped[int] = mapped_column(Integer)
+    month: Mapped[int] = mapped_column(Integer)
+    price_raw: Mapped[float] = mapped_column(Float)
+    price_category: Mapped[str] = mapped_column(String(50))
+    currency: Mapped[str] = mapped_column(String(3))
+    received_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
 class UserFavorite(Base):

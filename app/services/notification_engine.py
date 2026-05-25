@@ -25,7 +25,7 @@ async def evaluate_price_drop(
     new_price: float,
     reference_price: float,
     currency: str,
-    trip_type: str,
+    trip_type: str | None = None,
 ) -> bool:
     """
     Verifica condiciones multi-nivel y encola notificación si corresponde.

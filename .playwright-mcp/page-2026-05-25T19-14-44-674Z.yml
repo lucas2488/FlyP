@@ -1,0 +1,171 @@
+- generic [ref=e16]:
+  - complementary [ref=e17]:
+    - generic [ref=e19]:
+      - generic [ref=e20]: ✈️
+      - generic [ref=e21]:
+        - paragraph [ref=e22]: FlyP
+        - paragraph [ref=e23]: Marketing Dashboard
+    - navigation [ref=e24]:
+      - link "📊 Overview" [ref=e25] [cursor=pointer]:
+        - /url: /overview
+        - generic [ref=e26]: 📊
+        - text: Overview
+      - link "🗺️ Top Rutas" [ref=e27] [cursor=pointer]:
+        - /url: /top-routes
+        - generic [ref=e28]: 🗺️
+        - text: Top Rutas
+      - link "🔔 Notificaciones" [ref=e29] [cursor=pointer]:
+        - /url: /notifications
+        - generic [ref=e30]: 🔔
+        - text: Notificaciones
+      - link "💰 Revenue" [ref=e31] [cursor=pointer]:
+        - /url: /revenue
+        - generic [ref=e32]: 💰
+        - text: Revenue
+      - link "👁️ Price Watches" [ref=e33] [cursor=pointer]:
+        - /url: /price-watches
+        - generic [ref=e34]: 👁️
+        - text: Price Watches
+      - link "✉️ Templates" [ref=e35] [cursor=pointer]:
+        - /url: /templates
+        - generic [ref=e36]: ✉️
+        - text: Templates
+      - link "🏢 Aeropuertos" [ref=e37] [cursor=pointer]:
+        - /url: /airports
+        - generic [ref=e38]: 🏢
+        - text: Aeropuertos
+      - link "📣 Campañas" [active] [ref=e39] [cursor=pointer]:
+        - /url: /campaigns
+        - generic [ref=e40]: 📣
+        - text: Campañas
+    - button "🚪 Cerrar sesión" [ref=e42]:
+      - generic [ref=e43]: 🚪
+      - text: Cerrar sesión
+  - main [ref=e44]:
+    - generic [ref=e124]:
+      - generic [ref=e125]:
+        - heading "Campañas 📣" [level=1] [ref=e126]
+        - paragraph [ref=e127]: Campañas de notificaciones por segmento de usuarios
+      - generic [ref=e128]:
+        - generic [ref=e129]:
+          - generic [ref=e131]: 📣
+          - generic [ref=e132]:
+            - paragraph [ref=e133]: Total campañas
+            - paragraph [ref=e134]: "29"
+            - paragraph [ref=e135]: creadas
+        - generic [ref=e136]:
+          - generic [ref=e138]: ✅
+          - generic [ref=e139]:
+            - paragraph [ref=e140]: Enviadas
+            - paragraph [ref=e141]: "0"
+            - paragraph [ref=e142]: completadas
+        - generic [ref=e143]:
+          - generic [ref=e145]: 📝
+          - generic [ref=e146]:
+            - paragraph [ref=e147]: Borradores
+            - paragraph [ref=e148]: "29"
+            - paragraph [ref=e149]: pendientes
+        - generic [ref=e150]:
+          - generic [ref=e152]: 🔄
+          - generic [ref=e153]:
+            - paragraph [ref=e154]: En progreso
+            - paragraph [ref=e155]: "0"
+            - paragraph [ref=e156]: enviando
+      - generic [ref=e157]:
+        - button "＋ Nueva campaña" [ref=e158]
+        - generic [ref=e159]:
+          - combobox [ref=e160]:
+            - option "Ene"
+            - option "Feb"
+            - option "Mar"
+            - option "Abr"
+            - option "May" [selected]
+            - option "Jun"
+            - option "Jul"
+            - option "Ago"
+            - option "Sep"
+            - option "Oct"
+            - option "Nov"
+            - option "Dic"
+          - combobox [ref=e161]:
+            - option "2026" [selected]
+            - option "2027"
+          - button "🗓 Generar mes" [ref=e162]
+      - generic [ref=e163]:
+        - button "📅 Calendario" [ref=e164]
+        - button "📋 Historial" [ref=e165]
+      - generic [ref=e166]:
+        - generic [ref=e167]:
+          - generic [ref=e168]:
+            - generic [ref=e169]: Lun
+            - generic [ref=e170]: Mar
+            - generic [ref=e171]: Mié
+            - generic [ref=e172]: Jue
+            - generic [ref=e173]: Vie
+            - generic [ref=e174]: Sáb
+            - generic [ref=e175]: Dom
+          - generic [ref=e176]:
+            - generic [ref=e177]:
+              - generic [ref=e178]: "25"
+              - generic [ref=e179]: 📣 slot
+            - generic [ref=e181]: "26"
+            - generic [ref=e182]:
+              - generic [ref=e183]: "27"
+              - generic [ref=e184]: 📣 slot
+              - generic "Campaña semanal Mié 27/05 — Heavy Searcher" [ref=e185]: 📝 Campaña semana
+            - generic [ref=e187]: "28"
+            - generic [ref=e188]:
+              - generic [ref=e189]: "29"
+              - generic [ref=e190]: 📣 slot
+              - generic "Campaña semanal Vie 29/05 — Heavy Searcher" [ref=e191]: 📝 Campaña semana
+            - generic [ref=e193]: "30"
+            - generic [ref=e195]: "31"
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - generic [ref=e198]: "1"
+              - generic [ref=e199]: 📣 slot
+            - generic [ref=e201]: "2"
+            - generic [ref=e202]:
+              - generic [ref=e203]: "3"
+              - generic [ref=e204]: 📣 slot
+            - generic [ref=e206]: "4"
+            - generic [ref=e207]:
+              - generic [ref=e208]: "5"
+              - generic [ref=e209]: 📣 slot
+            - generic [ref=e211]: "6"
+            - generic [ref=e213]: "7"
+          - generic [ref=e214]:
+            - generic [ref=e215]:
+              - generic [ref=e216]: "8"
+              - generic [ref=e217]: 📣 slot
+            - generic [ref=e219]: "9"
+            - generic [ref=e220]:
+              - generic [ref=e221]: "10"
+              - generic [ref=e222]: 📣 slot
+            - generic [ref=e224]: "11"
+            - generic [ref=e225]:
+              - generic [ref=e226]: "12"
+              - generic [ref=e227]: 📣 slot
+            - generic [ref=e229]: "13"
+            - generic [ref=e231]: "14"
+          - generic [ref=e232]:
+            - generic [ref=e233]:
+              - generic [ref=e234]: "15"
+              - generic [ref=e235]: 📣 slot
+            - generic [ref=e237]: "16"
+            - generic [ref=e238]:
+              - generic [ref=e239]: "17"
+              - generic [ref=e240]: 📣 slot
+            - generic [ref=e242]: "18"
+            - generic [ref=e243]:
+              - generic [ref=e244]: "19"
+              - generic [ref=e245]: 📣 slot
+            - generic [ref=e247]: "20"
+            - generic [ref=e249]: "21"
+        - generic [ref=e250]:
+          - heading "🗓 Próximas fechas especiales" [level=3] [ref=e251]
+          - generic [ref=e253]:
+            - generic [ref=e254]: Vacaciones Invierno 20262026-07-18
+            - generic [ref=e255]:
+              - generic [ref=e256]: "Notificar: 2026-07-15"
+              - generic [ref=e257]: (en 50d)

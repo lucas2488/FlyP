@@ -1,0 +1,106 @@
+- generic [ref=e1]:
+  - generic [ref=e16]:
+    - complementary [ref=e17]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: ✈️
+        - generic [ref=e21]:
+          - paragraph [ref=e22]: FlyP
+          - paragraph [ref=e23]: Marketing Dashboard
+      - navigation [ref=e24]:
+        - link "📊 Overview" [ref=e25] [cursor=pointer]:
+          - /url: /overview
+          - generic [ref=e26]: 📊
+          - text: Overview
+        - link "🗺️ Top Rutas" [ref=e27] [cursor=pointer]:
+          - /url: /top-routes
+          - generic [ref=e28]: 🗺️
+          - text: Top Rutas
+        - link "🔔 Notificaciones" [ref=e29] [cursor=pointer]:
+          - /url: /notifications
+          - generic [ref=e30]: 🔔
+          - text: Notificaciones
+        - link "💰 Revenue" [active] [ref=e31] [cursor=pointer]:
+          - /url: /revenue
+          - generic [ref=e32]: 💰
+          - text: Revenue
+        - link "👁️ Price Watches" [ref=e33] [cursor=pointer]:
+          - /url: /price-watches
+          - generic [ref=e34]: 👁️
+          - text: Price Watches
+        - link "✉️ Templates" [ref=e35] [cursor=pointer]:
+          - /url: /templates
+          - generic [ref=e36]: ✉️
+          - text: Templates
+        - link "🏢 Aeropuertos" [ref=e37] [cursor=pointer]:
+          - /url: /airports
+          - generic [ref=e38]: 🏢
+          - text: Aeropuertos
+        - link "📣 Campañas" [ref=e39] [cursor=pointer]:
+          - /url: /campaigns
+          - generic [ref=e40]: 📣
+          - text: Campañas
+      - button "🚪 Cerrar sesión" [ref=e42]:
+        - generic [ref=e43]: 🚪
+        - text: Cerrar sesión
+    - main [ref=e44]:
+      - generic [ref=e980]:
+        - generic [ref=e981]:
+          - heading "Revenue" [level=1] [ref=e982]
+          - paragraph [ref=e983]: Clicks en links afiliados (Impact.com) — últimos 30 días
+        - generic [ref=e984]:
+          - generic [ref=e985]:
+            - generic [ref=e987]: 🔗
+            - generic [ref=e988]:
+              - paragraph [ref=e989]: Clicks afiliados 7d
+              - paragraph [ref=e990]: "310"
+              - paragraph [ref=e991]: últimos 7 días
+          - generic [ref=e992]:
+            - generic [ref=e994]: 📈
+            - generic [ref=e995]:
+              - paragraph [ref=e996]: Clicks afiliados 30d
+              - paragraph [ref=e997]: "310"
+              - paragraph [ref=e998]: últimos 30 días
+        - generic [ref=e999]:
+          - generic [ref=e1000]:
+            - heading "Clicks por día" [level=2] [ref=e1001]
+            - application [ref=e1004]:
+              - generic [ref=e1023]:
+                - generic [ref=e1024]:
+                  - generic [ref=e1026]: 05-22
+                  - generic [ref=e1028]: 05-23
+                  - generic [ref=e1030]: 05-24
+                  - generic [ref=e1032]: 05-25
+                - generic [ref=e1033]:
+                  - generic [ref=e1035]: "0"
+                  - generic [ref=e1037]: "30"
+                  - generic [ref=e1039]: "60"
+                  - generic [ref=e1041]: "90"
+                  - generic [ref=e1043]: "120"
+          - generic [ref=e1044]:
+            - heading "Top dominios" [level=2] [ref=e1045]
+            - generic [ref=e1046]:
+              - generic [ref=e1048]:
+                - generic [ref=e1049]: skyscanner.pxf.io
+                - generic [ref=e1050]: "228"
+              - generic [ref=e1054]:
+                - generic [ref=e1055]: flybondi.com
+                - generic [ref=e1056]: "41"
+              - generic [ref=e1060]:
+                - generic [ref=e1061]: booking.jetsmart.com
+                - generic [ref=e1062]: "12"
+              - generic [ref=e1066]:
+                - generic [ref=e1067]: checkin.aerolineas.com.ar
+                - generic [ref=e1068]: "10"
+              - generic [ref=e1072]:
+                - generic [ref=e1073]: www.aerolineas.com.ar
+                - generic [ref=e1074]: "8"
+              - generic [ref=e1078]:
+                - generic [ref=e1079]: shop.unibus.com.ar
+                - generic [ref=e1080]: "7"
+              - generic [ref=e1084]:
+                - generic [ref=e1085]: www.aireuropa.com
+                - generic [ref=e1086]: "2"
+              - generic [ref=e1090]:
+                - generic [ref=e1091]: jetsmart.com
+                - generic [ref=e1092]: "2"
+  - generic [ref=e979]: "30"

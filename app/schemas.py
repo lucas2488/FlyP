@@ -51,33 +51,27 @@ class DayPriceDTO(BaseModel):
     price: float
 
 
-class PriceSnapshotRequest(BaseModel):
+class PriceCalendarRequest(BaseModel):
     user_id: str
-    origin: str
-    destination: str
-    trip_type: str
+    origin_iata: str
+    destination_iata: str
     currency: str
-    prices: list[DayPriceDTO]
+    days: list[DayPriceDTO]
 
 
-class SearchResultEvent(BaseModel):
-    user_id: str
-    origin: str
-    destination: str
-    trip_type: Optional[str] = "ONE_WAY"
-    best_price: float
-    currency: str
-
-
-class FlightSelectedEvent(BaseModel):
-    user_id: str
-    origin: str
-    destination: str
+class MonthPriceDTO(BaseModel):
+    year: int
+    month: int
     price: float
+    price_category: str   # PRICE_CATEGORY_LOW / LOWEST / HIGH / UNSPECIFIED
+
+
+class MonthCalendarRequest(BaseModel):
+    user_id: str
+    origin_iata: str
+    destination_iata: str
     currency: str
-    trip_type: Optional[str] = "ONE_WAY"
-    airline: Optional[str] = None
-    departure_date: Optional[str] = None
+    months: list[MonthPriceDTO]
 
 
 # --- Favoritos ---

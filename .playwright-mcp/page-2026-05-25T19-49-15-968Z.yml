@@ -1,0 +1,2214 @@
+- generic [ref=e1]:
+  - generic [ref=e16]:
+    - complementary [ref=e17]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: ✈️
+        - generic [ref=e21]:
+          - paragraph [ref=e22]: FlyP
+          - paragraph [ref=e23]: Marketing Dashboard
+      - navigation [ref=e24]:
+        - link "📊 Overview" [ref=e25] [cursor=pointer]:
+          - /url: /overview
+          - generic [ref=e26]: 📊
+          - text: Overview
+        - link "🗺️ Top Rutas" [ref=e27] [cursor=pointer]:
+          - /url: /top-routes
+          - generic [ref=e28]: 🗺️
+          - text: Top Rutas
+        - link "🔔 Notificaciones" [ref=e29] [cursor=pointer]:
+          - /url: /notifications
+          - generic [ref=e30]: 🔔
+          - text: Notificaciones
+        - link "💰 Revenue" [ref=e31] [cursor=pointer]:
+          - /url: /revenue
+          - generic [ref=e32]: 💰
+          - text: Revenue
+        - link "👁️ Price Watches" [ref=e33] [cursor=pointer]:
+          - /url: /price-watches
+          - generic [ref=e34]: 👁️
+          - text: Price Watches
+        - link "✉️ Templates" [active] [ref=e35] [cursor=pointer]:
+          - /url: /templates
+          - generic [ref=e36]: ✉️
+          - text: Templates
+        - link "🏢 Aeropuertos" [ref=e37] [cursor=pointer]:
+          - /url: /airports
+          - generic [ref=e38]: 🏢
+          - text: Aeropuertos
+        - link "📣 Campañas" [ref=e39] [cursor=pointer]:
+          - /url: /campaigns
+          - generic [ref=e40]: 📣
+          - text: Campañas
+      - button "🚪 Cerrar sesión" [ref=e42]:
+        - generic [ref=e43]: 🚪
+        - text: Cerrar sesión
+    - main [ref=e44]:
+      - generic [ref=e1488]:
+        - generic [ref=e1489]:
+          - heading "Templates de notificaciones" [level=1] [ref=e1490]
+          - paragraph [ref=e1491]: Librería de mensajes push por país y nivel de bajada
+        - generic [ref=e1492]:
+          - button "🌍 Genérico 12" [ref=e1493]:
+            - generic [ref=e1494]: 🌍
+            - generic [ref=e1495]: Genérico
+            - generic [ref=e1496]: "12"
+          - button "🇦🇷 Argentina 39" [ref=e1497]:
+            - generic [ref=e1498]: 🇦🇷
+            - generic [ref=e1499]: Argentina
+            - generic [ref=e1500]: "39"
+          - button "🇧🇷 Brasil 28" [ref=e1501]:
+            - generic [ref=e1502]: 🇧🇷
+            - generic [ref=e1503]: Brasil
+            - generic [ref=e1504]: "28"
+          - button "🇨🇱 Chile 14" [ref=e1505]:
+            - generic [ref=e1506]: 🇨🇱
+            - generic [ref=e1507]: Chile
+            - generic [ref=e1508]: "14"
+          - button "🇨🇴 Colombia 18" [ref=e1509]:
+            - generic [ref=e1510]: 🇨🇴
+            - generic [ref=e1511]: Colombia
+            - generic [ref=e1512]: "18"
+          - button "🇪🇸 España 11" [ref=e1513]:
+            - generic [ref=e1514]: 🇪🇸
+            - generic [ref=e1515]: España
+            - generic [ref=e1516]: "11"
+          - button "🇲🇽 México 27" [ref=e1517]:
+            - generic [ref=e1518]: 🇲🇽
+            - generic [ref=e1519]: México
+            - generic [ref=e1520]: "27"
+          - button "🇵🇪 Perú 10" [ref=e1521]:
+            - generic [ref=e1522]: 🇵🇪
+            - generic [ref=e1523]: Perú
+            - generic [ref=e1524]: "10"
+          - button "🇵🇾 Paraguay 8" [ref=e1525]:
+            - generic [ref=e1526]: 🇵🇾
+            - generic [ref=e1527]: Paraguay
+            - generic [ref=e1528]: "8"
+          - button "🇺🇾 Uruguay 10" [ref=e1529]:
+            - generic [ref=e1530]: 🇺🇾
+            - generic [ref=e1531]: Uruguay
+            - generic [ref=e1532]: "10"
+          - button "🇻🇪 Venezuela 10" [ref=e1533]:
+            - generic [ref=e1534]: 🇻🇪
+            - generic [ref=e1535]: Venezuela
+            - generic [ref=e1536]: "10"
+        - generic [ref=e1537]:
+          - generic [ref=e1538]:
+            - combobox [ref=e1539]:
+              - option "Todos los niveles" [selected]
+              - option "Soft"
+              - option "Strong"
+              - option "Urgent"
+              - option "Reengagement"
+            - generic [ref=e1540] [cursor=pointer]:
+              - checkbox "Mostrar inactivos" [ref=e1541]
+              - text: Mostrar inactivos
+            - generic [ref=e1542]: 187 templates
+            - button "＋ Crear manual" [ref=e1543]
+          - table [ref=e1545]:
+            - rowgroup [ref=e1546]:
+              - row "País Nivel Mensaje Activo" [ref=e1547]:
+                - columnheader "País" [ref=e1548]
+                - columnheader "Nivel" [ref=e1549]
+                - columnheader "Mensaje" [ref=e1550]
+                - columnheader "Activo" [ref=e1551]
+                - columnheader [ref=e1552]
+            - rowgroup [ref=e1553]:
+              - 'row "🌍* campaign ✈️ {origin} → {destination} ¡gran oportunidad! Hay vuelos a {destination} con buenos precios. ¡Aprovechá! ×" [ref=e1554]':
+                - cell "🌍*" [ref=e1555]
+                - cell "campaign" [ref=e1556]:
+                  - generic [ref=e1557]: campaign
+                - 'cell "✈️ {origin} → {destination} ¡gran oportunidad! Hay vuelos a {destination} con buenos precios. ¡Aprovechá!" [ref=e1558]':
+                  - paragraph [ref=e1559]: "✈️ {origin} → {destination} ¡gran oportunidad!"
+                  - paragraph [ref=e1560]: "Hay vuelos a {destination} con buenos precios. ¡Aprovechá!"
+                - cell [ref=e1561]:
+                  - button "Desactivar" [ref=e1562] [cursor=pointer]
+                - cell "×" [ref=e1564]:
+                  - button "×" [ref=e1565]
+              - 'row "🌍* campaign 🔥 Ruta destacada: {origin_iata} → {destination_iata} Vuelos a {destination} disponibles ahora. ¡No te lo pierdas! ×" [ref=e1566]':
+                - cell "🌍*" [ref=e1567]
+                - cell "campaign" [ref=e1568]:
+                  - generic [ref=e1569]: campaign
+                - 'cell "🔥 Ruta destacada: {origin_iata} → {destination_iata} Vuelos a {destination} disponibles ahora. ¡No te lo pierdas!" [ref=e1570]':
+                  - paragraph [ref=e1571]: "🔥 Ruta destacada: {origin_iata} → {destination_iata}"
+                  - paragraph [ref=e1572]: "Vuelos a {destination} disponibles ahora. ¡No te lo pierdas!"
+                - cell [ref=e1573]:
+                  - button "Desactivar" [ref=e1574] [cursor=pointer]
+                - cell "×" [ref=e1576]:
+                  - button "×" [ref=e1577]
+              - 'row "🌍* campaign 📍 ¿Pensaste volar a {destination}? Hay opciones desde {origin} con precios interesantes. ×" [ref=e1578]':
+                - cell "🌍*" [ref=e1579]
+                - cell "campaign" [ref=e1580]:
+                  - generic [ref=e1581]: campaign
+                - 'cell "📍 ¿Pensaste volar a {destination}? Hay opciones desde {origin} con precios interesantes." [ref=e1582]':
+                  - paragraph [ref=e1583]: "📍 ¿Pensaste volar a {destination}?"
+                  - paragraph [ref=e1584]: "Hay opciones desde {origin} con precios interesantes."
+                - cell [ref=e1585]:
+                  - button "Desactivar" [ref=e1586] [cursor=pointer]
+                - cell "×" [ref=e1588]:
+                  - button "×" [ref=e1589]
+              - 'row "🌍* 🔄 reeng. ¿Todavía pensás en volar a {destination}? 🛫 Viste precios desde {price} {currency}. ¡No lo dejes escapar! ×" [ref=e1590]':
+                - cell "🌍*" [ref=e1591]
+                - cell "🔄 reeng." [ref=e1592]:
+                  - generic [ref=e1593]: 🔄 reeng.
+                - 'cell "¿Todavía pensás en volar a {destination}? 🛫 Viste precios desde {price} {currency}. ¡No lo dejes escapar!" [ref=e1594]':
+                  - paragraph [ref=e1595]: "¿Todavía pensás en volar a {destination}? 🛫"
+                  - paragraph [ref=e1596]: "Viste precios desde {price} {currency}. ¡No lo dejes escapar!"
+                - cell [ref=e1597]:
+                  - button "Desactivar" [ref=e1598] [cursor=pointer]
+                - cell "×" [ref=e1600]:
+                  - button "×" [ref=e1601]
+              - 'row "🌍* 🔄 reeng. {destination} te está esperando ✈️ Encontraste {price} {currency}. ¡Es el momento de volar! ×" [ref=e1602]':
+                - cell "🌍*" [ref=e1603]
+                - cell "🔄 reeng." [ref=e1604]:
+                  - generic [ref=e1605]: 🔄 reeng.
+                - 'cell "{destination} te está esperando ✈️ Encontraste {price} {currency}. ¡Es el momento de volar!" [ref=e1606]':
+                  - paragraph [ref=e1607]: "{destination} te está esperando ✈️"
+                  - paragraph [ref=e1608]: "Encontraste {price} {currency}. ¡Es el momento de volar!"
+                - cell [ref=e1609]:
+                  - button "Desactivar" [ref=e1610] [cursor=pointer]
+                - cell "×" [ref=e1612]:
+                  - button "×" [ref=e1613]
+              - 'row "🌍* ✈️ soft {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Buen momento para volar! ×" [ref=e1614]':
+                - cell "🌍*" [ref=e1615]
+                - cell "✈️ soft" [ref=e1616]:
+                  - generic [ref=e1617]: ✈️ soft
+                - 'cell "{origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Buen momento para volar!" [ref=e1618]':
+                  - paragraph [ref=e1619]: "{origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e1620]: "Hoy desde {price} {currency}. ¡Buen momento para volar!"
+                - cell [ref=e1621]:
+                  - button "Desactivar" [ref=e1622] [cursor=pointer]
+                - cell "×" [ref=e1624]:
+                  - button "×" [ref=e1625]
+              - 'row "🌍* ✈️ soft Oferta: {origin} → {destination} -{pct}% 🛫 Sale desde {price} {currency}. ¡No te lo pierdas! ×" [ref=e1626]':
+                - cell "🌍*" [ref=e1627]
+                - cell "✈️ soft" [ref=e1628]:
+                  - generic [ref=e1629]: ✈️ soft
+                - 'cell "Oferta: {origin} → {destination} -{pct}% 🛫 Sale desde {price} {currency}. ¡No te lo pierdas!" [ref=e1630]':
+                  - paragraph [ref=e1631]: "Oferta: {origin} → {destination} -{pct}% 🛫"
+                  - paragraph [ref=e1632]: "Sale desde {price} {currency}. ¡No te lo pierdas!"
+                - cell [ref=e1633]:
+                  - button "Desactivar" [ref=e1634] [cursor=pointer]
+                - cell "×" [ref=e1636]:
+                  - button "×" [ref=e1637]
+              - 'row "🌍* 💸 strong 💸 Gran bajada: {origin} → {destination} -{pct}% Hoy desde {price} {currency}. ¡Excelente precio! ×" [ref=e1638]':
+                - cell "🌍*" [ref=e1639]
+                - cell "💸 strong" [ref=e1640]:
+                  - generic [ref=e1641]: 💸 strong
+                - 'cell "💸 Gran bajada: {origin} → {destination} -{pct}% Hoy desde {price} {currency}. ¡Excelente precio!" [ref=e1642]':
+                  - paragraph [ref=e1643]: "💸 Gran bajada: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e1644]: "Hoy desde {price} {currency}. ¡Excelente precio!"
+                - cell [ref=e1645]:
+                  - button "Desactivar" [ref=e1646] [cursor=pointer]
+                - cell "×" [ref=e1648]:
+                  - button "×" [ref=e1649]
+              - 'row "🌍* 💸 strong 🔥 Precio histórico: {origin} → {destination} Bajó {pct}%. Desde {price} {currency}. No te lo pierdas. ×" [ref=e1650]':
+                - cell "🌍*" [ref=e1651]
+                - cell "💸 strong" [ref=e1652]:
+                  - generic [ref=e1653]: 💸 strong
+                - 'cell "🔥 Precio histórico: {origin} → {destination} Bajó {pct}%. Desde {price} {currency}. No te lo pierdas." [ref=e1654]':
+                  - paragraph [ref=e1655]: "🔥 Precio histórico: {origin} → {destination}"
+                  - paragraph [ref=e1656]: "Bajó {pct}%. Desde {price} {currency}. No te lo pierdas."
+                - cell [ref=e1657]:
+                  - button "Desactivar" [ref=e1658] [cursor=pointer]
+                - cell "×" [ref=e1660]:
+                  - button "×" [ref=e1661]
+              - 'row "🌍* 🔥 urgent 🚨 Precio mínimo: {origin} → {destination} -{pct}% ¡Solo {price} {currency}! Esta oferta no dura. ×" [ref=e1662]':
+                - cell "🌍*" [ref=e1663]
+                - cell "🔥 urgent" [ref=e1664]:
+                  - generic [ref=e1665]: 🔥 urgent
+                - 'cell "🚨 Precio mínimo: {origin} → {destination} -{pct}% ¡Solo {price} {currency}! Esta oferta no dura." [ref=e1666]':
+                  - paragraph [ref=e1667]: "🚨 Precio mínimo: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e1668]: "¡Solo {price} {currency}! Esta oferta no dura."
+                - cell [ref=e1669]:
+                  - button "Desactivar" [ref=e1670] [cursor=pointer]
+                - cell "×" [ref=e1672]:
+                  - button "×" [ref=e1673]
+              - 'row "🌍* 🔥 urgent ⚡ Oferta imperdible: {origin} → {destination} bajó {pct}% 💥 Desde {price} {currency}. ¡Es ahora o nunca! ×" [ref=e1674]':
+                - cell "🌍*" [ref=e1675]
+                - cell "🔥 urgent" [ref=e1676]:
+                  - generic [ref=e1677]: 🔥 urgent
+                - 'cell "⚡ Oferta imperdible: {origin} → {destination} bajó {pct}% 💥 Desde {price} {currency}. ¡Es ahora o nunca!" [ref=e1678]':
+                  - paragraph [ref=e1679]: "⚡ Oferta imperdible: {origin} → {destination} bajó {pct}% 💥"
+                  - paragraph [ref=e1680]: "Desde {price} {currency}. ¡Es ahora o nunca!"
+                - cell [ref=e1681]:
+                  - button "Desactivar" [ref=e1682] [cursor=pointer]
+                - cell "×" [ref=e1684]:
+                  - button "×" [ref=e1685]
+              - row "🌍* welcome Welcome to FlyPromociones! ✈️ Your flight price alerts are now active. We'll notify you when prices drop! ×" [ref=e1686]:
+                - cell "🌍*" [ref=e1687]
+                - cell "welcome" [ref=e1688]:
+                  - generic [ref=e1689]: welcome
+                - cell "Welcome to FlyPromociones! ✈️ Your flight price alerts are now active. We'll notify you when prices drop!" [ref=e1690]:
+                  - paragraph [ref=e1691]: Welcome to FlyPromociones! ✈️
+                  - paragraph [ref=e1692]: Your flight price alerts are now active. We'll notify you when prices drop!
+                - cell [ref=e1693]:
+                  - button "Desactivar" [ref=e1694] [cursor=pointer]
+                - cell "×" [ref=e1696]:
+                  - button "×" [ref=e1697]
+              - 'row "🇦🇷AR campaign ✈️ {origin} → {destination} está re copado ahora Hay vuelos piolas para {destination}. ¡Fiera, dale un vistazo! ×" [ref=e1698]':
+                - cell "🇦🇷AR" [ref=e1699]
+                - cell "campaign" [ref=e1700]:
+                  - generic [ref=e1701]: campaign
+                - 'cell "✈️ {origin} → {destination} está re copado ahora Hay vuelos piolas para {destination}. ¡Fiera, dale un vistazo!" [ref=e1702]':
+                  - paragraph [ref=e1703]: "✈️ {origin} → {destination} está re copado ahora"
+                  - paragraph [ref=e1704]: "Hay vuelos piolas para {destination}. ¡Fiera, dale un vistazo!"
+                - cell [ref=e1705]:
+                  - button "Desactivar" [ref=e1706] [cursor=pointer]
+                - cell "×" [ref=e1708]:
+                  - button "×" [ref=e1709]
+              - 'row "🇦🇷AR campaign 🔥 Fijate esta ruta: {origin_iata}→{destination_iata} Vuelos a {destination} con precios que se ven bien. ¡No aflojes! ×" [ref=e1710]':
+                - cell "🇦🇷AR" [ref=e1711]
+                - cell "campaign" [ref=e1712]:
+                  - generic [ref=e1713]: campaign
+                - 'cell "🔥 Fijate esta ruta: {origin_iata}→{destination_iata} Vuelos a {destination} con precios que se ven bien. ¡No aflojes!" [ref=e1714]':
+                  - paragraph [ref=e1715]: "🔥 Fijate esta ruta: {origin_iata}→{destination_iata}"
+                  - paragraph [ref=e1716]: "Vuelos a {destination} con precios que se ven bien. ¡No aflojes!"
+                - cell [ref=e1717]:
+                  - button "Desactivar" [ref=e1718] [cursor=pointer]
+                - cell "×" [ref=e1720]:
+                  - button "×" [ref=e1721]
+              - 'row "🇦🇷AR campaign 📍 {destination} te espera, che Aprovechá que hay vuelos desde {origin} a buen precio. ¡Golazo! ×" [ref=e1722]':
+                - cell "🇦🇷AR" [ref=e1723]
+                - cell "campaign" [ref=e1724]:
+                  - generic [ref=e1725]: campaign
+                - 'cell "📍 {destination} te espera, che Aprovechá que hay vuelos desde {origin} a buen precio. ¡Golazo!" [ref=e1726]':
+                  - paragraph [ref=e1727]: "📍 {destination} te espera, che"
+                  - paragraph [ref=e1728]: "Aprovechá que hay vuelos desde {origin} a buen precio. ¡Golazo!"
+                - cell [ref=e1729]:
+                  - button "Desactivar" [ref=e1730] [cursor=pointer]
+                - cell "×" [ref=e1732]:
+                  - button "×" [ref=e1733]
+              - 'row "🇦🇷AR campaign 🗺️ ¿Y si volás a {destination}? Hay opciones desde {origin_iata} que están joya. Chequealo! ×" [ref=e1734]':
+                - cell "🇦🇷AR" [ref=e1735]
+                - cell "campaign" [ref=e1736]:
+                  - generic [ref=e1737]: campaign
+                - 'cell "🗺️ ¿Y si volás a {destination}? Hay opciones desde {origin_iata} que están joya. Chequealo!" [ref=e1738]':
+                  - paragraph [ref=e1739]: "🗺️ ¿Y si volás a {destination}?"
+                  - paragraph [ref=e1740]: "Hay opciones desde {origin_iata} que están joya. Chequealo!"
+                - cell [ref=e1741]:
+                  - button "Desactivar" [ref=e1742] [cursor=pointer]
+                - cell "×" [ref=e1744]:
+                  - button "×" [ref=e1745]
+              - 'row "🇦🇷AR 🔄 reeng. ¿Todavía pensás en volar a {destination}? 🛫 Viste {price} {currency} antes. ¡Dale che, es tu momento! ×" [ref=e1746]':
+                - cell "🇦🇷AR" [ref=e1747]
+                - cell "🔄 reeng." [ref=e1748]:
+                  - generic [ref=e1749]: 🔄 reeng.
+                - 'cell "¿Todavía pensás en volar a {destination}? 🛫 Viste {price} {currency} antes. ¡Dale che, es tu momento!" [ref=e1750]':
+                  - paragraph [ref=e1751]: "¿Todavía pensás en volar a {destination}? 🛫"
+                  - paragraph [ref=e1752]: "Viste {price} {currency} antes. ¡Dale che, es tu momento!"
+                - cell [ref=e1753]:
+                  - button "Desactivar" [ref=e1754] [cursor=pointer]
+                - cell "×" [ref=e1756]:
+                  - button "×" [ref=e1757]
+              - 'row "🇦🇷AR 🔄 reeng. Che, ¿te vas a {destination}? ✈️ Tenías {price} {currency} en el radar. No lo dejes escapar, fiera. ×" [ref=e1758]':
+                - cell "🇦🇷AR" [ref=e1759]
+                - cell "🔄 reeng." [ref=e1760]:
+                  - generic [ref=e1761]: 🔄 reeng.
+                - 'cell "Che, ¿te vas a {destination}? ✈️ Tenías {price} {currency} en el radar. No lo dejes escapar, fiera." [ref=e1762]':
+                  - paragraph [ref=e1763]: "Che, ¿te vas a {destination}? ✈️"
+                  - paragraph [ref=e1764]: "Tenías {price} {currency} en el radar. No lo dejes escapar, fiera."
+                - cell [ref=e1765]:
+                  - button "Desactivar" [ref=e1766] [cursor=pointer]
+                - cell "×" [ref=e1768]:
+                  - button "×" [ref=e1769]
+              - 'row "🇦🇷AR 🔄 reeng. Fiera, ¿qué pasó con el viaje a {destination}? Viste {price} {currency} antes. ¡Ese precio es una joya! ×" [ref=e1770]':
+                - cell "🇦🇷AR" [ref=e1771]
+                - cell "🔄 reeng." [ref=e1772]:
+                  - generic [ref=e1773]: 🔄 reeng.
+                - 'cell "Fiera, ¿qué pasó con el viaje a {destination}? Viste {price} {currency} antes. ¡Ese precio es una joya!" [ref=e1774]':
+                  - paragraph [ref=e1775]: "Fiera, ¿qué pasó con el viaje a {destination}?"
+                  - paragraph [ref=e1776]: "Viste {price} {currency} antes. ¡Ese precio es una joya!"
+                - cell [ref=e1777]:
+                  - button "Desactivar" [ref=e1778] [cursor=pointer]
+                - cell "×" [ref=e1780]:
+                  - button "×" [ref=e1781]
+              - 'row "🇦🇷AR 🔄 reeng. {destination} te está esperando 🌎 Viste precios desde {price} {currency}. ¿Arrancamos? ×" [ref=e1782]':
+                - cell "🇦🇷AR" [ref=e1783]
+                - cell "🔄 reeng." [ref=e1784]:
+                  - generic [ref=e1785]: 🔄 reeng.
+                - 'cell "{destination} te está esperando 🌎 Viste precios desde {price} {currency}. ¿Arrancamos?" [ref=e1786]':
+                  - paragraph [ref=e1787]: "{destination} te está esperando 🌎"
+                  - paragraph [ref=e1788]: "Viste precios desde {price} {currency}. ¿Arrancamos?"
+                - cell [ref=e1789]:
+                  - button "Desactivar" [ref=e1790] [cursor=pointer]
+                - cell "×" [ref=e1792]:
+                  - button "×" [ref=e1793]
+              - 'row "🇦🇷AR 🔄 reeng. ¿Se armó el viaje a {destination}? 🤔 Encontraste {price} {currency}. Posta que vale la pena. ×" [ref=e1794]':
+                - cell "🇦🇷AR" [ref=e1795]
+                - cell "🔄 reeng." [ref=e1796]:
+                  - generic [ref=e1797]: 🔄 reeng.
+                - 'cell "¿Se armó el viaje a {destination}? 🤔 Encontraste {price} {currency}. Posta que vale la pena." [ref=e1798]':
+                  - paragraph [ref=e1799]: "¿Se armó el viaje a {destination}? 🤔"
+                  - paragraph [ref=e1800]: "Encontraste {price} {currency}. Posta que vale la pena."
+                - cell [ref=e1801]:
+                  - button "Desactivar" [ref=e1802] [cursor=pointer]
+                - cell "×" [ref=e1804]:
+                  - button "×" [ref=e1805]
+              - 'row "🇦🇷AR ✈️ soft Che, {origin} → {destination} bajó {pct}% ✈️ Hoy salís desde {price} {currency}. ¡Está piola! ×" [ref=e1806]':
+                - cell "🇦🇷AR" [ref=e1807]
+                - cell "✈️ soft" [ref=e1808]:
+                  - generic [ref=e1809]: ✈️ soft
+                - 'cell "Che, {origin} → {destination} bajó {pct}% ✈️ Hoy salís desde {price} {currency}. ¡Está piola!" [ref=e1810]':
+                  - paragraph [ref=e1811]: "Che, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e1812]: "Hoy salís desde {price} {currency}. ¡Está piola!"
+                - cell [ref=e1813]:
+                  - button "Desactivar" [ref=e1814] [cursor=pointer]
+                - cell "×" [ref=e1816]:
+                  - button "×" [ref=e1817]
+              - 'row "🇦🇷AR ✈️ soft Fiera, apareció una oferta: {origin} → {destination} Bajó {pct}%. Desde {price} {currency}, una masa. ×" [ref=e1818]':
+                - cell "🇦🇷AR" [ref=e1819]
+                - cell "✈️ soft" [ref=e1820]:
+                  - generic [ref=e1821]: ✈️ soft
+                - 'cell "Fiera, apareció una oferta: {origin} → {destination} Bajó {pct}%. Desde {price} {currency}, una masa." [ref=e1822]':
+                  - paragraph [ref=e1823]: "Fiera, apareció una oferta: {origin} → {destination}"
+                  - paragraph [ref=e1824]: "Bajó {pct}%. Desde {price} {currency}, una masa."
+                - cell [ref=e1825]:
+                  - button "Desactivar" [ref=e1826] [cursor=pointer]
+                - cell "×" [ref=e1828]:
+                  - button "×" [ref=e1829]
+              - 'row "🇦🇷AR ✈️ soft ✈️ {origin} → {destination} se puso copado Bajó {pct}%, hoy desde {price} {currency}. Dale que conviene. ×" [ref=e1830]':
+                - cell "🇦🇷AR" [ref=e1831]
+                - cell "✈️ soft" [ref=e1832]:
+                  - generic [ref=e1833]: ✈️ soft
+                - 'cell "✈️ {origin} → {destination} se puso copado Bajó {pct}%, hoy desde {price} {currency}. Dale que conviene." [ref=e1834]':
+                  - paragraph [ref=e1835]: "✈️ {origin} → {destination} se puso copado"
+                  - paragraph [ref=e1836]: "Bajó {pct}%, hoy desde {price} {currency}. Dale que conviene."
+                - cell [ref=e1837]:
+                  - button "Desactivar" [ref=e1838] [cursor=pointer]
+                - cell "×" [ref=e1840]:
+                  - button "×" [ref=e1841]
+              - 'row "🇦🇷AR ✈️ soft Bajó {pct}% el vuelo a {destination} 🛫 Sale desde {price} {currency}. Re joya para volar. ×" [ref=e1842]':
+                - cell "🇦🇷AR" [ref=e1843]
+                - cell "✈️ soft" [ref=e1844]:
+                  - generic [ref=e1845]: ✈️ soft
+                - 'cell "Bajó {pct}% el vuelo a {destination} 🛫 Sale desde {price} {currency}. Re joya para volar." [ref=e1846]':
+                  - paragraph [ref=e1847]: "Bajó {pct}% el vuelo a {destination} 🛫"
+                  - paragraph [ref=e1848]: "Sale desde {price} {currency}. Re joya para volar."
+                - cell [ref=e1849]:
+                  - button "Desactivar" [ref=e1850] [cursor=pointer]
+                - cell "×" [ref=e1852]:
+                  - button "×" [ref=e1853]
+              - 'row "🇦🇷AR ✈️ soft Ojo, {origin} → {destination} está más barato Cayó {pct}%, desde {price} {currency}. Posta. ×" [ref=e1854]':
+                - cell "🇦🇷AR" [ref=e1855]
+                - cell "✈️ soft" [ref=e1856]:
+                  - generic [ref=e1857]: ✈️ soft
+                - 'cell "Ojo, {origin} → {destination} está más barato Cayó {pct}%, desde {price} {currency}. Posta." [ref=e1858]':
+                  - paragraph [ref=e1859]: "Ojo, {origin} → {destination} está más barato"
+                  - paragraph [ref=e1860]: "Cayó {pct}%, desde {price} {currency}. Posta."
+                - cell [ref=e1861]:
+                  - button "Desactivar" [ref=e1862] [cursor=pointer]
+                - cell "×" [ref=e1864]:
+                  - button "×" [ref=e1865]
+              - 'row "🇦🇷AR ✈️ soft Che, ¡el vuelo a {destination} bajó! {origin} → {destination}: -{pct}%, desde {price} {currency}. ¡Un golazo! ×" [ref=e1866]':
+                - cell "🇦🇷AR" [ref=e1867]
+                - cell "✈️ soft" [ref=e1868]:
+                  - generic [ref=e1869]: ✈️ soft
+                - 'cell "Che, ¡el vuelo a {destination} bajó! {origin} → {destination}: -{pct}%, desde {price} {currency}. ¡Un golazo!" [ref=e1870]':
+                  - paragraph [ref=e1871]: "Che, ¡el vuelo a {destination} bajó!"
+                  - paragraph [ref=e1872]: "{origin} → {destination}: -{pct}%, desde {price} {currency}. ¡Un golazo!"
+                - cell [ref=e1873]:
+                  - button "Desactivar" [ref=e1874] [cursor=pointer]
+                - cell "×" [ref=e1876]:
+                  - button "×" [ref=e1877]
+              - 'row "🇦🇷AR ✈️ soft 🎯 Oportunidad: {origin} → {destination} Bajó {pct}%. Salís desde {price} {currency}. Capo. ×" [ref=e1878]':
+                - cell "🇦🇷AR" [ref=e1879]
+                - cell "✈️ soft" [ref=e1880]:
+                  - generic [ref=e1881]: ✈️ soft
+                - 'cell "🎯 Oportunidad: {origin} → {destination} Bajó {pct}%. Salís desde {price} {currency}. Capo." [ref=e1882]':
+                  - paragraph [ref=e1883]: "🎯 Oportunidad: {origin} → {destination}"
+                  - paragraph [ref=e1884]: "Bajó {pct}%. Salís desde {price} {currency}. Capo."
+                - cell [ref=e1885]:
+                  - button "Desactivar" [ref=e1886] [cursor=pointer]
+                - cell "×" [ref=e1888]:
+                  - button "×" [ref=e1889]
+              - 'row "🇦🇷AR ✈️ soft {origin} → {destination} a precio piola 🛫 Desde {price} {currency} nomás. Cayó {pct}%. ×" [ref=e1890]':
+                - cell "🇦🇷AR" [ref=e1891]
+                - cell "✈️ soft" [ref=e1892]:
+                  - generic [ref=e1893]: ✈️ soft
+                - 'cell "{origin} → {destination} a precio piola 🛫 Desde {price} {currency} nomás. Cayó {pct}%." [ref=e1894]':
+                  - paragraph [ref=e1895]: "{origin} → {destination} a precio piola 🛫"
+                  - paragraph [ref=e1896]: "Desde {price} {currency} nomás. Cayó {pct}%."
+                - cell [ref=e1897]:
+                  - button "Desactivar" [ref=e1898] [cursor=pointer]
+                - cell "×" [ref=e1900]:
+                  - button "×" [ref=e1901]
+              - 'row "🇦🇷AR ✈️ soft Buena onda en {origin} → {destination} ✨ El precio se fue pa'' abajo {pct}%. Desde {price} {currency}. ×" [ref=e1902]':
+                - cell "🇦🇷AR" [ref=e1903]
+                - cell "✈️ soft" [ref=e1904]:
+                  - generic [ref=e1905]: ✈️ soft
+                - 'cell "Buena onda en {origin} → {destination} ✨ El precio se fue pa'' abajo {pct}%. Desde {price} {currency}." [ref=e1906]':
+                  - paragraph [ref=e1907]: "Buena onda en {origin} → {destination} ✨"
+                  - paragraph [ref=e1908]: "El precio se fue pa' abajo {pct}%. Desde {price} {currency}."
+                - cell [ref=e1909]:
+                  - button "Desactivar" [ref=e1910] [cursor=pointer]
+                - cell "×" [ref=e1912]:
+                  - button "×" [ref=e1913]
+              - 'row "🇦🇷AR ✈️ soft Dale che, el vuelo a {destination} bajó 🤩 Hoy desde {price} {currency}, un {pct}% menos que antes. ×" [ref=e1914]':
+                - cell "🇦🇷AR" [ref=e1915]
+                - cell "✈️ soft" [ref=e1916]:
+                  - generic [ref=e1917]: ✈️ soft
+                - 'cell "Dale che, el vuelo a {destination} bajó 🤩 Hoy desde {price} {currency}, un {pct}% menos que antes." [ref=e1918]':
+                  - paragraph [ref=e1919]: "Dale che, el vuelo a {destination} bajó 🤩"
+                  - paragraph [ref=e1920]: "Hoy desde {price} {currency}, un {pct}% menos que antes."
+                - cell [ref=e1921]:
+                  - button "Desactivar" [ref=e1922] [cursor=pointer]
+                - cell "×" [ref=e1924]:
+                  - button "×" [ref=e1925]
+              - 'row "🇦🇷AR 💸 strong 💸 Esto es una locura: {origin} → {destination} bajó {pct}% Hoy desde {price} {currency}. ¡Re copado! ×" [ref=e1926]':
+                - cell "🇦🇷AR" [ref=e1927]
+                - cell "💸 strong" [ref=e1928]:
+                  - generic [ref=e1929]: 💸 strong
+                - 'cell "💸 Esto es una locura: {origin} → {destination} bajó {pct}% Hoy desde {price} {currency}. ¡Re copado!" [ref=e1930]':
+                  - paragraph [ref=e1931]: "💸 Esto es una locura: {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e1932]: "Hoy desde {price} {currency}. ¡Re copado!"
+                - cell [ref=e1933]:
+                  - button "Desactivar" [ref=e1934] [cursor=pointer]
+                - cell "×" [ref=e1936]:
+                  - button "×" [ref=e1937]
+              - 'row "🇦🇷AR 💸 strong Che, se armó la ganga 🔥 {origin} → {destination} Bajó {pct}%. Desde {price} {currency}, posta. ×" [ref=e1938]':
+                - cell "🇦🇷AR" [ref=e1939]
+                - cell "💸 strong" [ref=e1940]:
+                  - generic [ref=e1941]: 💸 strong
+                - 'cell "Che, se armó la ganga 🔥 {origin} → {destination} Bajó {pct}%. Desde {price} {currency}, posta." [ref=e1942]':
+                  - paragraph [ref=e1943]: "Che, se armó la ganga 🔥 {origin} → {destination}"
+                  - paragraph [ref=e1944]: "Bajó {pct}%. Desde {price} {currency}, posta."
+                - cell [ref=e1945]:
+                  - button "Desactivar" [ref=e1946] [cursor=pointer]
+                - cell "×" [ref=e1948]:
+                  - button "×" [ref=e1949]
+              - 'row "🇦🇷AR 💸 strong Gran bajada en {origin} → {destination} 🚀 ¡{pct}% menos! Salís desde {price} {currency}. No aflojes. ×" [ref=e1950]':
+                - cell "🇦🇷AR" [ref=e1951]
+                - cell "💸 strong" [ref=e1952]:
+                  - generic [ref=e1953]: 💸 strong
+                - 'cell "Gran bajada en {origin} → {destination} 🚀 ¡{pct}% menos! Salís desde {price} {currency}. No aflojes." [ref=e1954]':
+                  - paragraph [ref=e1955]: "Gran bajada en {origin} → {destination} 🚀"
+                  - paragraph [ref=e1956]: "¡{pct}% menos! Salís desde {price} {currency}. No aflojes."
+                - cell [ref=e1957]:
+                  - button "Desactivar" [ref=e1958] [cursor=pointer]
+                - cell "×" [ref=e1960]:
+                  - button "×" [ref=e1961]
+              - 'row "🇦🇷AR 💸 strong Fiera, esto es un golazo 🎉 {origin} → {destination}: -{pct}%, desde {price} {currency}. ×" [ref=e1962]':
+                - cell "🇦🇷AR" [ref=e1963]
+                - cell "💸 strong" [ref=e1964]:
+                  - generic [ref=e1965]: 💸 strong
+                - 'cell "Fiera, esto es un golazo 🎉 {origin} → {destination}: -{pct}%, desde {price} {currency}." [ref=e1966]':
+                  - paragraph [ref=e1967]: Fiera, esto es un golazo 🎉
+                  - paragraph [ref=e1968]: "{origin} → {destination}: -{pct}%, desde {price} {currency}."
+                - cell [ref=e1969]:
+                  - button "Desactivar" [ref=e1970] [cursor=pointer]
+                - cell "×" [ref=e1972]:
+                  - button "×" [ref=e1973]
+              - 'row "🇦🇷AR 💸 strong 💸 {pct}% de descuento: {origin} → {destination} Hoy desde {price} {currency}. Una masa total. ×" [ref=e1974]':
+                - cell "🇦🇷AR" [ref=e1975]
+                - cell "💸 strong" [ref=e1976]:
+                  - generic [ref=e1977]: 💸 strong
+                - 'cell "💸 {pct}% de descuento: {origin} → {destination} Hoy desde {price} {currency}. Una masa total." [ref=e1978]':
+                  - paragraph [ref=e1979]: "💸 {pct}% de descuento: {origin} → {destination}"
+                  - paragraph [ref=e1980]: "Hoy desde {price} {currency}. Una masa total."
+                - cell [ref=e1981]:
+                  - button "Desactivar" [ref=e1982] [cursor=pointer]
+                - cell "×" [ref=e1984]:
+                  - button "×" [ref=e1985]
+              - 'row "🇦🇷AR 💸 strong Re barato: {origin} → {destination} ✈️ Cayó {pct}%. Salís desde {price} {currency}. ¡Arrancá! ×" [ref=e1986]':
+                - cell "🇦🇷AR" [ref=e1987]
+                - cell "💸 strong" [ref=e1988]:
+                  - generic [ref=e1989]: 💸 strong
+                - 'cell "Re barato: {origin} → {destination} ✈️ Cayó {pct}%. Salís desde {price} {currency}. ¡Arrancá!" [ref=e1990]':
+                  - paragraph [ref=e1991]: "Re barato: {origin} → {destination} ✈️"
+                  - paragraph [ref=e1992]: "Cayó {pct}%. Salís desde {price} {currency}. ¡Arrancá!"
+                - cell [ref=e1993]:
+                  - button "Desactivar" [ref=e1994] [cursor=pointer]
+                - cell "×" [ref=e1996]:
+                  - button "×" [ref=e1997]
+              - 'row "🇦🇷AR 💸 strong Che, mirá este precio 👀 {origin} → {destination}: -{pct}%, hoy desde {price} {currency}. Capazo. ×" [ref=e1998]':
+                - cell "🇦🇷AR" [ref=e1999]
+                - cell "💸 strong" [ref=e2000]:
+                  - generic [ref=e2001]: 💸 strong
+                - 'cell "Che, mirá este precio 👀 {origin} → {destination}: -{pct}%, hoy desde {price} {currency}. Capazo." [ref=e2002]':
+                  - paragraph [ref=e2003]: Che, mirá este precio 👀
+                  - paragraph [ref=e2004]: "{origin} → {destination}: -{pct}%, hoy desde {price} {currency}. Capazo."
+                - cell [ref=e2005]:
+                  - button "Desactivar" [ref=e2006] [cursor=pointer]
+                - cell "×" [ref=e2008]:
+                  - button "×" [ref=e2009]
+              - 'row "🇦🇷AR 💸 strong 🏆 El mejor precio en meses: {origin} → {destination} Bajó {pct}%, desde {price} {currency}. Se armó. ×" [ref=e2010]':
+                - cell "🇦🇷AR" [ref=e2011]
+                - cell "💸 strong" [ref=e2012]:
+                  - generic [ref=e2013]: 💸 strong
+                - 'cell "🏆 El mejor precio en meses: {origin} → {destination} Bajó {pct}%, desde {price} {currency}. Se armó." [ref=e2014]':
+                  - paragraph [ref=e2015]: "🏆 El mejor precio en meses: {origin} → {destination}"
+                  - paragraph [ref=e2016]: "Bajó {pct}%, desde {price} {currency}. Se armó."
+                - cell [ref=e2017]:
+                  - button "Desactivar" [ref=e2018] [cursor=pointer]
+                - cell "×" [ref=e2020]:
+                  - button "×" [ref=e2021]
+              - 'row "🇦🇷AR 💸 strong No te quedés sin verlo: {origin} → {destination} bajó {pct}% 💥 Desde {price} {currency}. Quilombo de oferta. ×" [ref=e2022]':
+                - cell "🇦🇷AR" [ref=e2023]
+                - cell "💸 strong" [ref=e2024]:
+                  - generic [ref=e2025]: 💸 strong
+                - 'cell "No te quedés sin verlo: {origin} → {destination} bajó {pct}% 💥 Desde {price} {currency}. Quilombo de oferta." [ref=e2026]':
+                  - paragraph [ref=e2027]: "No te quedés sin verlo: {origin} → {destination} bajó {pct}% 💥"
+                  - paragraph [ref=e2028]: "Desde {price} {currency}. Quilombo de oferta."
+                - cell [ref=e2029]:
+                  - button "Desactivar" [ref=e2030] [cursor=pointer]
+                - cell "×" [ref=e2032]:
+                  - button "×" [ref=e2033]
+              - 'row "🇦🇷AR 💸 strong Precio de capo: {origin} → {destination} -{pct}% y sale desde {price} {currency}. ¡Una joya! ×" [ref=e2034]':
+                - cell "🇦🇷AR" [ref=e2035]
+                - cell "💸 strong" [ref=e2036]:
+                  - generic [ref=e2037]: 💸 strong
+                - 'cell "Precio de capo: {origin} → {destination} -{pct}% y sale desde {price} {currency}. ¡Una joya!" [ref=e2038]':
+                  - paragraph [ref=e2039]: "Precio de capo: {origin} → {destination}"
+                  - paragraph [ref=e2040]: "-{pct}% y sale desde {price} {currency}. ¡Una joya!"
+                - cell [ref=e2041]:
+                  - button "Desactivar" [ref=e2042] [cursor=pointer]
+                - cell "×" [ref=e2044]:
+                  - button "×" [ref=e2045]
+              - 'row "🇦🇷AR 🔥 urgent 🔥 PRECIO MÍNIMO: {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! No dejes escapar esta. ×" [ref=e2046]':
+                - cell "🇦🇷AR" [ref=e2047]
+                - cell "🔥 urgent" [ref=e2048]:
+                  - generic [ref=e2049]: 🔥 urgent
+                - 'cell "🔥 PRECIO MÍNIMO: {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! No dejes escapar esta." [ref=e2050]':
+                  - paragraph [ref=e2051]: "🔥 PRECIO MÍNIMO: {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e2052]: "¡Solo {price} {currency}! No dejes escapar esta."
+                - cell [ref=e2053]:
+                  - button "Desactivar" [ref=e2054] [cursor=pointer]
+                - cell "×" [ref=e2056]:
+                  - button "×" [ref=e2057]
+              - 'row "🇦🇷AR 🔥 urgent ⚡ Bolazo total: {origin} → {destination} -{pct}% Desde {price} {currency}. Posta, es ahora o nunca. ×" [ref=e2058]':
+                - cell "🇦🇷AR" [ref=e2059]
+                - cell "🔥 urgent" [ref=e2060]:
+                  - generic [ref=e2061]: 🔥 urgent
+                - 'cell "⚡ Bolazo total: {origin} → {destination} -{pct}% Desde {price} {currency}. Posta, es ahora o nunca." [ref=e2062]':
+                  - paragraph [ref=e2063]: "⚡ Bolazo total: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2064]: "Desde {price} {currency}. Posta, es ahora o nunca."
+                - cell [ref=e2065]:
+                  - button "Desactivar" [ref=e2066] [cursor=pointer]
+                - cell "×" [ref=e2068]:
+                  - button "×" [ref=e2069]
+              - 'row "🇦🇷AR 🔥 urgent Che, ¡esto es histórico! {origin} → {destination} Bajó {pct}%, hoy desde {price} {currency}. ¡Una locura! ×" [ref=e2070]':
+                - cell "🇦🇷AR" [ref=e2071]
+                - cell "🔥 urgent" [ref=e2072]:
+                  - generic [ref=e2073]: 🔥 urgent
+                - 'cell "Che, ¡esto es histórico! {origin} → {destination} Bajó {pct}%, hoy desde {price} {currency}. ¡Una locura!" [ref=e2074]':
+                  - paragraph [ref=e2075]: "Che, ¡esto es histórico! {origin} → {destination}"
+                  - paragraph [ref=e2076]: "Bajó {pct}%, hoy desde {price} {currency}. ¡Una locura!"
+                - cell [ref=e2077]:
+                  - button "Desactivar" [ref=e2078] [cursor=pointer]
+                - cell "×" [ref=e2080]:
+                  - button "×" [ref=e2081]
+              - 'row "🇦🇷AR 🔥 urgent 🚨 Oportunidad única: {origin} → {destination} -{pct}% y sale {price} {currency}. ¡Dale ya, fiera! ×" [ref=e2082]':
+                - cell "🇦🇷AR" [ref=e2083]
+                - cell "🔥 urgent" [ref=e2084]:
+                  - generic [ref=e2085]: 🔥 urgent
+                - 'cell "🚨 Oportunidad única: {origin} → {destination} -{pct}% y sale {price} {currency}. ¡Dale ya, fiera!" [ref=e2086]':
+                  - paragraph [ref=e2087]: "🚨 Oportunidad única: {origin} → {destination}"
+                  - paragraph [ref=e2088]: "-{pct}% y sale {price} {currency}. ¡Dale ya, fiera!"
+                - cell [ref=e2089]:
+                  - button "Desactivar" [ref=e2090] [cursor=pointer]
+                - cell "×" [ref=e2092]:
+                  - button "×" [ref=e2093]
+              - 'row "🇦🇷AR 🔥 urgent Re baratísimo: {origin} → {destination} ✈️🔥 ¡{pct}% de bajada! Desde {price} {currency}. Ahora o nunca. ×" [ref=e2094]':
+                - cell "🇦🇷AR" [ref=e2095]
+                - cell "🔥 urgent" [ref=e2096]:
+                  - generic [ref=e2097]: 🔥 urgent
+                - 'cell "Re baratísimo: {origin} → {destination} ✈️🔥 ¡{pct}% de bajada! Desde {price} {currency}. Ahora o nunca." [ref=e2098]':
+                  - paragraph [ref=e2099]: "Re baratísimo: {origin} → {destination} ✈️🔥"
+                  - paragraph [ref=e2100]: "¡{pct}% de bajada! Desde {price} {currency}. Ahora o nunca."
+                - cell [ref=e2101]:
+                  - button "Desactivar" [ref=e2102] [cursor=pointer]
+                - cell "×" [ref=e2104]:
+                  - button "×" [ref=e2105]
+              - 'row "🇦🇷AR 🔥 urgent Precio de película: {origin} → {destination} 💥 Cayó {pct}%. Desde {price} {currency}. ¡Un caponazo! ×" [ref=e2106]':
+                - cell "🇦🇷AR" [ref=e2107]
+                - cell "🔥 urgent" [ref=e2108]:
+                  - generic [ref=e2109]: 🔥 urgent
+                - 'cell "Precio de película: {origin} → {destination} 💥 Cayó {pct}%. Desde {price} {currency}. ¡Un caponazo!" [ref=e2110]':
+                  - paragraph [ref=e2111]: "Precio de película: {origin} → {destination} 💥"
+                  - paragraph [ref=e2112]: "Cayó {pct}%. Desde {price} {currency}. ¡Un caponazo!"
+                - cell [ref=e2113]:
+                  - button "Desactivar" [ref=e2114] [cursor=pointer]
+                - cell "×" [ref=e2116]:
+                  - button "×" [ref=e2117]
+              - 'row "🇦🇷AR 🔥 urgent 🏆 La oferta del año: {origin} → {destination} -{pct}%, hoy desde {price} {currency}. ¡Una masa! ×" [ref=e2118]':
+                - cell "🇦🇷AR" [ref=e2119]
+                - cell "🔥 urgent" [ref=e2120]:
+                  - generic [ref=e2121]: 🔥 urgent
+                - 'cell "🏆 La oferta del año: {origin} → {destination} -{pct}%, hoy desde {price} {currency}. ¡Una masa!" [ref=e2122]':
+                  - paragraph [ref=e2123]: "🏆 La oferta del año: {origin} → {destination}"
+                  - paragraph [ref=e2124]: "-{pct}%, hoy desde {price} {currency}. ¡Una masa!"
+                - cell [ref=e2125]:
+                  - button "Desactivar" [ref=e2126] [cursor=pointer]
+                - cell "×" [ref=e2128]:
+                  - button "×" [ref=e2129]
+              - 'row "🇦🇷AR 🔥 urgent ¡No lo puedo creer! {origin} → {destination} bajó {pct}% 😱 Hoy desde {price} {currency}. ¡Arrancá ya, chabón! ×" [ref=e2130]':
+                - cell "🇦🇷AR" [ref=e2131]
+                - cell "🔥 urgent" [ref=e2132]:
+                  - generic [ref=e2133]: 🔥 urgent
+                - 'cell "¡No lo puedo creer! {origin} → {destination} bajó {pct}% 😱 Hoy desde {price} {currency}. ¡Arrancá ya, chabón!" [ref=e2134]':
+                  - paragraph [ref=e2135]: "¡No lo puedo creer! {origin} → {destination} bajó {pct}% 😱"
+                  - paragraph [ref=e2136]: "Hoy desde {price} {currency}. ¡Arrancá ya, chabón!"
+                - cell [ref=e2137]:
+                  - button "Desactivar" [ref=e2138] [cursor=pointer]
+                - cell "×" [ref=e2140]:
+                  - button "×" [ref=e2141]
+              - row "🇦🇷AR welcome ¡Bienvenido a FlyPromociones! ✈️ ¡Ya activamos tus alertas de precio! Te avisamos cuando baje tu vuelo preferido. ×" [ref=e2142]:
+                - cell "🇦🇷AR" [ref=e2143]
+                - cell "welcome" [ref=e2144]:
+                  - generic [ref=e2145]: welcome
+                - cell "¡Bienvenido a FlyPromociones! ✈️ ¡Ya activamos tus alertas de precio! Te avisamos cuando baje tu vuelo preferido." [ref=e2146]:
+                  - paragraph [ref=e2147]: ¡Bienvenido a FlyPromociones! ✈️
+                  - paragraph [ref=e2148]: ¡Ya activamos tus alertas de precio! Te avisamos cuando baje tu vuelo preferido.
+                - cell [ref=e2149]:
+                  - button "Desactivar" [ref=e2150] [cursor=pointer]
+                - cell "×" [ref=e2152]:
+                  - button "×" [ref=e2153]
+              - row "🇦🇷AR welcome ¡Listo para despegar! 🎉 Ahora recibís alertas de vuelos baratos. ¡Ahorrá en tu próximo viaje con FlyP! ×" [ref=e2154]:
+                - cell "🇦🇷AR" [ref=e2155]
+                - cell "welcome" [ref=e2156]:
+                  - generic [ref=e2157]: welcome
+                - cell "¡Listo para despegar! 🎉 Ahora recibís alertas de vuelos baratos. ¡Ahorrá en tu próximo viaje con FlyP!" [ref=e2158]:
+                  - paragraph [ref=e2159]: ¡Listo para despegar! 🎉
+                  - paragraph [ref=e2160]: Ahora recibís alertas de vuelos baratos. ¡Ahorrá en tu próximo viaje con FlyP!
+                - cell [ref=e2161]:
+                  - button "Desactivar" [ref=e2162] [cursor=pointer]
+                - cell "×" [ref=e2164]:
+                  - button "×" [ref=e2165]
+              - 'row "🇧🇷BR campaign ✈️ {origin} → {destination} partiu! Tem voos para {destination} que estão topzera. Bora aproveitar! ×" [ref=e2166]':
+                - cell "🇧🇷BR" [ref=e2167]
+                - cell "campaign" [ref=e2168]:
+                  - generic [ref=e2169]: campaign
+                - 'cell "✈️ {origin} → {destination} partiu! Tem voos para {destination} que estão topzera. Bora aproveitar!" [ref=e2170]':
+                  - paragraph [ref=e2171]: "✈️ {origin} → {destination} partiu!"
+                  - paragraph [ref=e2172]: "Tem voos para {destination} que estão topzera. Bora aproveitar!"
+                - cell [ref=e2173]:
+                  - button "Desactivar" [ref=e2174] [cursor=pointer]
+                - cell "×" [ref=e2176]:
+                  - button "×" [ref=e2177]
+              - 'row "🇧🇷BR campaign 🔥 Cara, olha essa rota: {origin_iata}→{destination_iata} Voos para {destination} com preços que são show de bola! ×" [ref=e2178]':
+                - cell "🇧🇷BR" [ref=e2179]
+                - cell "campaign" [ref=e2180]:
+                  - generic [ref=e2181]: campaign
+                - 'cell "🔥 Cara, olha essa rota: {origin_iata}→{destination_iata} Voos para {destination} com preços que são show de bola!" [ref=e2182]':
+                  - paragraph [ref=e2183]: "🔥 Cara, olha essa rota: {origin_iata}→{destination_iata}"
+                  - paragraph [ref=e2184]: "Voos para {destination} com preços que são show de bola!"
+                - cell [ref=e2185]:
+                  - button "Desactivar" [ref=e2186] [cursor=pointer]
+                - cell "×" [ref=e2188]:
+                  - button "×" [ref=e2189]
+              - 'row "🇧🇷BR 🔄 reeng. Ainda pensando em voar para {destination}? 🛫 Você viu {price} {currency}. Bora, mano! ×" [ref=e2190]':
+                - cell "🇧🇷BR" [ref=e2191]
+                - cell "🔄 reeng." [ref=e2192]:
+                  - generic [ref=e2193]: 🔄 reeng.
+                - 'cell "Ainda pensando em voar para {destination}? 🛫 Você viu {price} {currency}. Bora, mano!" [ref=e2194]':
+                  - paragraph [ref=e2195]: "Ainda pensando em voar para {destination}? 🛫"
+                  - paragraph [ref=e2196]: "Você viu {price} {currency}. Bora, mano!"
+                - cell [ref=e2197]:
+                  - button "Desactivar" [ref=e2198] [cursor=pointer]
+                - cell "×" [ref=e2200]:
+                  - button "×" [ref=e2201]
+              - 'row "🇧🇷BR 🔄 reeng. Ei, e a viagem para {destination}? ✈️ Tinha {price} {currency}. Aproveita enquanto dá! ×" [ref=e2202]':
+                - cell "🇧🇷BR" [ref=e2203]
+                - cell "🔄 reeng." [ref=e2204]:
+                  - generic [ref=e2205]: 🔄 reeng.
+                - 'cell "Ei, e a viagem para {destination}? ✈️ Tinha {price} {currency}. Aproveita enquanto dá!" [ref=e2206]':
+                  - paragraph [ref=e2207]: "Ei, e a viagem para {destination}? ✈️"
+                  - paragraph [ref=e2208]: "Tinha {price} {currency}. Aproveita enquanto dá!"
+                - cell [ref=e2209]:
+                  - button "Desactivar" [ref=e2210] [cursor=pointer]
+                - cell "×" [ref=e2212]:
+                  - button "×" [ref=e2213]
+              - 'row "🇧🇷BR 🔄 reeng. {destination} tá te chamando 🌎 Você viu preços de {price} {currency}. Partiu! ×" [ref=e2214]':
+                - cell "🇧🇷BR" [ref=e2215]
+                - cell "🔄 reeng." [ref=e2216]:
+                  - generic [ref=e2217]: 🔄 reeng.
+                - 'cell "{destination} tá te chamando 🌎 Você viu preços de {price} {currency}. Partiu!" [ref=e2218]':
+                  - paragraph [ref=e2219]: "{destination} tá te chamando 🌎"
+                  - paragraph [ref=e2220]: "Você viu preços de {price} {currency}. Partiu!"
+                - cell [ref=e2221]:
+                  - button "Desactivar" [ref=e2222] [cursor=pointer]
+                - cell "×" [ref=e2224]:
+                  - button "×" [ref=e2225]
+              - 'row "🇧🇷BR 🔄 reeng. Cara, vai voar para {destination}? 🤔 Encontrou {price} {currency}. Manda ver! ×" [ref=e2226]':
+                - cell "🇧🇷BR" [ref=e2227]
+                - cell "🔄 reeng." [ref=e2228]:
+                  - generic [ref=e2229]: 🔄 reeng.
+                - 'cell "Cara, vai voar para {destination}? 🤔 Encontrou {price} {currency}. Manda ver!" [ref=e2230]':
+                  - paragraph [ref=e2231]: "Cara, vai voar para {destination}? 🤔"
+                  - paragraph [ref=e2232]: "Encontrou {price} {currency}. Manda ver!"
+                - cell [ref=e2233]:
+                  - button "Desactivar" [ref=e2234] [cursor=pointer]
+                - cell "×" [ref=e2236]:
+                  - button "×" [ref=e2237]
+              - 'row "🇧🇷BR ✈️ soft Cara, {origin} → {destination} baixou {pct}% ✈️ Hoje de {price} {currency}. Que legal, aproveita! ×" [ref=e2238]':
+                - cell "🇧🇷BR" [ref=e2239]
+                - cell "✈️ soft" [ref=e2240]:
+                  - generic [ref=e2241]: ✈️ soft
+                - 'cell "Cara, {origin} → {destination} baixou {pct}% ✈️ Hoje de {price} {currency}. Que legal, aproveita!" [ref=e2242]':
+                  - paragraph [ref=e2243]: "Cara, {origin} → {destination} baixou {pct}% ✈️"
+                  - paragraph [ref=e2244]: "Hoje de {price} {currency}. Que legal, aproveita!"
+                - cell [ref=e2245]:
+                  - button "Desactivar" [ref=e2246] [cursor=pointer]
+                - cell "×" [ref=e2248]:
+                  - button "×" [ref=e2249]
+              - 'row "🇧🇷BR ✈️ soft Mano, tá barato voar para {destination}! Caiu {pct}%. Só {price} {currency}. Partiu?! ×" [ref=e2250]':
+                - cell "🇧🇷BR" [ref=e2251]
+                - cell "✈️ soft" [ref=e2252]:
+                  - generic [ref=e2253]: ✈️ soft
+                - 'cell "Mano, tá barato voar para {destination}! Caiu {pct}%. Só {price} {currency}. Partiu?!" [ref=e2254]':
+                  - paragraph [ref=e2255]: "Mano, tá barato voar para {destination}!"
+                  - paragraph [ref=e2256]: "Caiu {pct}%. Só {price} {currency}. Partiu?!"
+                - cell [ref=e2257]:
+                  - button "Desactivar" [ref=e2258] [cursor=pointer]
+                - cell "×" [ref=e2260]:
+                  - button "×" [ref=e2261]
+              - 'row "🇧🇷BR ✈️ soft ✈️ Voo {origin} → {destination} com desconto! Baixou {pct}%. De {price} {currency}. Não perde! ×" [ref=e2262]':
+                - cell "🇧🇷BR" [ref=e2263]
+                - cell "✈️ soft" [ref=e2264]:
+                  - generic [ref=e2265]: ✈️ soft
+                - 'cell "✈️ Voo {origin} → {destination} com desconto! Baixou {pct}%. De {price} {currency}. Não perde!" [ref=e2266]':
+                  - paragraph [ref=e2267]: "✈️ Voo {origin} → {destination} com desconto!"
+                  - paragraph [ref=e2268]: "Baixou {pct}%. De {price} {currency}. Não perde!"
+                - cell [ref=e2269]:
+                  - button "Desactivar" [ref=e2270] [cursor=pointer]
+                - cell "×" [ref=e2272]:
+                  - button "×" [ref=e2273]
+              - 'row "🇧🇷BR ✈️ soft Topzera: {origin} → {destination} baixou {pct}% 🛫 A partir de {price} {currency}. Bora logo! ×" [ref=e2274]':
+                - cell "🇧🇷BR" [ref=e2275]
+                - cell "✈️ soft" [ref=e2276]:
+                  - generic [ref=e2277]: ✈️ soft
+                - 'cell "Topzera: {origin} → {destination} baixou {pct}% 🛫 A partir de {price} {currency}. Bora logo!" [ref=e2278]':
+                  - paragraph [ref=e2279]: "Topzera: {origin} → {destination} baixou {pct}% 🛫"
+                  - paragraph [ref=e2280]: "A partir de {price} {currency}. Bora logo!"
+                - cell [ref=e2281]:
+                  - button "Desactivar" [ref=e2282] [cursor=pointer]
+                - cell "×" [ref=e2284]:
+                  - button "×" [ref=e2285]
+              - 'row "🇧🇷BR ✈️ soft Véi, olha o preço: {origin} → {destination} -{pct}% De {price} {currency}. Aproveita essa oferta! ×" [ref=e2286]':
+                - cell "🇧🇷BR" [ref=e2287]
+                - cell "✈️ soft" [ref=e2288]:
+                  - generic [ref=e2289]: ✈️ soft
+                - 'cell "Véi, olha o preço: {origin} → {destination} -{pct}% De {price} {currency}. Aproveita essa oferta!" [ref=e2290]':
+                  - paragraph [ref=e2291]: "Véi, olha o preço: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2292]: "De {price} {currency}. Aproveita essa oferta!"
+                - cell [ref=e2293]:
+                  - button "Desactivar" [ref=e2294] [cursor=pointer]
+                - cell "×" [ref=e2296]:
+                  - button "×" [ref=e2297]
+              - 'row "🇧🇷BR ✈️ soft Que bacana! {origin} → {destination} baixou {pct}% ✈️ De {price} {currency}. Manda ver, vai lá! ×" [ref=e2298]':
+                - cell "🇧🇷BR" [ref=e2299]
+                - cell "✈️ soft" [ref=e2300]:
+                  - generic [ref=e2301]: ✈️ soft
+                - 'cell "Que bacana! {origin} → {destination} baixou {pct}% ✈️ De {price} {currency}. Manda ver, vai lá!" [ref=e2302]':
+                  - paragraph [ref=e2303]: "Que bacana! {origin} → {destination} baixou {pct}% ✈️"
+                  - paragraph [ref=e2304]: "De {price} {currency}. Manda ver, vai lá!"
+                - cell [ref=e2305]:
+                  - button "Desactivar" [ref=e2306] [cursor=pointer]
+                - cell "×" [ref=e2308]:
+                  - button "×" [ref=e2309]
+              - 'row "🇧🇷BR ✈️ soft 🎯 Desconto de {pct}%: {origin} → {destination} A partir de {price} {currency}. Show de bola! ×" [ref=e2310]':
+                - cell "🇧🇷BR" [ref=e2311]
+                - cell "✈️ soft" [ref=e2312]:
+                  - generic [ref=e2313]: ✈️ soft
+                - 'cell "🎯 Desconto de {pct}%: {origin} → {destination} A partir de {price} {currency}. Show de bola!" [ref=e2314]':
+                  - paragraph [ref=e2315]: "🎯 Desconto de {pct}%: {origin} → {destination}"
+                  - paragraph [ref=e2316]: "A partir de {price} {currency}. Show de bola!"
+                - cell [ref=e2317]:
+                  - button "Desactivar" [ref=e2318] [cursor=pointer]
+                - cell "×" [ref=e2320]:
+                  - button "×" [ref=e2321]
+              - 'row "🇧🇷BR 💸 strong 💸 Caramba! {origin} → {destination} baixou {pct}% De {price} {currency}. Isso sim é oferta, mano! ×" [ref=e2322]':
+                - cell "🇧🇷BR" [ref=e2323]
+                - cell "💸 strong" [ref=e2324]:
+                  - generic [ref=e2325]: 💸 strong
+                - 'cell "💸 Caramba! {origin} → {destination} baixou {pct}% De {price} {currency}. Isso sim é oferta, mano!" [ref=e2326]':
+                  - paragraph [ref=e2327]: "💸 Caramba! {origin} → {destination} baixou {pct}%"
+                  - paragraph [ref=e2328]: "De {price} {currency}. Isso sim é oferta, mano!"
+                - cell [ref=e2329]:
+                  - button "Desactivar" [ref=e2330] [cursor=pointer]
+                - cell "×" [ref=e2332]:
+                  - button "×" [ref=e2333]
+              - 'row "🇧🇷BR 💸 strong 🔥 Promoção incrível: {origin} → {destination} -{pct}% De {price} {currency}. Bora que é top demais! ×" [ref=e2334]':
+                - cell "🇧🇷BR" [ref=e2335]
+                - cell "💸 strong" [ref=e2336]:
+                  - generic [ref=e2337]: 💸 strong
+                - 'cell "🔥 Promoção incrível: {origin} → {destination} -{pct}% De {price} {currency}. Bora que é top demais!" [ref=e2338]':
+                  - paragraph [ref=e2339]: "🔥 Promoção incrível: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2340]: "De {price} {currency}. Bora que é top demais!"
+                - cell [ref=e2341]:
+                  - button "Desactivar" [ref=e2342] [cursor=pointer]
+                - cell "×" [ref=e2344]:
+                  - button "×" [ref=e2345]
+              - 'row "🇧🇷BR 💸 strong Véi, que oferta! {origin} → {destination} -{pct}% ✈️ Só {price} {currency}. Não deixa passar não! ×" [ref=e2346]':
+                - cell "🇧🇷BR" [ref=e2347]
+                - cell "💸 strong" [ref=e2348]:
+                  - generic [ref=e2349]: 💸 strong
+                - 'cell "Véi, que oferta! {origin} → {destination} -{pct}% ✈️ Só {price} {currency}. Não deixa passar não!" [ref=e2350]':
+                  - paragraph [ref=e2351]: "Véi, que oferta! {origin} → {destination} -{pct}% ✈️"
+                  - paragraph [ref=e2352]: "Só {price} {currency}. Não deixa passar não!"
+                - cell [ref=e2353]:
+                  - button "Desactivar" [ref=e2354] [cursor=pointer]
+                - cell "×" [ref=e2356]:
+                  - button "×" [ref=e2357]
+              - 'row "🇧🇷BR 💸 strong 💥 {pct}% a menos: {origin} → {destination} De {price} {currency}. Tá demais, cara! ×" [ref=e2358]':
+                - cell "🇧🇷BR" [ref=e2359]
+                - cell "💸 strong" [ref=e2360]:
+                  - generic [ref=e2361]: 💸 strong
+                - 'cell "💥 {pct}% a menos: {origin} → {destination} De {price} {currency}. Tá demais, cara!" [ref=e2362]':
+                  - paragraph [ref=e2363]: "💥 {pct}% a menos: {origin} → {destination}"
+                  - paragraph [ref=e2364]: "De {price} {currency}. Tá demais, cara!"
+                - cell [ref=e2365]:
+                  - button "Desactivar" [ref=e2366] [cursor=pointer]
+                - cell "×" [ref=e2368]:
+                  - button "×" [ref=e2369]
+              - 'row "🇧🇷BR 💸 strong Irmão, olha esse preço 👀 {origin} → {destination} Baixou {pct}%. De {price} {currency}. Que massa! ×" [ref=e2370]':
+                - cell "🇧🇷BR" [ref=e2371]
+                - cell "💸 strong" [ref=e2372]:
+                  - generic [ref=e2373]: 💸 strong
+                - 'cell "Irmão, olha esse preço 👀 {origin} → {destination} Baixou {pct}%. De {price} {currency}. Que massa!" [ref=e2374]':
+                  - paragraph [ref=e2375]: "Irmão, olha esse preço 👀 {origin} → {destination}"
+                  - paragraph [ref=e2376]: "Baixou {pct}%. De {price} {currency}. Que massa!"
+                - cell [ref=e2377]:
+                  - button "Desactivar" [ref=e2378] [cursor=pointer]
+                - cell "×" [ref=e2380]:
+                  - button "×" [ref=e2381]
+              - 'row "🇧🇷BR 💸 strong 🏆 Melhor preço do mês: {origin} → {destination} Caiu {pct}%. De {price} {currency}. Topzera! ×" [ref=e2382]':
+                - cell "🇧🇷BR" [ref=e2383]
+                - cell "💸 strong" [ref=e2384]:
+                  - generic [ref=e2385]: 💸 strong
+                - 'cell "🏆 Melhor preço do mês: {origin} → {destination} Caiu {pct}%. De {price} {currency}. Topzera!" [ref=e2386]':
+                  - paragraph [ref=e2387]: "🏆 Melhor preço do mês: {origin} → {destination}"
+                  - paragraph [ref=e2388]: "Caiu {pct}%. De {price} {currency}. Topzera!"
+                - cell [ref=e2389]:
+                  - button "Desactivar" [ref=e2390] [cursor=pointer]
+                - cell "×" [ref=e2392]:
+                  - button "×" [ref=e2393]
+              - 'row "🇧🇷BR 💸 strong Rapaz, tá voando: {origin} → {destination} -{pct}% 🚀 De {price} {currency}. Aproveita logo! ×" [ref=e2394]':
+                - cell "🇧🇷BR" [ref=e2395]
+                - cell "💸 strong" [ref=e2396]:
+                  - generic [ref=e2397]: 💸 strong
+                - 'cell "Rapaz, tá voando: {origin} → {destination} -{pct}% 🚀 De {price} {currency}. Aproveita logo!" [ref=e2398]':
+                  - paragraph [ref=e2399]: "Rapaz, tá voando: {origin} → {destination} -{pct}% 🚀"
+                  - paragraph [ref=e2400]: "De {price} {currency}. Aproveita logo!"
+                - cell [ref=e2401]:
+                  - button "Desactivar" [ref=e2402] [cursor=pointer]
+                - cell "×" [ref=e2404]:
+                  - button "×" [ref=e2405]
+              - 'row "🇧🇷BR 💸 strong Show de bola! {origin} → {destination} baixou {pct}% 🎉 Só {price} {currency}. Manda ver, irmão! ×" [ref=e2406]':
+                - cell "🇧🇷BR" [ref=e2407]
+                - cell "💸 strong" [ref=e2408]:
+                  - generic [ref=e2409]: 💸 strong
+                - 'cell "Show de bola! {origin} → {destination} baixou {pct}% 🎉 Só {price} {currency}. Manda ver, irmão!" [ref=e2410]':
+                  - paragraph [ref=e2411]: "Show de bola! {origin} → {destination} baixou {pct}% 🎉"
+                  - paragraph [ref=e2412]: "Só {price} {currency}. Manda ver, irmão!"
+                - cell [ref=e2413]:
+                  - button "Desactivar" [ref=e2414] [cursor=pointer]
+                - cell "×" [ref=e2416]:
+                  - button "×" [ref=e2417]
+              - 'row "🇧🇷BR 🔥 urgent 🔥 PREÇO MÍNIMO: {origin} → {destination} -{pct}% Só {price} {currency}! Corre que é agora! ×" [ref=e2418]':
+                - cell "🇧🇷BR" [ref=e2419]
+                - cell "🔥 urgent" [ref=e2420]:
+                  - generic [ref=e2421]: 🔥 urgent
+                - 'cell "🔥 PREÇO MÍNIMO: {origin} → {destination} -{pct}% Só {price} {currency}! Corre que é agora!" [ref=e2422]':
+                  - paragraph [ref=e2423]: "🔥 PREÇO MÍNIMO: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2424]: "Só {price} {currency}! Corre que é agora!"
+                - cell [ref=e2425]:
+                  - button "Desactivar" [ref=e2426] [cursor=pointer]
+                - cell "×" [ref=e2428]:
+                  - button "×" [ref=e2429]
+              - 'row "🇧🇷BR 🔥 urgent ⚡ Tá de graça, véi! {origin} → {destination} -{pct}% De {price} {currency}. Não perde essa, mano! ×" [ref=e2430]':
+                - cell "🇧🇷BR" [ref=e2431]
+                - cell "🔥 urgent" [ref=e2432]:
+                  - generic [ref=e2433]: 🔥 urgent
+                - 'cell "⚡ Tá de graça, véi! {origin} → {destination} -{pct}% De {price} {currency}. Não perde essa, mano!" [ref=e2434]':
+                  - paragraph [ref=e2435]: "⚡ Tá de graça, véi! {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2436]: "De {price} {currency}. Não perde essa, mano!"
+                - cell [ref=e2437]:
+                  - button "Desactivar" [ref=e2438] [cursor=pointer]
+                - cell "×" [ref=e2440]:
+                  - button "×" [ref=e2441]
+              - 'row "🇧🇷BR 🔥 urgent 🚨 Oferta histórica: {origin} → {destination} Baixou {pct}%! De {price} {currency}. Bora! ×" [ref=e2442]':
+                - cell "🇧🇷BR" [ref=e2443]
+                - cell "🔥 urgent" [ref=e2444]:
+                  - generic [ref=e2445]: 🔥 urgent
+                - 'cell "🚨 Oferta histórica: {origin} → {destination} Baixou {pct}%! De {price} {currency}. Bora!" [ref=e2446]':
+                  - paragraph [ref=e2447]: "🚨 Oferta histórica: {origin} → {destination}"
+                  - paragraph [ref=e2448]: "Baixou {pct}%! De {price} {currency}. Bora!"
+                - cell [ref=e2449]:
+                  - button "Desactivar" [ref=e2450] [cursor=pointer]
+                - cell "×" [ref=e2452]:
+                  - button "×" [ref=e2453]
+              - 'row "🇧🇷BR 🔥 urgent Caramba, isso é demais! {origin} → {destination} -{pct}% 💥 Só {price} {currency}! É agora ou nunca, cara! ×" [ref=e2454]':
+                - cell "🇧🇷BR" [ref=e2455]
+                - cell "🔥 urgent" [ref=e2456]:
+                  - generic [ref=e2457]: 🔥 urgent
+                - 'cell "Caramba, isso é demais! {origin} → {destination} -{pct}% 💥 Só {price} {currency}! É agora ou nunca, cara!" [ref=e2458]':
+                  - paragraph [ref=e2459]: "Caramba, isso é demais! {origin} → {destination} -{pct}% 💥"
+                  - paragraph [ref=e2460]: "Só {price} {currency}! É agora ou nunca, cara!"
+                - cell [ref=e2461]:
+                  - button "Desactivar" [ref=e2462] [cursor=pointer]
+                - cell "×" [ref=e2464]:
+                  - button "×" [ref=e2465]
+              - 'row "🇧🇷BR 🔥 urgent ⚡ O melhor desconto do ano: {origin} → {destination} 🎊 -{pct}%! De {price} {currency}. Parte já, irmão! ×" [ref=e2466]':
+                - cell "🇧🇷BR" [ref=e2467]
+                - cell "🔥 urgent" [ref=e2468]:
+                  - generic [ref=e2469]: 🔥 urgent
+                - 'cell "⚡ O melhor desconto do ano: {origin} → {destination} 🎊 -{pct}%! De {price} {currency}. Parte já, irmão!" [ref=e2470]':
+                  - paragraph [ref=e2471]: "⚡ O melhor desconto do ano: {origin} → {destination} 🎊"
+                  - paragraph [ref=e2472]: "-{pct}%! De {price} {currency}. Parte já, irmão!"
+                - cell [ref=e2473]:
+                  - button "Desactivar" [ref=e2474] [cursor=pointer]
+                - cell "×" [ref=e2476]:
+                  - button "×" [ref=e2477]
+              - 'row "🇧🇷BR 🔥 urgent 🔥 Isso tá topzera! {origin} → {destination} -{pct}% Só {price} {currency}! Não deixa passar! ×" [ref=e2478]':
+                - cell "🇧🇷BR" [ref=e2479]
+                - cell "🔥 urgent" [ref=e2480]:
+                  - generic [ref=e2481]: 🔥 urgent
+                - 'cell "🔥 Isso tá topzera! {origin} → {destination} -{pct}% Só {price} {currency}! Não deixa passar!" [ref=e2482]':
+                  - paragraph [ref=e2483]: "🔥 Isso tá topzera! {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2484]: "Só {price} {currency}! Não deixa passar!"
+                - cell [ref=e2485]:
+                  - button "Desactivar" [ref=e2486] [cursor=pointer]
+                - cell "×" [ref=e2488]:
+                  - button "×" [ref=e2489]
+              - row "🇧🇷BR welcome Bem-vindo ao FlyPromociones! ✈️ Ativamos seus alertas de passagens aéreas. Avisaremos quando os preços caírem! ×" [ref=e2490]:
+                - cell "🇧🇷BR" [ref=e2491]
+                - cell "welcome" [ref=e2492]:
+                  - generic [ref=e2493]: welcome
+                - cell "Bem-vindo ao FlyPromociones! ✈️ Ativamos seus alertas de passagens aéreas. Avisaremos quando os preços caírem!" [ref=e2494]:
+                  - paragraph [ref=e2495]: Bem-vindo ao FlyPromociones! ✈️
+                  - paragraph [ref=e2496]: Ativamos seus alertas de passagens aéreas. Avisaremos quando os preços caírem!
+                - cell [ref=e2497]:
+                  - button "Desactivar" [ref=e2498] [cursor=pointer]
+                - cell "×" [ref=e2500]:
+                  - button "×" [ref=e2501]
+              - 'row "🇨🇱CL campaign ✈️ {origin} → {destination} ¡la raja po! Hay vuelos a {destination} que están bacán. ¡Al tiro! ×" [ref=e2502]':
+                - cell "🇨🇱CL" [ref=e2503]
+                - cell "campaign" [ref=e2504]:
+                  - generic [ref=e2505]: campaign
+                - 'cell "✈️ {origin} → {destination} ¡la raja po! Hay vuelos a {destination} que están bacán. ¡Al tiro!" [ref=e2506]':
+                  - paragraph [ref=e2507]: "✈️ {origin} → {destination} ¡la raja po!"
+                  - paragraph [ref=e2508]: "Hay vuelos a {destination} que están bacán. ¡Al tiro!"
+                - cell [ref=e2509]:
+                  - button "Desactivar" [ref=e2510] [cursor=pointer]
+                - cell "×" [ref=e2512]:
+                  - button "×" [ref=e2513]
+              - 'row "🇨🇱CL campaign 🔥 Cachai: vuelos {origin_iata}→{destination_iata} Opciones a {destination} que están filete. ¡Al tiro! ×" [ref=e2514]':
+                - cell "🇨🇱CL" [ref=e2515]
+                - cell "campaign" [ref=e2516]:
+                  - generic [ref=e2517]: campaign
+                - 'cell "🔥 Cachai: vuelos {origin_iata}→{destination_iata} Opciones a {destination} que están filete. ¡Al tiro!" [ref=e2518]':
+                  - paragraph [ref=e2519]: "🔥 Cachai: vuelos {origin_iata}→{destination_iata}"
+                  - paragraph [ref=e2520]: "Opciones a {destination} que están filete. ¡Al tiro!"
+                - cell [ref=e2521]:
+                  - button "Desactivar" [ref=e2522] [cursor=pointer]
+                - cell "×" [ref=e2524]:
+                  - button "×" [ref=e2525]
+              - 'row "🇨🇱CL 🔄 reeng. ¿Todavía vai a {destination}, weón? 🛫 Viste {price} {currency} antes. ¡Al tiro po! ×" [ref=e2526]':
+                - cell "🇨🇱CL" [ref=e2527]
+                - cell "🔄 reeng." [ref=e2528]:
+                  - generic [ref=e2529]: 🔄 reeng.
+                - 'cell "¿Todavía vai a {destination}, weón? 🛫 Viste {price} {currency} antes. ¡Al tiro po!" [ref=e2530]':
+                  - paragraph [ref=e2531]: "¿Todavía vai a {destination}, weón? 🛫"
+                  - paragraph [ref=e2532]: "Viste {price} {currency} antes. ¡Al tiro po!"
+                - cell [ref=e2533]:
+                  - button "Desactivar" [ref=e2534] [cursor=pointer]
+                - cell "×" [ref=e2536]:
+                  - button "×" [ref=e2537]
+              - 'row "🇨🇱CL 🔄 reeng. {destination} te está esperando po ✈️ Encontraste {price} {currency}. ¡Wena, de una! ×" [ref=e2538]':
+                - cell "🇨🇱CL" [ref=e2539]
+                - cell "🔄 reeng." [ref=e2540]:
+                  - generic [ref=e2541]: 🔄 reeng.
+                - 'cell "{destination} te está esperando po ✈️ Encontraste {price} {currency}. ¡Wena, de una!" [ref=e2542]':
+                  - paragraph [ref=e2543]: "{destination} te está esperando po ✈️"
+                  - paragraph [ref=e2544]: "Encontraste {price} {currency}. ¡Wena, de una!"
+                - cell [ref=e2545]:
+                  - button "Desactivar" [ref=e2546] [cursor=pointer]
+                - cell "×" [ref=e2548]:
+                  - button "×" [ref=e2549]
+              - 'row "🇨🇱CL ✈️ soft Wena po, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Al tiro, cachai! ×" [ref=e2550]':
+                - cell "🇨🇱CL" [ref=e2551]
+                - cell "✈️ soft" [ref=e2552]:
+                  - generic [ref=e2553]: ✈️ soft
+                - 'cell "Wena po, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Al tiro, cachai!" [ref=e2554]':
+                  - paragraph [ref=e2555]: "Wena po, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e2556]: "Hoy desde {price} {currency}. ¡Al tiro, cachai!"
+                - cell [ref=e2557]:
+                  - button "Desactivar" [ref=e2558] [cursor=pointer]
+                - cell "×" [ref=e2560]:
+                  - button "×" [ref=e2561]
+              - 'row "🇨🇱CL ✈️ soft Filete: {origin} → {destination} cayó {pct}% 🛫 Sale desde {price} {currency}. ¡Bacán po! ×" [ref=e2562]':
+                - cell "🇨🇱CL" [ref=e2563]
+                - cell "✈️ soft" [ref=e2564]:
+                  - generic [ref=e2565]: ✈️ soft
+                - 'cell "Filete: {origin} → {destination} cayó {pct}% 🛫 Sale desde {price} {currency}. ¡Bacán po!" [ref=e2566]':
+                  - paragraph [ref=e2567]: "Filete: {origin} → {destination} cayó {pct}% 🛫"
+                  - paragraph [ref=e2568]: "Sale desde {price} {currency}. ¡Bacán po!"
+                - cell [ref=e2569]:
+                  - button "Desactivar" [ref=e2570] [cursor=pointer]
+                - cell "×" [ref=e2572]:
+                  - button "×" [ref=e2573]
+              - 'row "🇨🇱CL ✈️ soft ✈️ Bajó caleta: {origin} → {destination} -{pct}% Hoy desde {price} {currency}. ¡La raja, weón! ×" [ref=e2574]':
+                - cell "🇨🇱CL" [ref=e2575]
+                - cell "✈️ soft" [ref=e2576]:
+                  - generic [ref=e2577]: ✈️ soft
+                - 'cell "✈️ Bajó caleta: {origin} → {destination} -{pct}% Hoy desde {price} {currency}. ¡La raja, weón!" [ref=e2578]':
+                  - paragraph [ref=e2579]: "✈️ Bajó caleta: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2580]: "Hoy desde {price} {currency}. ¡La raja, weón!"
+                - cell [ref=e2581]:
+                  - button "Desactivar" [ref=e2582] [cursor=pointer]
+                - cell "×" [ref=e2584]:
+                  - button "×" [ref=e2585]
+              - 'row "🇨🇱CL 💸 strong 💸 ¡La raja! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Al tiro po! ×" [ref=e2586]':
+                - cell "🇨🇱CL" [ref=e2587]
+                - cell "💸 strong" [ref=e2588]:
+                  - generic [ref=e2589]: 💸 strong
+                - 'cell "💸 ¡La raja! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Al tiro po!" [ref=e2590]':
+                  - paragraph [ref=e2591]: "💸 ¡La raja! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e2592]: "Desde {price} {currency}. ¡Al tiro po!"
+                - cell [ref=e2593]:
+                  - button "Desactivar" [ref=e2594] [cursor=pointer]
+                - cell "×" [ref=e2596]:
+                  - button "×" [ref=e2597]
+              - 'row "🇨🇱CL 💸 strong Gran bajada po: {origin} → {destination} -{pct}% 🔥 Hoy desde {price} {currency}. ¡Filete de oferta! ×" [ref=e2598]':
+                - cell "🇨🇱CL" [ref=e2599]
+                - cell "💸 strong" [ref=e2600]:
+                  - generic [ref=e2601]: 💸 strong
+                - 'cell "Gran bajada po: {origin} → {destination} -{pct}% 🔥 Hoy desde {price} {currency}. ¡Filete de oferta!" [ref=e2602]':
+                  - paragraph [ref=e2603]: "Gran bajada po: {origin} → {destination} -{pct}% 🔥"
+                  - paragraph [ref=e2604]: "Hoy desde {price} {currency}. ¡Filete de oferta!"
+                - cell [ref=e2605]:
+                  - button "Desactivar" [ref=e2606] [cursor=pointer]
+                - cell "×" [ref=e2608]:
+                  - button "×" [ref=e2609]
+              - 'row "🇨🇱CL 💸 strong ¡Qué onda más bacán! {origin} → {destination} -{pct}% ✈️ Sale desde {price} {currency}. ¡Wena po! ×" [ref=e2610]':
+                - cell "🇨🇱CL" [ref=e2611]
+                - cell "💸 strong" [ref=e2612]:
+                  - generic [ref=e2613]: 💸 strong
+                - 'cell "¡Qué onda más bacán! {origin} → {destination} -{pct}% ✈️ Sale desde {price} {currency}. ¡Wena po!" [ref=e2614]':
+                  - paragraph [ref=e2615]: "¡Qué onda más bacán! {origin} → {destination} -{pct}% ✈️"
+                  - paragraph [ref=e2616]: "Sale desde {price} {currency}. ¡Wena po!"
+                - cell [ref=e2617]:
+                  - button "Desactivar" [ref=e2618] [cursor=pointer]
+                - cell "×" [ref=e2620]:
+                  - button "×" [ref=e2621]
+              - 'row "🇨🇱CL 💸 strong 🏆 Precio histórico: {origin} → {destination} Bajó {pct}% po. Desde {price} {currency}. ¡Cachai qué oferta! ×" [ref=e2622]':
+                - cell "🇨🇱CL" [ref=e2623]
+                - cell "💸 strong" [ref=e2624]:
+                  - generic [ref=e2625]: 💸 strong
+                - 'cell "🏆 Precio histórico: {origin} → {destination} Bajó {pct}% po. Desde {price} {currency}. ¡Cachai qué oferta!" [ref=e2626]':
+                  - paragraph [ref=e2627]: "🏆 Precio histórico: {origin} → {destination}"
+                  - paragraph [ref=e2628]: "Bajó {pct}% po. Desde {price} {currency}. ¡Cachai qué oferta!"
+                - cell [ref=e2629]:
+                  - button "Desactivar" [ref=e2630] [cursor=pointer]
+                - cell "×" [ref=e2632]:
+                  - button "×" [ref=e2633]
+              - 'row "🇨🇱CL 🔥 urgent 🔥 ¡La raja total! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency} po! ¡Al tiro weón! ×" [ref=e2634]':
+                - cell "🇨🇱CL" [ref=e2635]
+                - cell "🔥 urgent" [ref=e2636]:
+                  - generic [ref=e2637]: 🔥 urgent
+                - 'cell "🔥 ¡La raja total! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency} po! ¡Al tiro weón!" [ref=e2638]':
+                  - paragraph [ref=e2639]: "🔥 ¡La raja total! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e2640]: "¡Solo {price} {currency} po! ¡Al tiro weón!"
+                - cell [ref=e2641]:
+                  - button "Desactivar" [ref=e2642] [cursor=pointer]
+                - cell "×" [ref=e2644]:
+                  - button "×" [ref=e2645]
+              - 'row "🇨🇱CL 🔥 urgent ⚡ Precio mínimo: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡No po, es ahora o nunca! ×" [ref=e2646]':
+                - cell "🇨🇱CL" [ref=e2647]
+                - cell "🔥 urgent" [ref=e2648]:
+                  - generic [ref=e2649]: 🔥 urgent
+                - 'cell "⚡ Precio mínimo: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡No po, es ahora o nunca!" [ref=e2650]':
+                  - paragraph [ref=e2651]: "⚡ Precio mínimo: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2652]: "Desde {price} {currency}. ¡No po, es ahora o nunca!"
+                - cell [ref=e2653]:
+                  - button "Desactivar" [ref=e2654] [cursor=pointer]
+                - cell "×" [ref=e2656]:
+                  - button "×" [ref=e2657]
+              - 'row "🇨🇱CL 🔥 urgent 🚨 ¡Filetísimo! {origin} → {destination} -{pct}% 💥 Hoy {price} {currency}. ¡Al tiro po, cachai! ×" [ref=e2658]':
+                - cell "🇨🇱CL" [ref=e2659]
+                - cell "🔥 urgent" [ref=e2660]:
+                  - generic [ref=e2661]: 🔥 urgent
+                - 'cell "🚨 ¡Filetísimo! {origin} → {destination} -{pct}% 💥 Hoy {price} {currency}. ¡Al tiro po, cachai!" [ref=e2662]':
+                  - paragraph [ref=e2663]: "🚨 ¡Filetísimo! {origin} → {destination} -{pct}% 💥"
+                  - paragraph [ref=e2664]: "Hoy {price} {currency}. ¡Al tiro po, cachai!"
+                - cell [ref=e2665]:
+                  - button "Desactivar" [ref=e2666] [cursor=pointer]
+                - cell "×" [ref=e2668]:
+                  - button "×" [ref=e2669]
+              - 'row "🇨🇴CO campaign ✈️ {origin} → {destination} ¡qué nota! Hay tiquetes a {destination} bacanos. ¡Parce, de una! ×" [ref=e2670]':
+                - cell "🇨🇴CO" [ref=e2671]
+                - cell "campaign" [ref=e2672]:
+                  - generic [ref=e2673]: campaign
+                - 'cell "✈️ {origin} → {destination} ¡qué nota! Hay tiquetes a {destination} bacanos. ¡Parce, de una!" [ref=e2674]':
+                  - paragraph [ref=e2675]: "✈️ {origin} → {destination} ¡qué nota!"
+                  - paragraph [ref=e2676]: "Hay tiquetes a {destination} bacanos. ¡Parce, de una!"
+                - cell [ref=e2677]:
+                  - button "Desactivar" [ref=e2678] [cursor=pointer]
+                - cell "×" [ref=e2680]:
+                  - button "×" [ref=e2681]
+              - 'row "🇨🇴CO campaign 🔥 Pilas: vuelos {origin_iata}→{destination_iata} Tiquetes a {destination} con precios chimba. ¡No hay tos! ×" [ref=e2682]':
+                - cell "🇨🇴CO" [ref=e2683]
+                - cell "campaign" [ref=e2684]:
+                  - generic [ref=e2685]: campaign
+                - 'cell "🔥 Pilas: vuelos {origin_iata}→{destination_iata} Tiquetes a {destination} con precios chimba. ¡No hay tos!" [ref=e2686]':
+                  - paragraph [ref=e2687]: "🔥 Pilas: vuelos {origin_iata}→{destination_iata}"
+                  - paragraph [ref=e2688]: "Tiquetes a {destination} con precios chimba. ¡No hay tos!"
+                - cell [ref=e2689]:
+                  - button "Desactivar" [ref=e2690] [cursor=pointer]
+                - cell "×" [ref=e2692]:
+                  - button "×" [ref=e2693]
+              - 'row "🇨🇴CO 🔄 reeng. ¿Qué pasó con el viaje a {destination}, parce? ✈️ Viste precios desde {price} {currency}. ¡Dale pues! ×" [ref=e2694]':
+                - cell "🇨🇴CO" [ref=e2695]
+                - cell "🔄 reeng." [ref=e2696]:
+                  - generic [ref=e2697]: 🔄 reeng.
+                - 'cell "¿Qué pasó con el viaje a {destination}, parce? ✈️ Viste precios desde {price} {currency}. ¡Dale pues!" [ref=e2698]':
+                  - paragraph [ref=e2699]: "¿Qué pasó con el viaje a {destination}, parce? ✈️"
+                  - paragraph [ref=e2700]: "Viste precios desde {price} {currency}. ¡Dale pues!"
+                - cell [ref=e2701]:
+                  - button "Desactivar" [ref=e2702] [cursor=pointer]
+                - cell "×" [ref=e2704]:
+                  - button "×" [ref=e2705]
+              - 'row "🇨🇴CO 🔄 reeng. {destination} te espera, broder 🌎 Encontraste {price} {currency}. ¡Qué chimba, de una! ×" [ref=e2706]':
+                - cell "🇨🇴CO" [ref=e2707]
+                - cell "🔄 reeng." [ref=e2708]:
+                  - generic [ref=e2709]: 🔄 reeng.
+                - 'cell "{destination} te espera, broder 🌎 Encontraste {price} {currency}. ¡Qué chimba, de una!" [ref=e2710]':
+                  - paragraph [ref=e2711]: "{destination} te espera, broder 🌎"
+                  - paragraph [ref=e2712]: "Encontraste {price} {currency}. ¡Qué chimba, de una!"
+                - cell [ref=e2713]:
+                  - button "Desactivar" [ref=e2714] [cursor=pointer]
+                - cell "×" [ref=e2716]:
+                  - button "×" [ref=e2717]
+              - 'row "🇨🇴CO ✈️ soft Parce, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Qué bacano! ×" [ref=e2718]':
+                - cell "🇨🇴CO" [ref=e2719]
+                - cell "✈️ soft" [ref=e2720]:
+                  - generic [ref=e2721]: ✈️ soft
+                - 'cell "Parce, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Qué bacano!" [ref=e2722]':
+                  - paragraph [ref=e2723]: "Parce, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e2724]: "Hoy desde {price} {currency}. ¡Qué bacano!"
+                - cell [ref=e2725]:
+                  - button "Desactivar" [ref=e2726] [cursor=pointer]
+                - cell "×" [ref=e2728]:
+                  - button "×" [ref=e2729]
+              - 'row "🇨🇴CO ✈️ soft ¡Qué nota! {origin} → {destination} cayó {pct}% Sale desde {price} {currency}. ¡Está chimba! ×" [ref=e2730]':
+                - cell "🇨🇴CO" [ref=e2731]
+                - cell "✈️ soft" [ref=e2732]:
+                  - generic [ref=e2733]: ✈️ soft
+                - 'cell "¡Qué nota! {origin} → {destination} cayó {pct}% Sale desde {price} {currency}. ¡Está chimba!" [ref=e2734]':
+                  - paragraph [ref=e2735]: "¡Qué nota! {origin} → {destination} cayó {pct}%"
+                  - paragraph [ref=e2736]: "Sale desde {price} {currency}. ¡Está chimba!"
+                - cell [ref=e2737]:
+                  - button "Desactivar" [ref=e2738] [cursor=pointer]
+                - cell "×" [ref=e2740]:
+                  - button "×" [ref=e2741]
+              - 'row "🇨🇴CO ✈️ soft Broder, bajó el tiquete {origin} → {destination} -{pct}%. Desde {price} {currency}. ¡Berraco! ×" [ref=e2742]':
+                - cell "🇨🇴CO" [ref=e2743]
+                - cell "✈️ soft" [ref=e2744]:
+                  - generic [ref=e2745]: ✈️ soft
+                - 'cell "Broder, bajó el tiquete {origin} → {destination} -{pct}%. Desde {price} {currency}. ¡Berraco!" [ref=e2746]':
+                  - paragraph [ref=e2747]: "Broder, bajó el tiquete {origin} → {destination}"
+                  - paragraph [ref=e2748]: "-{pct}%. Desde {price} {currency}. ¡Berraco!"
+                - cell [ref=e2749]:
+                  - button "Desactivar" [ref=e2750] [cursor=pointer]
+                - cell "×" [ref=e2752]:
+                  - button "×" [ref=e2753]
+              - 'row "🇨🇴CO ✈️ soft Oportunidad bacana: {origin} → {destination} ✈️ Bajó {pct}%, hoy desde {price} {currency}. ¡Dale pues! ×" [ref=e2754]':
+                - cell "🇨🇴CO" [ref=e2755]
+                - cell "✈️ soft" [ref=e2756]:
+                  - generic [ref=e2757]: ✈️ soft
+                - 'cell "Oportunidad bacana: {origin} → {destination} ✈️ Bajó {pct}%, hoy desde {price} {currency}. ¡Dale pues!" [ref=e2758]':
+                  - paragraph [ref=e2759]: "Oportunidad bacana: {origin} → {destination} ✈️"
+                  - paragraph [ref=e2760]: "Bajó {pct}%, hoy desde {price} {currency}. ¡Dale pues!"
+                - cell [ref=e2761]:
+                  - button "Desactivar" [ref=e2762] [cursor=pointer]
+                - cell "×" [ref=e2764]:
+                  - button "×" [ref=e2765]
+              - 'row "🇨🇴CO ✈️ soft ✈️ Pilas con esto: {origin} → {destination} -{pct}% Sale desde {price} {currency}. ¡Está de chimba! ×" [ref=e2766]':
+                - cell "🇨🇴CO" [ref=e2767]
+                - cell "✈️ soft" [ref=e2768]:
+                  - generic [ref=e2769]: ✈️ soft
+                - 'cell "✈️ Pilas con esto: {origin} → {destination} -{pct}% Sale desde {price} {currency}. ¡Está de chimba!" [ref=e2770]':
+                  - paragraph [ref=e2771]: "✈️ Pilas con esto: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2772]: "Sale desde {price} {currency}. ¡Está de chimba!"
+                - cell [ref=e2773]:
+                  - button "Desactivar" [ref=e2774] [cursor=pointer]
+                - cell "×" [ref=e2776]:
+                  - button "×" [ref=e2777]
+              - 'row "🇨🇴CO 💸 strong 💸 ¡Qué chimba! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Eso sí es bacano, parce! ×" [ref=e2778]':
+                - cell "🇨🇴CO" [ref=e2779]
+                - cell "💸 strong" [ref=e2780]:
+                  - generic [ref=e2781]: 💸 strong
+                - 'cell "💸 ¡Qué chimba! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Eso sí es bacano, parce!" [ref=e2782]':
+                  - paragraph [ref=e2783]: "💸 ¡Qué chimba! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e2784]: "Desde {price} {currency}. ¡Eso sí es bacano, parce!"
+                - cell [ref=e2785]:
+                  - button "Desactivar" [ref=e2786] [cursor=pointer]
+                - cell "×" [ref=e2788]:
+                  - button "×" [ref=e2789]
+              - 'row "🇨🇴CO 💸 strong Parce, esto está berraco 🔥 {origin} → {destination} -{pct}%, desde {price} {currency}. ¡Qué vaina tan nota! ×" [ref=e2790]':
+                - cell "🇨🇴CO" [ref=e2791]
+                - cell "💸 strong" [ref=e2792]:
+                  - generic [ref=e2793]: 💸 strong
+                - 'cell "Parce, esto está berraco 🔥 {origin} → {destination} -{pct}%, desde {price} {currency}. ¡Qué vaina tan nota!" [ref=e2794]':
+                  - paragraph [ref=e2795]: "Parce, esto está berraco 🔥 {origin} → {destination}"
+                  - paragraph [ref=e2796]: "-{pct}%, desde {price} {currency}. ¡Qué vaina tan nota!"
+                - cell [ref=e2797]:
+                  - button "Desactivar" [ref=e2798] [cursor=pointer]
+                - cell "×" [ref=e2800]:
+                  - button "×" [ref=e2801]
+              - 'row "🇨🇴CO 💸 strong ¡No hay tos! Gran bajada en {origin} → {destination} Cayó {pct}%. Sale desde {price} {currency}. ¡De una, broder! ×" [ref=e2802]':
+                - cell "🇨🇴CO" [ref=e2803]
+                - cell "💸 strong" [ref=e2804]:
+                  - generic [ref=e2805]: 💸 strong
+                - 'cell "¡No hay tos! Gran bajada en {origin} → {destination} Cayó {pct}%. Sale desde {price} {currency}. ¡De una, broder!" [ref=e2806]':
+                  - paragraph [ref=e2807]: "¡No hay tos! Gran bajada en {origin} → {destination}"
+                  - paragraph [ref=e2808]: "Cayó {pct}%. Sale desde {price} {currency}. ¡De una, broder!"
+                - cell [ref=e2809]:
+                  - button "Desactivar" [ref=e2810] [cursor=pointer]
+                - cell "×" [ref=e2812]:
+                  - button "×" [ref=e2813]
+              - 'row "🇨🇴CO 💸 strong 🏆 Precio histórico: {origin} → {destination} -{pct}% Hoy desde {price} {currency}. ¡Esto sí es chimba, parce! ×" [ref=e2814]':
+                - cell "🇨🇴CO" [ref=e2815]
+                - cell "💸 strong" [ref=e2816]:
+                  - generic [ref=e2817]: 💸 strong
+                - 'cell "🏆 Precio histórico: {origin} → {destination} -{pct}% Hoy desde {price} {currency}. ¡Esto sí es chimba, parce!" [ref=e2818]':
+                  - paragraph [ref=e2819]: "🏆 Precio histórico: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2820]: "Hoy desde {price} {currency}. ¡Esto sí es chimba, parce!"
+                - cell [ref=e2821]:
+                  - button "Desactivar" [ref=e2822] [cursor=pointer]
+                - cell "×" [ref=e2824]:
+                  - button "×" [ref=e2825]
+              - 'row "🇨🇴CO 🔥 urgent 🔥 ¡Bacano pues! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! ¡De una, parce! ×" [ref=e2826]':
+                - cell "🇨🇴CO" [ref=e2827]
+                - cell "🔥 urgent" [ref=e2828]:
+                  - generic [ref=e2829]: 🔥 urgent
+                - 'cell "🔥 ¡Bacano pues! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! ¡De una, parce!" [ref=e2830]':
+                  - paragraph [ref=e2831]: "🔥 ¡Bacano pues! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e2832]: "¡Solo {price} {currency}! ¡De una, parce!"
+                - cell [ref=e2833]:
+                  - button "Desactivar" [ref=e2834] [cursor=pointer]
+                - cell "×" [ref=e2836]:
+                  - button "×" [ref=e2837]
+              - 'row "🇨🇴CO 🔥 urgent ⚡ ¡Eso sí es una oferta! {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Berraco, broder! ×" [ref=e2838]':
+                - cell "🇨🇴CO" [ref=e2839]
+                - cell "🔥 urgent" [ref=e2840]:
+                  - generic [ref=e2841]: 🔥 urgent
+                - 'cell "⚡ ¡Eso sí es una oferta! {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Berraco, broder!" [ref=e2842]':
+                  - paragraph [ref=e2843]: "⚡ ¡Eso sí es una oferta! {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e2844]: "Desde {price} {currency}. ¡Berraco, broder!"
+                - cell [ref=e2845]:
+                  - button "Desactivar" [ref=e2846] [cursor=pointer]
+                - cell "×" [ref=e2848]:
+                  - button "×" [ref=e2849]
+              - 'row "🇨🇴CO 🔥 urgent 🚨 Precio mínimo: {origin} → {destination} Bajó {pct}%, desde {price} {currency}. ¡Pilas que se acaba! ×" [ref=e2850]':
+                - cell "🇨🇴CO" [ref=e2851]
+                - cell "🔥 urgent" [ref=e2852]:
+                  - generic [ref=e2853]: 🔥 urgent
+                - 'cell "🚨 Precio mínimo: {origin} → {destination} Bajó {pct}%, desde {price} {currency}. ¡Pilas que se acaba!" [ref=e2854]':
+                  - paragraph [ref=e2855]: "🚨 Precio mínimo: {origin} → {destination}"
+                  - paragraph [ref=e2856]: "Bajó {pct}%, desde {price} {currency}. ¡Pilas que se acaba!"
+                - cell [ref=e2857]:
+                  - button "Desactivar" [ref=e2858] [cursor=pointer]
+                - cell "×" [ref=e2860]:
+                  - button "×" [ref=e2861]
+              - 'row "🇨🇴CO 🔥 urgent ¡Chimba de oferta! {origin} → {destination} -{pct}% 🎊 Hoy {price} {currency}. ¡De una parce, no la dejes ir! ×" [ref=e2862]':
+                - cell "🇨🇴CO" [ref=e2863]
+                - cell "🔥 urgent" [ref=e2864]:
+                  - generic [ref=e2865]: 🔥 urgent
+                - 'cell "¡Chimba de oferta! {origin} → {destination} -{pct}% 🎊 Hoy {price} {currency}. ¡De una parce, no la dejes ir!" [ref=e2866]':
+                  - paragraph [ref=e2867]: "¡Chimba de oferta! {origin} → {destination} -{pct}% 🎊"
+                  - paragraph [ref=e2868]: "Hoy {price} {currency}. ¡De una parce, no la dejes ir!"
+                - cell [ref=e2869]:
+                  - button "Desactivar" [ref=e2870] [cursor=pointer]
+                - cell "×" [ref=e2872]:
+                  - button "×" [ref=e2873]
+              - row "🇨🇴CO welcome ¡Bienvenido a FlyPromociones! ✈️ ¡Ya tenés alertas de vuelos activadas! Volá más barato con FlyPromociones. ×" [ref=e2874]:
+                - cell "🇨🇴CO" [ref=e2875]
+                - cell "welcome" [ref=e2876]:
+                  - generic [ref=e2877]: welcome
+                - cell "¡Bienvenido a FlyPromociones! ✈️ ¡Ya tenés alertas de vuelos activadas! Volá más barato con FlyPromociones." [ref=e2878]:
+                  - paragraph [ref=e2879]: ¡Bienvenido a FlyPromociones! ✈️
+                  - paragraph [ref=e2880]: ¡Ya tenés alertas de vuelos activadas! Volá más barato con FlyPromociones.
+                - cell [ref=e2881]:
+                  - button "Desactivar" [ref=e2882] [cursor=pointer]
+                - cell "×" [ref=e2884]:
+                  - button "×" [ref=e2885]
+              - 'row "🇪🇸ES 🔄 reeng. ¿Sigues pensando en volar a {destination}, tío? 🛫 Viste {price} {currency} antes. ¡Mola mucho, no lo dejes! ×" [ref=e2886]':
+                - cell "🇪🇸ES" [ref=e2887]
+                - cell "🔄 reeng." [ref=e2888]:
+                  - generic [ref=e2889]: 🔄 reeng.
+                - 'cell "¿Sigues pensando en volar a {destination}, tío? 🛫 Viste {price} {currency} antes. ¡Mola mucho, no lo dejes!" [ref=e2890]':
+                  - paragraph [ref=e2891]: "¿Sigues pensando en volar a {destination}, tío? 🛫"
+                  - paragraph [ref=e2892]: "Viste {price} {currency} antes. ¡Mola mucho, no lo dejes!"
+                - cell [ref=e2893]:
+                  - button "Desactivar" [ref=e2894] [cursor=pointer]
+                - cell "×" [ref=e2896]:
+                  - button "×" [ref=e2897]
+              - 'row "🇪🇸ES 🔄 reeng. {destination} te espera, tía ✈️ Encontraste {price} {currency}. ¡Ostras, no lo dejes escapar! ×" [ref=e2898]':
+                - cell "🇪🇸ES" [ref=e2899]
+                - cell "🔄 reeng." [ref=e2900]:
+                  - generic [ref=e2901]: 🔄 reeng.
+                - 'cell "{destination} te espera, tía ✈️ Encontraste {price} {currency}. ¡Ostras, no lo dejes escapar!" [ref=e2902]':
+                  - paragraph [ref=e2903]: "{destination} te espera, tía ✈️"
+                  - paragraph [ref=e2904]: "Encontraste {price} {currency}. ¡Ostras, no lo dejes escapar!"
+                - cell [ref=e2905]:
+                  - button "Desactivar" [ref=e2906] [cursor=pointer]
+                - cell "×" [ref=e2908]:
+                  - button "×" [ref=e2909]
+              - 'row "🇪🇸ES ✈️ soft Tío, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Mola mazo! ×" [ref=e2910]':
+                - cell "🇪🇸ES" [ref=e2911]
+                - cell "✈️ soft" [ref=e2912]:
+                  - generic [ref=e2913]: ✈️ soft
+                - 'cell "Tío, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Mola mazo!" [ref=e2914]':
+                  - paragraph [ref=e2915]: "Tío, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e2916]: "Hoy desde {price} {currency}. ¡Mola mazo!"
+                - cell [ref=e2917]:
+                  - button "Desactivar" [ref=e2918] [cursor=pointer]
+                - cell "×" [ref=e2920]:
+                  - button "×" [ref=e2921]
+              - 'row "🇪🇸ES ✈️ soft ¡Guay! {origin} → {destination} cayó {pct}% 🛫 Sale desde {price} {currency}. ¡Qué pasada! ×" [ref=e2922]':
+                - cell "🇪🇸ES" [ref=e2923]
+                - cell "✈️ soft" [ref=e2924]:
+                  - generic [ref=e2925]: ✈️ soft
+                - 'cell "¡Guay! {origin} → {destination} cayó {pct}% 🛫 Sale desde {price} {currency}. ¡Qué pasada!" [ref=e2926]':
+                  - paragraph [ref=e2927]: "¡Guay! {origin} → {destination} cayó {pct}% 🛫"
+                  - paragraph [ref=e2928]: "Sale desde {price} {currency}. ¡Qué pasada!"
+                - cell [ref=e2929]:
+                  - button "Desactivar" [ref=e2930] [cursor=pointer]
+                - cell "×" [ref=e2932]:
+                  - button "×" [ref=e2933]
+              - 'row "🇪🇸ES ✈️ soft ✈️ {origin} → {destination}: -{pct}%, flipante Hoy desde {price} {currency}. ¡Está chulo, tío! ×" [ref=e2934]':
+                - cell "🇪🇸ES" [ref=e2935]
+                - cell "✈️ soft" [ref=e2936]:
+                  - generic [ref=e2937]: ✈️ soft
+                - 'cell "✈️ {origin} → {destination}: -{pct}%, flipante Hoy desde {price} {currency}. ¡Está chulo, tío!" [ref=e2938]':
+                  - paragraph [ref=e2939]: "✈️ {origin} → {destination}: -{pct}%, flipante"
+                  - paragraph [ref=e2940]: "Hoy desde {price} {currency}. ¡Está chulo, tío!"
+                - cell [ref=e2941]:
+                  - button "Desactivar" [ref=e2942] [cursor=pointer]
+                - cell "×" [ref=e2944]:
+                  - button "×" [ref=e2945]
+              - 'row "🇪🇸ES 💸 strong 💸 ¡Esto mola! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Ostras tía, qué precio! ×" [ref=e2946]':
+                - cell "🇪🇸ES" [ref=e2947]
+                - cell "💸 strong" [ref=e2948]:
+                  - generic [ref=e2949]: 💸 strong
+                - 'cell "💸 ¡Esto mola! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Ostras tía, qué precio!" [ref=e2950]':
+                  - paragraph [ref=e2951]: "💸 ¡Esto mola! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e2952]: "Desde {price} {currency}. ¡Ostras tía, qué precio!"
+                - cell [ref=e2953]:
+                  - button "Desactivar" [ref=e2954] [cursor=pointer]
+                - cell "×" [ref=e2956]:
+                  - button "×" [ref=e2957]
+              - 'row "🇪🇸ES 💸 strong Gran bajada: {origin} → {destination} -{pct}% 🔥 Hoy desde {price} {currency}. ¡Cojonudo, tío! ×" [ref=e2958]':
+                - cell "🇪🇸ES" [ref=e2959]
+                - cell "💸 strong" [ref=e2960]:
+                  - generic [ref=e2961]: 💸 strong
+                - 'cell "Gran bajada: {origin} → {destination} -{pct}% 🔥 Hoy desde {price} {currency}. ¡Cojonudo, tío!" [ref=e2962]':
+                  - paragraph [ref=e2963]: "Gran bajada: {origin} → {destination} -{pct}% 🔥"
+                  - paragraph [ref=e2964]: "Hoy desde {price} {currency}. ¡Cojonudo, tío!"
+                - cell [ref=e2965]:
+                  - button "Desactivar" [ref=e2966] [cursor=pointer]
+                - cell "×" [ref=e2968]:
+                  - button "×" [ref=e2969]
+              - 'row "🇪🇸ES 💸 strong ¡Madre mía! {origin} → {destination} bajó {pct}% ✈️ Sale desde {price} {currency}. ¡Mola un montón! ×" [ref=e2970]':
+                - cell "🇪🇸ES" [ref=e2971]
+                - cell "💸 strong" [ref=e2972]:
+                  - generic [ref=e2973]: 💸 strong
+                - 'cell "¡Madre mía! {origin} → {destination} bajó {pct}% ✈️ Sale desde {price} {currency}. ¡Mola un montón!" [ref=e2974]':
+                  - paragraph [ref=e2975]: "¡Madre mía! {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e2976]: "Sale desde {price} {currency}. ¡Mola un montón!"
+                - cell [ref=e2977]:
+                  - button "Desactivar" [ref=e2978] [cursor=pointer]
+                - cell "×" [ref=e2980]:
+                  - button "×" [ref=e2981]
+              - 'row "🇪🇸ES 💸 strong 🏆 Precio histórico: {origin} → {destination} Bajó {pct}%. Desde {price} {currency}. ¡Tiene tela marinera! ×" [ref=e2982]':
+                - cell "🇪🇸ES" [ref=e2983]
+                - cell "💸 strong" [ref=e2984]:
+                  - generic [ref=e2985]: 💸 strong
+                - 'cell "🏆 Precio histórico: {origin} → {destination} Bajó {pct}%. Desde {price} {currency}. ¡Tiene tela marinera!" [ref=e2986]':
+                  - paragraph [ref=e2987]: "🏆 Precio histórico: {origin} → {destination}"
+                  - paragraph [ref=e2988]: "Bajó {pct}%. Desde {price} {currency}. ¡Tiene tela marinera!"
+                - cell [ref=e2989]:
+                  - button "Desactivar" [ref=e2990] [cursor=pointer]
+                - cell "×" [ref=e2992]:
+                  - button "×" [ref=e2993]
+              - 'row "🇪🇸ES 🔥 urgent 🔥 ¡Flipas! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! ¡A por ello, tío! ×" [ref=e2994]':
+                - cell "🇪🇸ES" [ref=e2995]
+                - cell "🔥 urgent" [ref=e2996]:
+                  - generic [ref=e2997]: 🔥 urgent
+                - 'cell "🔥 ¡Flipas! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! ¡A por ello, tío!" [ref=e2998]':
+                  - paragraph [ref=e2999]: "🔥 ¡Flipas! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3000]: "¡Solo {price} {currency}! ¡A por ello, tío!"
+                - cell [ref=e3001]:
+                  - button "Desactivar" [ref=e3002] [cursor=pointer]
+                - cell "×" [ref=e3004]:
+                  - button "×" [ref=e3005]
+              - 'row "🇪🇸ES 🔥 urgent ⚡ Precio mínimo: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Cojonudo, no hay nada igual! ×" [ref=e3006]':
+                - cell "🇪🇸ES" [ref=e3007]
+                - cell "🔥 urgent" [ref=e3008]:
+                  - generic [ref=e3009]: 🔥 urgent
+                - 'cell "⚡ Precio mínimo: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Cojonudo, no hay nada igual!" [ref=e3010]':
+                  - paragraph [ref=e3011]: "⚡ Precio mínimo: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3012]: "Desde {price} {currency}. ¡Cojonudo, no hay nada igual!"
+                - cell [ref=e3013]:
+                  - button "Desactivar" [ref=e3014] [cursor=pointer]
+                - cell "×" [ref=e3016]:
+                  - button "×" [ref=e3017]
+              - 'row "🇲🇽MX campaign ✈️ {origin} → {destination} ¡órale! Hay vuelos a {destination} que están de pelos. ¡Dale gas! ×" [ref=e3018]':
+                - cell "🇲🇽MX" [ref=e3019]
+                - cell "campaign" [ref=e3020]:
+                  - generic [ref=e3021]: campaign
+                - 'cell "✈️ {origin} → {destination} ¡órale! Hay vuelos a {destination} que están de pelos. ¡Dale gas!" [ref=e3022]':
+                  - paragraph [ref=e3023]: "✈️ {origin} → {destination} ¡órale!"
+                  - paragraph [ref=e3024]: "Hay vuelos a {destination} que están de pelos. ¡Dale gas!"
+                - cell [ref=e3025]:
+                  - button "Desactivar" [ref=e3026] [cursor=pointer]
+                - cell "×" [ref=e3028]:
+                  - button "×" [ref=e3029]
+              - 'row "🇲🇽MX campaign 🔥 No te rajes: {origin_iata}→{destination_iata} Vuelos a {destination} con precios chidos. ¡Échale un ojo! ×" [ref=e3030]':
+                - cell "🇲🇽MX" [ref=e3031]
+                - cell "campaign" [ref=e3032]:
+                  - generic [ref=e3033]: campaign
+                - 'cell "🔥 No te rajes: {origin_iata}→{destination_iata} Vuelos a {destination} con precios chidos. ¡Échale un ojo!" [ref=e3034]':
+                  - paragraph [ref=e3035]: "🔥 No te rajes: {origin_iata}→{destination_iata}"
+                  - paragraph [ref=e3036]: "Vuelos a {destination} con precios chidos. ¡Échale un ojo!"
+                - cell [ref=e3037]:
+                  - button "Desactivar" [ref=e3038] [cursor=pointer]
+                - cell "×" [ref=e3040]:
+                  - button "×" [ref=e3041]
+              - 'row "🇲🇽MX campaign 📍 ¿Ya viste los vuelos a {destination}? Desde {origin} hay opciones que están cañón. ¡Aguas, se van! ×" [ref=e3042]':
+                - cell "🇲🇽MX" [ref=e3043]
+                - cell "campaign" [ref=e3044]:
+                  - generic [ref=e3045]: campaign
+                - 'cell "📍 ¿Ya viste los vuelos a {destination}? Desde {origin} hay opciones que están cañón. ¡Aguas, se van!" [ref=e3046]':
+                  - paragraph [ref=e3047]: "📍 ¿Ya viste los vuelos a {destination}?"
+                  - paragraph [ref=e3048]: "Desde {origin} hay opciones que están cañón. ¡Aguas, se van!"
+                - cell [ref=e3049]:
+                  - button "Desactivar" [ref=e3050] [cursor=pointer]
+                - cell "×" [ref=e3052]:
+                  - button "×" [ref=e3053]
+              - 'row "🇲🇽MX 🔄 reeng. ¿Ya vas a {destination}, güey? 🛫 Viste {price} {currency} antes. ¡Órale, no te rajes! ×" [ref=e3054]':
+                - cell "🇲🇽MX" [ref=e3055]
+                - cell "🔄 reeng." [ref=e3056]:
+                  - generic [ref=e3057]: 🔄 reeng.
+                - 'cell "¿Ya vas a {destination}, güey? 🛫 Viste {price} {currency} antes. ¡Órale, no te rajes!" [ref=e3058]':
+                  - paragraph [ref=e3059]: "¿Ya vas a {destination}, güey? 🛫"
+                  - paragraph [ref=e3060]: "Viste {price} {currency} antes. ¡Órale, no te rajes!"
+                - cell [ref=e3061]:
+                  - button "Desactivar" [ref=e3062] [cursor=pointer]
+                - cell "×" [ref=e3064]:
+                  - button "×" [ref=e3065]
+              - 'row "🇲🇽MX 🔄 reeng. ¿Qué onda con el viaje a {destination}? ✈️ Encontraste precios desde {price} {currency}. ¡Dale gas! ×" [ref=e3066]':
+                - cell "🇲🇽MX" [ref=e3067]
+                - cell "🔄 reeng." [ref=e3068]:
+                  - generic [ref=e3069]: 🔄 reeng.
+                - 'cell "¿Qué onda con el viaje a {destination}? ✈️ Encontraste precios desde {price} {currency}. ¡Dale gas!" [ref=e3070]':
+                  - paragraph [ref=e3071]: "¿Qué onda con el viaje a {destination}? ✈️"
+                  - paragraph [ref=e3072]: "Encontraste precios desde {price} {currency}. ¡Dale gas!"
+                - cell [ref=e3073]:
+                  - button "Desactivar" [ref=e3074] [cursor=pointer]
+                - cell "×" [ref=e3076]:
+                  - button "×" [ref=e3077]
+              - 'row "🇲🇽MX 🔄 reeng. Ahorita o nunca: {destination} te espera 🌎 Tenías {price} {currency} en el radar. ¡Sale! ×" [ref=e3078]':
+                - cell "🇲🇽MX" [ref=e3079]
+                - cell "🔄 reeng." [ref=e3080]:
+                  - generic [ref=e3081]: 🔄 reeng.
+                - 'cell "Ahorita o nunca: {destination} te espera 🌎 Tenías {price} {currency} en el radar. ¡Sale!" [ref=e3082]':
+                  - paragraph [ref=e3083]: "Ahorita o nunca: {destination} te espera 🌎"
+                  - paragraph [ref=e3084]: "Tenías {price} {currency} en el radar. ¡Sale!"
+                - cell [ref=e3085]:
+                  - button "Desactivar" [ref=e3086] [cursor=pointer]
+                - cell "×" [ref=e3088]:
+                  - button "×" [ref=e3089]
+              - 'row "🇲🇽MX ✈️ soft Órale, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Está chido! ×" [ref=e3090]':
+                - cell "🇲🇽MX" [ref=e3091]
+                - cell "✈️ soft" [ref=e3092]:
+                  - generic [ref=e3093]: ✈️ soft
+                - 'cell "Órale, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Está chido!" [ref=e3094]':
+                  - paragraph [ref=e3095]: "Órale, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e3096]: "Hoy desde {price} {currency}. ¡Está chido!"
+                - cell [ref=e3097]:
+                  - button "Desactivar" [ref=e3098] [cursor=pointer]
+                - cell "×" [ref=e3100]:
+                  - button "×" [ref=e3101]
+              - 'row "🇲🇽MX ✈️ soft ¡No manches! {origin} → {destination} se puso bueno Bajó {pct}%. Desde {price} {currency}, está de pelos. ×" [ref=e3102]':
+                - cell "🇲🇽MX" [ref=e3103]
+                - cell "✈️ soft" [ref=e3104]:
+                  - generic [ref=e3105]: ✈️ soft
+                - 'cell "¡No manches! {origin} → {destination} se puso bueno Bajó {pct}%. Desde {price} {currency}, está de pelos." [ref=e3106]':
+                  - paragraph [ref=e3107]: "¡No manches! {origin} → {destination} se puso bueno"
+                  - paragraph [ref=e3108]: "Bajó {pct}%. Desde {price} {currency}, está de pelos."
+                - cell [ref=e3109]:
+                  - button "Desactivar" [ref=e3110] [cursor=pointer]
+                - cell "×" [ref=e3112]:
+                  - button "×" [ref=e3113]
+              - 'row "🇲🇽MX ✈️ soft Güey, ¿viste? {origin} → {destination} bajó {pct}% Sale desde {price} {currency}. ¡Qué onda tan chida! ×" [ref=e3114]':
+                - cell "🇲🇽MX" [ref=e3115]
+                - cell "✈️ soft" [ref=e3116]:
+                  - generic [ref=e3117]: ✈️ soft
+                - 'cell "Güey, ¿viste? {origin} → {destination} bajó {pct}% Sale desde {price} {currency}. ¡Qué onda tan chida!" [ref=e3118]':
+                  - paragraph [ref=e3119]: "Güey, ¿viste? {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3120]: "Sale desde {price} {currency}. ¡Qué onda tan chida!"
+                - cell [ref=e3121]:
+                  - button "Desactivar" [ref=e3122] [cursor=pointer]
+                - cell "×" [ref=e3124]:
+                  - button "×" [ref=e3125]
+              - 'row "🇲🇽MX ✈️ soft ✈️ {origin} → {destination} cayó {pct}% Desde {price} {currency}. Sale, no te rajes. ×" [ref=e3126]':
+                - cell "🇲🇽MX" [ref=e3127]
+                - cell "✈️ soft" [ref=e3128]:
+                  - generic [ref=e3129]: ✈️ soft
+                - 'cell "✈️ {origin} → {destination} cayó {pct}% Desde {price} {currency}. Sale, no te rajes." [ref=e3130]':
+                  - paragraph [ref=e3131]: "✈️ {origin} → {destination} cayó {pct}%"
+                  - paragraph [ref=e3132]: "Desde {price} {currency}. Sale, no te rajes."
+                - cell [ref=e3133]:
+                  - button "Desactivar" [ref=e3134] [cursor=pointer]
+                - cell "×" [ref=e3136]:
+                  - button "×" [ref=e3137]
+              - 'row "🇲🇽MX ✈️ soft Ahorita conviene: {origin} → {destination} ✈️ Bajó {pct}%. Sale desde {price} {currency}. ¡Dale gas! ×" [ref=e3138]':
+                - cell "🇲🇽MX" [ref=e3139]
+                - cell "✈️ soft" [ref=e3140]:
+                  - generic [ref=e3141]: ✈️ soft
+                - 'cell "Ahorita conviene: {origin} → {destination} ✈️ Bajó {pct}%. Sale desde {price} {currency}. ¡Dale gas!" [ref=e3142]':
+                  - paragraph [ref=e3143]: "Ahorita conviene: {origin} → {destination} ✈️"
+                  - paragraph [ref=e3144]: "Bajó {pct}%. Sale desde {price} {currency}. ¡Dale gas!"
+                - cell [ref=e3145]:
+                  - button "Desactivar" [ref=e3146] [cursor=pointer]
+                - cell "×" [ref=e3148]:
+                  - button "×" [ref=e3149]
+              - 'row "🇲🇽MX ✈️ soft Qué onda chida en {origin} → {destination} 🎉 -{pct}%, hoy desde {price} {currency}. Está a neta. ×" [ref=e3150]':
+                - cell "🇲🇽MX" [ref=e3151]
+                - cell "✈️ soft" [ref=e3152]:
+                  - generic [ref=e3153]: ✈️ soft
+                - 'cell "Qué onda chida en {origin} → {destination} 🎉 -{pct}%, hoy desde {price} {currency}. Está a neta." [ref=e3154]':
+                  - paragraph [ref=e3155]: "Qué onda chida en {origin} → {destination} 🎉"
+                  - paragraph [ref=e3156]: "-{pct}%, hoy desde {price} {currency}. Está a neta."
+                - cell [ref=e3157]:
+                  - button "Desactivar" [ref=e3158] [cursor=pointer]
+                - cell "×" [ref=e3160]:
+                  - button "×" [ref=e3161]
+              - 'row "🇲🇽MX ✈️ soft De neta: {origin} → {destination} bajó {pct}% 🛫 Sale desde {price} {currency}. ¡Está heavy! ×" [ref=e3162]':
+                - cell "🇲🇽MX" [ref=e3163]
+                - cell "✈️ soft" [ref=e3164]:
+                  - generic [ref=e3165]: ✈️ soft
+                - 'cell "De neta: {origin} → {destination} bajó {pct}% 🛫 Sale desde {price} {currency}. ¡Está heavy!" [ref=e3166]':
+                  - paragraph [ref=e3167]: "De neta: {origin} → {destination} bajó {pct}% 🛫"
+                  - paragraph [ref=e3168]: "Sale desde {price} {currency}. ¡Está heavy!"
+                - cell [ref=e3169]:
+                  - button "Desactivar" [ref=e3170] [cursor=pointer]
+                - cell "×" [ref=e3172]:
+                  - button "×" [ref=e3173]
+              - 'row "🇲🇽MX 💸 strong 💸 ¡No manches qué precio! {origin} → {destination} Bajó {pct}%. Desde {price} {currency}. ¡A huevo! ×" [ref=e3174]':
+                - cell "🇲🇽MX" [ref=e3175]
+                - cell "💸 strong" [ref=e3176]:
+                  - generic [ref=e3177]: 💸 strong
+                - 'cell "💸 ¡No manches qué precio! {origin} → {destination} Bajó {pct}%. Desde {price} {currency}. ¡A huevo!" [ref=e3178]':
+                  - paragraph [ref=e3179]: "💸 ¡No manches qué precio! {origin} → {destination}"
+                  - paragraph [ref=e3180]: "Bajó {pct}%. Desde {price} {currency}. ¡A huevo!"
+                - cell [ref=e3181]:
+                  - button "Desactivar" [ref=e3182] [cursor=pointer]
+                - cell "×" [ref=e3184]:
+                  - button "×" [ref=e3185]
+              - 'row "🇲🇽MX 💸 strong 🔥 Gran bajada: {origin} → {destination} -{pct}% Sale desde {price} {currency}. ¡Órale, es la neta! ×" [ref=e3186]':
+                - cell "🇲🇽MX" [ref=e3187]
+                - cell "💸 strong" [ref=e3188]:
+                  - generic [ref=e3189]: 💸 strong
+                - 'cell "🔥 Gran bajada: {origin} → {destination} -{pct}% Sale desde {price} {currency}. ¡Órale, es la neta!" [ref=e3190]':
+                  - paragraph [ref=e3191]: "🔥 Gran bajada: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3192]: "Sale desde {price} {currency}. ¡Órale, es la neta!"
+                - cell [ref=e3193]:
+                  - button "Desactivar" [ref=e3194] [cursor=pointer]
+                - cell "×" [ref=e3196]:
+                  - button "×" [ref=e3197]
+              - 'row "🇲🇽MX 💸 strong Güey, esto está cañón 💥 {origin} → {destination} -{pct}%, desde {price} {currency}. ¡Está de pelos! ×" [ref=e3198]':
+                - cell "🇲🇽MX" [ref=e3199]
+                - cell "💸 strong" [ref=e3200]:
+                  - generic [ref=e3201]: 💸 strong
+                - 'cell "Güey, esto está cañón 💥 {origin} → {destination} -{pct}%, desde {price} {currency}. ¡Está de pelos!" [ref=e3202]':
+                  - paragraph [ref=e3203]: "Güey, esto está cañón 💥 {origin} → {destination}"
+                  - paragraph [ref=e3204]: "-{pct}%, desde {price} {currency}. ¡Está de pelos!"
+                - cell [ref=e3205]:
+                  - button "Desactivar" [ref=e3206] [cursor=pointer]
+                - cell "×" [ref=e3208]:
+                  - button "×" [ref=e3209]
+              - 'row "🇲🇽MX 💸 strong ¡Sale y vale! {origin} → {destination} bajó {pct}% ✈️ Desde {price} {currency}. Dale gas, cuate. ×" [ref=e3210]':
+                - cell "🇲🇽MX" [ref=e3211]
+                - cell "💸 strong" [ref=e3212]:
+                  - generic [ref=e3213]: 💸 strong
+                - 'cell "¡Sale y vale! {origin} → {destination} bajó {pct}% ✈️ Desde {price} {currency}. Dale gas, cuate." [ref=e3214]':
+                  - paragraph [ref=e3215]: "¡Sale y vale! {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e3216]: "Desde {price} {currency}. Dale gas, cuate."
+                - cell [ref=e3217]:
+                  - button "Desactivar" [ref=e3218] [cursor=pointer]
+                - cell "×" [ref=e3220]:
+                  - button "×" [ref=e3221]
+              - 'row "🇲🇽MX 💸 strong 🏆 Precio histórico: {origin} → {destination} Bajó {pct}%, hoy desde {price} {currency}. ¡Qué pasada! ×" [ref=e3222]':
+                - cell "🇲🇽MX" [ref=e3223]
+                - cell "💸 strong" [ref=e3224]:
+                  - generic [ref=e3225]: 💸 strong
+                - 'cell "🏆 Precio histórico: {origin} → {destination} Bajó {pct}%, hoy desde {price} {currency}. ¡Qué pasada!" [ref=e3226]':
+                  - paragraph [ref=e3227]: "🏆 Precio histórico: {origin} → {destination}"
+                  - paragraph [ref=e3228]: "Bajó {pct}%, hoy desde {price} {currency}. ¡Qué pasada!"
+                - cell [ref=e3229]:
+                  - button "Desactivar" [ref=e3230] [cursor=pointer]
+                - cell "×" [ref=e3232]:
+                  - button "×" [ref=e3233]
+              - 'row "🇲🇽MX 💸 strong ¡Aguas que se va! {origin} → {destination} -{pct}% 🚀 Desde {price} {currency}. ¡La neta es ahorita! ×" [ref=e3234]':
+                - cell "🇲🇽MX" [ref=e3235]
+                - cell "💸 strong" [ref=e3236]:
+                  - generic [ref=e3237]: 💸 strong
+                - 'cell "¡Aguas que se va! {origin} → {destination} -{pct}% 🚀 Desde {price} {currency}. ¡La neta es ahorita!" [ref=e3238]':
+                  - paragraph [ref=e3239]: "¡Aguas que se va! {origin} → {destination} -{pct}% 🚀"
+                  - paragraph [ref=e3240]: "Desde {price} {currency}. ¡La neta es ahorita!"
+                - cell [ref=e3241]:
+                  - button "Desactivar" [ref=e3242] [cursor=pointer]
+                - cell "×" [ref=e3244]:
+                  - button "×" [ref=e3245]
+              - 'row "🇲🇽MX 💸 strong 🎯 Oportunidad chida: {origin} → {destination} -{pct}% y sale desde {price} {currency}. ¡Está bien macizo! ×" [ref=e3246]':
+                - cell "🇲🇽MX" [ref=e3247]
+                - cell "💸 strong" [ref=e3248]:
+                  - generic [ref=e3249]: 💸 strong
+                - 'cell "🎯 Oportunidad chida: {origin} → {destination} -{pct}% y sale desde {price} {currency}. ¡Está bien macizo!" [ref=e3250]':
+                  - paragraph [ref=e3251]: "🎯 Oportunidad chida: {origin} → {destination}"
+                  - paragraph [ref=e3252]: "-{pct}% y sale desde {price} {currency}. ¡Está bien macizo!"
+                - cell [ref=e3253]:
+                  - button "Desactivar" [ref=e3254] [cursor=pointer]
+                - cell "×" [ref=e3256]:
+                  - button "×" [ref=e3257]
+              - 'row "🇲🇽MX 🔥 urgent 🔥 ¡A huevo! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! ¡Órale ya, güey! ×" [ref=e3258]':
+                - cell "🇲🇽MX" [ref=e3259]
+                - cell "🔥 urgent" [ref=e3260]:
+                  - generic [ref=e3261]: 🔥 urgent
+                - 'cell "🔥 ¡A huevo! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! ¡Órale ya, güey!" [ref=e3262]':
+                  - paragraph [ref=e3263]: "🔥 ¡A huevo! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3264]: "¡Solo {price} {currency}! ¡Órale ya, güey!"
+                - cell [ref=e3265]:
+                  - button "Desactivar" [ref=e3266] [cursor=pointer]
+                - cell "×" [ref=e3268]:
+                  - button "×" [ref=e3269]
+              - 'row "🇲🇽MX 🔥 urgent ⚡ Precio mínimo: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡No manches, es ahorita! ×" [ref=e3270]':
+                - cell "🇲🇽MX" [ref=e3271]
+                - cell "🔥 urgent" [ref=e3272]:
+                  - generic [ref=e3273]: 🔥 urgent
+                - 'cell "⚡ Precio mínimo: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡No manches, es ahorita!" [ref=e3274]':
+                  - paragraph [ref=e3275]: "⚡ Precio mínimo: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3276]: "Desde {price} {currency}. ¡No manches, es ahorita!"
+                - cell [ref=e3277]:
+                  - button "Desactivar" [ref=e3278] [cursor=pointer]
+                - cell "×" [ref=e3280]:
+                  - button "×" [ref=e3281]
+              - 'row "🇲🇽MX 🔥 urgent ¡Esto está cañonísimo! {origin} → {destination} 💥 Bajó {pct}%, desde {price} {currency}. ¡Dale gas ya! ×" [ref=e3282]':
+                - cell "🇲🇽MX" [ref=e3283]
+                - cell "🔥 urgent" [ref=e3284]:
+                  - generic [ref=e3285]: 🔥 urgent
+                - 'cell "¡Esto está cañonísimo! {origin} → {destination} 💥 Bajó {pct}%, desde {price} {currency}. ¡Dale gas ya!" [ref=e3286]':
+                  - paragraph [ref=e3287]: "¡Esto está cañonísimo! {origin} → {destination} 💥"
+                  - paragraph [ref=e3288]: "Bajó {pct}%, desde {price} {currency}. ¡Dale gas ya!"
+                - cell [ref=e3289]:
+                  - button "Desactivar" [ref=e3290] [cursor=pointer]
+                - cell "×" [ref=e3292]:
+                  - button "×" [ref=e3293]
+              - 'row "🇲🇽MX 🔥 urgent 🚨 ¡Aguas! La mejor oferta del año: {origin} → {destination} -{pct}%, sale {price} {currency}. ¡Sale cuate! ×" [ref=e3294]':
+                - cell "🇲🇽MX" [ref=e3295]
+                - cell "🔥 urgent" [ref=e3296]:
+                  - generic [ref=e3297]: 🔥 urgent
+                - 'cell "🚨 ¡Aguas! La mejor oferta del año: {origin} → {destination} -{pct}%, sale {price} {currency}. ¡Sale cuate!" [ref=e3298]':
+                  - paragraph [ref=e3299]: "🚨 ¡Aguas! La mejor oferta del año: {origin} → {destination}"
+                  - paragraph [ref=e3300]: "-{pct}%, sale {price} {currency}. ¡Sale cuate!"
+                - cell [ref=e3301]:
+                  - button "Desactivar" [ref=e3302] [cursor=pointer]
+                - cell "×" [ref=e3304]:
+                  - button "×" [ref=e3305]
+              - 'row "🇲🇽MX 🔥 urgent ¡De pelos y pa'' arriba! {origin} → {destination} -{pct}% 🎊 Hoy desde {price} {currency}. ¡La neta! ×" [ref=e3306]':
+                - cell "🇲🇽MX" [ref=e3307]
+                - cell "🔥 urgent" [ref=e3308]:
+                  - generic [ref=e3309]: 🔥 urgent
+                - 'cell "¡De pelos y pa'' arriba! {origin} → {destination} -{pct}% 🎊 Hoy desde {price} {currency}. ¡La neta!" [ref=e3310]':
+                  - paragraph [ref=e3311]: "¡De pelos y pa' arriba! {origin} → {destination} -{pct}% 🎊"
+                  - paragraph [ref=e3312]: "Hoy desde {price} {currency}. ¡La neta!"
+                - cell [ref=e3313]:
+                  - button "Desactivar" [ref=e3314] [cursor=pointer]
+                - cell "×" [ref=e3316]:
+                  - button "×" [ref=e3317]
+              - 'row "🇲🇽MX 🔥 urgent 🔥 Oferta de impacto: {origin} → {destination} bajó {pct}% ¡Desde {price} {currency} nomás! ¡Órale, no te rajes! ×" [ref=e3318]':
+                - cell "🇲🇽MX" [ref=e3319]
+                - cell "🔥 urgent" [ref=e3320]:
+                  - generic [ref=e3321]: 🔥 urgent
+                - 'cell "🔥 Oferta de impacto: {origin} → {destination} bajó {pct}% ¡Desde {price} {currency} nomás! ¡Órale, no te rajes!" [ref=e3322]':
+                  - paragraph [ref=e3323]: "🔥 Oferta de impacto: {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3324]: "¡Desde {price} {currency} nomás! ¡Órale, no te rajes!"
+                - cell [ref=e3325]:
+                  - button "Desactivar" [ref=e3326] [cursor=pointer]
+                - cell "×" [ref=e3328]:
+                  - button "×" [ref=e3329]
+              - row "🇲🇽MX welcome ¡Bienvenido a FlyPromociones! ✈️ ¡Activamos tus alertas de vuelo! Te avisamos cuando los precios bajen. ×" [ref=e3330]:
+                - cell "🇲🇽MX" [ref=e3331]
+                - cell "welcome" [ref=e3332]:
+                  - generic [ref=e3333]: welcome
+                - cell "¡Bienvenido a FlyPromociones! ✈️ ¡Activamos tus alertas de vuelo! Te avisamos cuando los precios bajen." [ref=e3334]:
+                  - paragraph [ref=e3335]: ¡Bienvenido a FlyPromociones! ✈️
+                  - paragraph [ref=e3336]: ¡Activamos tus alertas de vuelo! Te avisamos cuando los precios bajen.
+                - cell [ref=e3337]:
+                  - button "Desactivar" [ref=e3338] [cursor=pointer]
+                - cell "×" [ref=e3340]:
+                  - button "×" [ref=e3341]
+              - 'row "🇵🇪PE 🔄 reeng. ¿Todavía pensás en volar a {destination}, causa? 🛫 Viste {price} {currency}. ¡Al toque pe! ×" [ref=e3342]':
+                - cell "🇵🇪PE" [ref=e3343]
+                - cell "🔄 reeng." [ref=e3344]:
+                  - generic [ref=e3345]: 🔄 reeng.
+                - 'cell "¿Todavía pensás en volar a {destination}, causa? 🛫 Viste {price} {currency}. ¡Al toque pe!" [ref=e3346]':
+                  - paragraph [ref=e3347]: "¿Todavía pensás en volar a {destination}, causa? 🛫"
+                  - paragraph [ref=e3348]: "Viste {price} {currency}. ¡Al toque pe!"
+                - cell [ref=e3349]:
+                  - button "Desactivar" [ref=e3350] [cursor=pointer]
+                - cell "×" [ref=e3352]:
+                  - button "×" [ref=e3353]
+              - 'row "🇵🇪PE 🔄 reeng. {destination} te espera, pata ✈️ Encontraste {price} {currency}. ¡Habla! ×" [ref=e3354]':
+                - cell "🇵🇪PE" [ref=e3355]
+                - cell "🔄 reeng." [ref=e3356]:
+                  - generic [ref=e3357]: 🔄 reeng.
+                - 'cell "{destination} te espera, pata ✈️ Encontraste {price} {currency}. ¡Habla!" [ref=e3358]':
+                  - paragraph [ref=e3359]: "{destination} te espera, pata ✈️"
+                  - paragraph [ref=e3360]: "Encontraste {price} {currency}. ¡Habla!"
+                - cell [ref=e3361]:
+                  - button "Desactivar" [ref=e3362] [cursor=pointer]
+                - cell "×" [ref=e3364]:
+                  - button "×" [ref=e3365]
+              - 'row "🇵🇪PE ✈️ soft Causa, {origin} → {destination} bajó {pct}% ✈️ Desde {price} {currency}. ¡Qué bacán, pata! ×" [ref=e3366]':
+                - cell "🇵🇪PE" [ref=e3367]
+                - cell "✈️ soft" [ref=e3368]:
+                  - generic [ref=e3369]: ✈️ soft
+                - 'cell "Causa, {origin} → {destination} bajó {pct}% ✈️ Desde {price} {currency}. ¡Qué bacán, pata!" [ref=e3370]':
+                  - paragraph [ref=e3371]: "Causa, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e3372]: "Desde {price} {currency}. ¡Qué bacán, pata!"
+                - cell [ref=e3373]:
+                  - button "Desactivar" [ref=e3374] [cursor=pointer]
+                - cell "×" [ref=e3376]:
+                  - button "×" [ref=e3377]
+              - 'row "🇵🇪PE ✈️ soft Al toque: {origin} → {destination} -{pct}% 🛫 Desde {price} {currency}. ¡Habla pues! ×" [ref=e3378]':
+                - cell "🇵🇪PE" [ref=e3379]
+                - cell "✈️ soft" [ref=e3380]:
+                  - generic [ref=e3381]: ✈️ soft
+                - 'cell "Al toque: {origin} → {destination} -{pct}% 🛫 Desde {price} {currency}. ¡Habla pues!" [ref=e3382]':
+                  - paragraph [ref=e3383]: "Al toque: {origin} → {destination} -{pct}% 🛫"
+                  - paragraph [ref=e3384]: "Desde {price} {currency}. ¡Habla pues!"
+                - cell [ref=e3385]:
+                  - button "Desactivar" [ref=e3386] [cursor=pointer]
+                - cell "×" [ref=e3388]:
+                  - button "×" [ref=e3389]
+              - 'row "🇵🇪PE ✈️ soft ✈️ Chévere: {origin} → {destination} bajó {pct}% Sale desde {price} {currency}. ¡Qué nota, pe! ×" [ref=e3390]':
+                - cell "🇵🇪PE" [ref=e3391]
+                - cell "✈️ soft" [ref=e3392]:
+                  - generic [ref=e3393]: ✈️ soft
+                - 'cell "✈️ Chévere: {origin} → {destination} bajó {pct}% Sale desde {price} {currency}. ¡Qué nota, pe!" [ref=e3394]':
+                  - paragraph [ref=e3395]: "✈️ Chévere: {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3396]: "Sale desde {price} {currency}. ¡Qué nota, pe!"
+                - cell [ref=e3397]:
+                  - button "Desactivar" [ref=e3398] [cursor=pointer]
+                - cell "×" [ref=e3400]:
+                  - button "×" [ref=e3401]
+              - 'row "🇵🇪PE 💸 strong 💸 ¡Qué bacanería! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Al toque, causa! ×" [ref=e3402]':
+                - cell "🇵🇪PE" [ref=e3403]
+                - cell "💸 strong" [ref=e3404]:
+                  - generic [ref=e3405]: 💸 strong
+                - 'cell "💸 ¡Qué bacanería! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Al toque, causa!" [ref=e3406]':
+                  - paragraph [ref=e3407]: "💸 ¡Qué bacanería! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3408]: "Desde {price} {currency}. ¡Al toque, causa!"
+                - cell [ref=e3409]:
+                  - button "Desactivar" [ref=e3410] [cursor=pointer]
+                - cell "×" [ref=e3412]:
+                  - button "×" [ref=e3413]
+              - 'row "🇵🇪PE 💸 strong 🔥 Gran bajada: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Habla pe, chévere! ×" [ref=e3414]':
+                - cell "🇵🇪PE" [ref=e3415]
+                - cell "💸 strong" [ref=e3416]:
+                  - generic [ref=e3417]: 💸 strong
+                - 'cell "🔥 Gran bajada: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Habla pe, chévere!" [ref=e3418]':
+                  - paragraph [ref=e3419]: "🔥 Gran bajada: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3420]: "Desde {price} {currency}. ¡Habla pe, chévere!"
+                - cell [ref=e3421]:
+                  - button "Desactivar" [ref=e3422] [cursor=pointer]
+                - cell "×" [ref=e3424]:
+                  - button "×" [ref=e3425]
+              - 'row "🇵🇪PE 💸 strong Pata, mirá este precio 👀 {origin} → {destination} -{pct}%, desde {price} {currency}. ¡De una! ×" [ref=e3426]':
+                - cell "🇵🇪PE" [ref=e3427]
+                - cell "💸 strong" [ref=e3428]:
+                  - generic [ref=e3429]: 💸 strong
+                - 'cell "Pata, mirá este precio 👀 {origin} → {destination} -{pct}%, desde {price} {currency}. ¡De una!" [ref=e3430]':
+                  - paragraph [ref=e3431]: "Pata, mirá este precio 👀 {origin} → {destination}"
+                  - paragraph [ref=e3432]: "-{pct}%, desde {price} {currency}. ¡De una!"
+                - cell [ref=e3433]:
+                  - button "Desactivar" [ref=e3434] [cursor=pointer]
+                - cell "×" [ref=e3436]:
+                  - button "×" [ref=e3437]
+              - 'row "🇵🇪PE 🔥 urgent 🔥 ¡Precio mínimo! {origin} → {destination} -{pct}% ¡Solo {price} {currency}! ¡Al toque, causa! ×" [ref=e3438]':
+                - cell "🇵🇪PE" [ref=e3439]
+                - cell "🔥 urgent" [ref=e3440]:
+                  - generic [ref=e3441]: 🔥 urgent
+                - 'cell "🔥 ¡Precio mínimo! {origin} → {destination} -{pct}% ¡Solo {price} {currency}! ¡Al toque, causa!" [ref=e3442]':
+                  - paragraph [ref=e3443]: "🔥 ¡Precio mínimo! {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3444]: "¡Solo {price} {currency}! ¡Al toque, causa!"
+                - cell [ref=e3445]:
+                  - button "Desactivar" [ref=e3446] [cursor=pointer]
+                - cell "×" [ref=e3448]:
+                  - button "×" [ref=e3449]
+              - 'row "🇵🇪PE 🔥 urgent ⚡ ¡Chévere total! {origin} → {destination} -{pct}% 💥 Desde {price} {currency}. ¡Es ahora pe! ×" [ref=e3450]':
+                - cell "🇵🇪PE" [ref=e3451]
+                - cell "🔥 urgent" [ref=e3452]:
+                  - generic [ref=e3453]: 🔥 urgent
+                - 'cell "⚡ ¡Chévere total! {origin} → {destination} -{pct}% 💥 Desde {price} {currency}. ¡Es ahora pe!" [ref=e3454]':
+                  - paragraph [ref=e3455]: "⚡ ¡Chévere total! {origin} → {destination} -{pct}% 💥"
+                  - paragraph [ref=e3456]: "Desde {price} {currency}. ¡Es ahora pe!"
+                - cell [ref=e3457]:
+                  - button "Desactivar" [ref=e3458] [cursor=pointer]
+                - cell "×" [ref=e3460]:
+                  - button "×" [ref=e3461]
+              - 'row "🇵🇾PY 🔄 reeng. ¿Todavía pensás en {destination}? 🛫 Viste {price} {currency}. ¡Dale, compañero! ×" [ref=e3462]':
+                - cell "🇵🇾PY" [ref=e3463]
+                - cell "🔄 reeng." [ref=e3464]:
+                  - generic [ref=e3465]: 🔄 reeng.
+                - 'cell "¿Todavía pensás en {destination}? 🛫 Viste {price} {currency}. ¡Dale, compañero!" [ref=e3466]':
+                  - paragraph [ref=e3467]: "¿Todavía pensás en {destination}? 🛫"
+                  - paragraph [ref=e3468]: "Viste {price} {currency}. ¡Dale, compañero!"
+                - cell [ref=e3469]:
+                  - button "Desactivar" [ref=e3470] [cursor=pointer]
+                - cell "×" [ref=e3472]:
+                  - button "×" [ref=e3473]
+              - 'row "🇵🇾PY 🔄 reeng. {destination} te espera ✈️ Viste {price} {currency}. ¡No dejes pasar! ×" [ref=e3474]':
+                - cell "🇵🇾PY" [ref=e3475]
+                - cell "🔄 reeng." [ref=e3476]:
+                  - generic [ref=e3477]: 🔄 reeng.
+                - 'cell "{destination} te espera ✈️ Viste {price} {currency}. ¡No dejes pasar!" [ref=e3478]':
+                  - paragraph [ref=e3479]: "{destination} te espera ✈️"
+                  - paragraph [ref=e3480]: "Viste {price} {currency}. ¡No dejes pasar!"
+                - cell [ref=e3481]:
+                  - button "Desactivar" [ref=e3482] [cursor=pointer]
+                - cell "×" [ref=e3484]:
+                  - button "×" [ref=e3485]
+              - 'row "🇵🇾PY ✈️ soft Che, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Al palo, compañero! ×" [ref=e3486]':
+                - cell "🇵🇾PY" [ref=e3487]
+                - cell "✈️ soft" [ref=e3488]:
+                  - generic [ref=e3489]: ✈️ soft
+                - 'cell "Che, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Al palo, compañero!" [ref=e3490]':
+                  - paragraph [ref=e3491]: "Che, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e3492]: "Hoy desde {price} {currency}. ¡Al palo, compañero!"
+                - cell [ref=e3493]:
+                  - button "Desactivar" [ref=e3494] [cursor=pointer]
+                - cell "×" [ref=e3496]:
+                  - button "×" [ref=e3497]
+              - 'row "🇵🇾PY ✈️ soft ✈️ Oferta: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Ta bien! ×" [ref=e3498]':
+                - cell "🇵🇾PY" [ref=e3499]
+                - cell "✈️ soft" [ref=e3500]:
+                  - generic [ref=e3501]: ✈️ soft
+                - 'cell "✈️ Oferta: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Ta bien!" [ref=e3502]':
+                  - paragraph [ref=e3503]: "✈️ Oferta: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3504]: "Desde {price} {currency}. ¡Ta bien!"
+                - cell [ref=e3505]:
+                  - button "Desactivar" [ref=e3506] [cursor=pointer]
+                - cell "×" [ref=e3508]:
+                  - button "×" [ref=e3509]
+              - 'row "🇵🇾PY 💸 strong 💸 Gran oferta: {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡No te lo pierdas! ×" [ref=e3510]':
+                - cell "🇵🇾PY" [ref=e3511]
+                - cell "💸 strong" [ref=e3512]:
+                  - generic [ref=e3513]: 💸 strong
+                - 'cell "💸 Gran oferta: {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡No te lo pierdas!" [ref=e3514]':
+                  - paragraph [ref=e3515]: "💸 Gran oferta: {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3516]: "Desde {price} {currency}. ¡No te lo pierdas!"
+                - cell [ref=e3517]:
+                  - button "Desactivar" [ref=e3518] [cursor=pointer]
+                - cell "×" [ref=e3520]:
+                  - button "×" [ref=e3521]
+              - 'row "🇵🇾PY 💸 strong 🔥 {origin} → {destination} bajó {pct}%, compañero! Desde {price} {currency}. ¡Dale ya! ×" [ref=e3522]':
+                - cell "🇵🇾PY" [ref=e3523]
+                - cell "💸 strong" [ref=e3524]:
+                  - generic [ref=e3525]: 💸 strong
+                - 'cell "🔥 {origin} → {destination} bajó {pct}%, compañero! Desde {price} {currency}. ¡Dale ya!" [ref=e3526]':
+                  - paragraph [ref=e3527]: "🔥 {origin} → {destination} bajó {pct}%, compañero!"
+                  - paragraph [ref=e3528]: "Desde {price} {currency}. ¡Dale ya!"
+                - cell [ref=e3529]:
+                  - button "Desactivar" [ref=e3530] [cursor=pointer]
+                - cell "×" [ref=e3532]:
+                  - button "×" [ref=e3533]
+              - 'row "🇵🇾PY 🔥 urgent 🚨 ¡Precio mínimo! {origin} → {destination} -{pct}% ¡Solo {price} {currency}! ¡Ahora, compañero! ×" [ref=e3534]':
+                - cell "🇵🇾PY" [ref=e3535]
+                - cell "🔥 urgent" [ref=e3536]:
+                  - generic [ref=e3537]: 🔥 urgent
+                - 'cell "🚨 ¡Precio mínimo! {origin} → {destination} -{pct}% ¡Solo {price} {currency}! ¡Ahora, compañero!" [ref=e3538]':
+                  - paragraph [ref=e3539]: "🚨 ¡Precio mínimo! {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3540]: "¡Solo {price} {currency}! ¡Ahora, compañero!"
+                - cell [ref=e3541]:
+                  - button "Desactivar" [ref=e3542] [cursor=pointer]
+                - cell "×" [ref=e3544]:
+                  - button "×" [ref=e3545]
+              - 'row "🇵🇾PY 🔥 urgent ⚡ ¡Al palo! {origin} → {destination} -{pct}% 💥 Desde {price} {currency}. ¡Es ahora o nunca! ×" [ref=e3546]':
+                - cell "🇵🇾PY" [ref=e3547]
+                - cell "🔥 urgent" [ref=e3548]:
+                  - generic [ref=e3549]: 🔥 urgent
+                - 'cell "⚡ ¡Al palo! {origin} → {destination} -{pct}% 💥 Desde {price} {currency}. ¡Es ahora o nunca!" [ref=e3550]':
+                  - paragraph [ref=e3551]: "⚡ ¡Al palo! {origin} → {destination} -{pct}% 💥"
+                  - paragraph [ref=e3552]: "Desde {price} {currency}. ¡Es ahora o nunca!"
+                - cell [ref=e3553]:
+                  - button "Desactivar" [ref=e3554] [cursor=pointer]
+                - cell "×" [ref=e3556]:
+                  - button "×" [ref=e3557]
+              - 'row "🇺🇾UY 🔄 reeng. ¿Todavía pensás en {destination}, botija? 🛫 Viste {price} {currency}. ¡Dale, ta! ×" [ref=e3558]':
+                - cell "🇺🇾UY" [ref=e3559]
+                - cell "🔄 reeng." [ref=e3560]:
+                  - generic [ref=e3561]: 🔄 reeng.
+                - 'cell "¿Todavía pensás en {destination}, botija? 🛫 Viste {price} {currency}. ¡Dale, ta!" [ref=e3562]':
+                  - paragraph [ref=e3563]: "¿Todavía pensás en {destination}, botija? 🛫"
+                  - paragraph [ref=e3564]: "Viste {price} {currency}. ¡Dale, ta!"
+                - cell [ref=e3565]:
+                  - button "Desactivar" [ref=e3566] [cursor=pointer]
+                - cell "×" [ref=e3568]:
+                  - button "×" [ref=e3569]
+              - 'row "🇺🇾UY 🔄 reeng. ¡{destination} te está esperando, che! ✈️ Viste precios desde {price} {currency}. ¡De una! ×" [ref=e3570]':
+                - cell "🇺🇾UY" [ref=e3571]
+                - cell "🔄 reeng." [ref=e3572]:
+                  - generic [ref=e3573]: 🔄 reeng.
+                - 'cell "¡{destination} te está esperando, che! ✈️ Viste precios desde {price} {currency}. ¡De una!" [ref=e3574]':
+                  - paragraph [ref=e3575]: "¡{destination} te está esperando, che! ✈️"
+                  - paragraph [ref=e3576]: "Viste precios desde {price} {currency}. ¡De una!"
+                - cell [ref=e3577]:
+                  - button "Desactivar" [ref=e3578] [cursor=pointer]
+                - cell "×" [ref=e3580]:
+                  - button "×" [ref=e3581]
+              - 'row "🇺🇾UY ✈️ soft Che, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Ta bueno! ×" [ref=e3582]':
+                - cell "🇺🇾UY" [ref=e3583]
+                - cell "✈️ soft" [ref=e3584]:
+                  - generic [ref=e3585]: ✈️ soft
+                - 'cell "Che, {origin} → {destination} bajó {pct}% ✈️ Hoy desde {price} {currency}. ¡Ta bueno!" [ref=e3586]':
+                  - paragraph [ref=e3587]: "Che, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e3588]: "Hoy desde {price} {currency}. ¡Ta bueno!"
+                - cell [ref=e3589]:
+                  - button "Desactivar" [ref=e3590] [cursor=pointer]
+                - cell "×" [ref=e3592]:
+                  - button "×" [ref=e3593]
+              - 'row "🇺🇾UY ✈️ soft Mirá qué oferta: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡De una, ta! ×" [ref=e3594]':
+                - cell "🇺🇾UY" [ref=e3595]
+                - cell "✈️ soft" [ref=e3596]:
+                  - generic [ref=e3597]: ✈️ soft
+                - 'cell "Mirá qué oferta: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡De una, ta!" [ref=e3598]':
+                  - paragraph [ref=e3599]: "Mirá qué oferta: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3600]: "Desde {price} {currency}. ¡De una, ta!"
+                - cell [ref=e3601]:
+                  - button "Desactivar" [ref=e3602] [cursor=pointer]
+                - cell "×" [ref=e3604]:
+                  - button "×" [ref=e3605]
+              - 'row "🇺🇾UY ✈️ soft ✈️ {origin} → {destination} bajó {pct}%, botija Sale desde {price} {currency}. ¡Ta piola! ×" [ref=e3606]':
+                - cell "🇺🇾UY" [ref=e3607]
+                - cell "✈️ soft" [ref=e3608]:
+                  - generic [ref=e3609]: ✈️ soft
+                - 'cell "✈️ {origin} → {destination} bajó {pct}%, botija Sale desde {price} {currency}. ¡Ta piola!" [ref=e3610]':
+                  - paragraph [ref=e3611]: "✈️ {origin} → {destination} bajó {pct}%, botija"
+                  - paragraph [ref=e3612]: "Sale desde {price} {currency}. ¡Ta piola!"
+                - cell [ref=e3613]:
+                  - button "Desactivar" [ref=e3614] [cursor=pointer]
+                - cell "×" [ref=e3616]:
+                  - button "×" [ref=e3617]
+              - 'row "🇺🇾UY 💸 strong 💸 ¡Gran bajada! {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Ta de taquito! ×" [ref=e3618]':
+                - cell "🇺🇾UY" [ref=e3619]
+                - cell "💸 strong" [ref=e3620]:
+                  - generic [ref=e3621]: 💸 strong
+                - 'cell "💸 ¡Gran bajada! {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Ta de taquito!" [ref=e3622]':
+                  - paragraph [ref=e3623]: "💸 ¡Gran bajada! {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3624]: "Desde {price} {currency}. ¡Ta de taquito!"
+                - cell [ref=e3625]:
+                  - button "Desactivar" [ref=e3626] [cursor=pointer]
+                - cell "×" [ref=e3628]:
+                  - button "×" [ref=e3629]
+              - 'row "🇺🇾UY 💸 strong Che, ¡esto ta copado! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Dale ya! ×" [ref=e3630]':
+                - cell "🇺🇾UY" [ref=e3631]
+                - cell "💸 strong" [ref=e3632]:
+                  - generic [ref=e3633]: 💸 strong
+                - 'cell "Che, ¡esto ta copado! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Dale ya!" [ref=e3634]':
+                  - paragraph [ref=e3635]: "Che, ¡esto ta copado! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3636]: "Desde {price} {currency}. ¡Dale ya!"
+                - cell [ref=e3637]:
+                  - button "Desactivar" [ref=e3638] [cursor=pointer]
+                - cell "×" [ref=e3640]:
+                  - button "×" [ref=e3641]
+              - 'row "🇺🇾UY 💸 strong 🏆 Precio histórico: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Ta buenísimo! ×" [ref=e3642]':
+                - cell "🇺🇾UY" [ref=e3643]
+                - cell "💸 strong" [ref=e3644]:
+                  - generic [ref=e3645]: 💸 strong
+                - 'cell "🏆 Precio histórico: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡Ta buenísimo!" [ref=e3646]':
+                  - paragraph [ref=e3647]: "🏆 Precio histórico: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3648]: "Desde {price} {currency}. ¡Ta buenísimo!"
+                - cell [ref=e3649]:
+                  - button "Desactivar" [ref=e3650] [cursor=pointer]
+                - cell "×" [ref=e3652]:
+                  - button "×" [ref=e3653]
+              - 'row "🇺🇾UY 🔥 urgent 🔥 ¡Ta baratísimo! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! ¡Ahora che! ×" [ref=e3654]':
+                - cell "🇺🇾UY" [ref=e3655]
+                - cell "🔥 urgent" [ref=e3656]:
+                  - generic [ref=e3657]: 🔥 urgent
+                - 'cell "🔥 ¡Ta baratísimo! {origin} → {destination} bajó {pct}% ¡Solo {price} {currency}! ¡Ahora che!" [ref=e3658]':
+                  - paragraph [ref=e3659]: "🔥 ¡Ta baratísimo! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3660]: "¡Solo {price} {currency}! ¡Ahora che!"
+                - cell [ref=e3661]:
+                  - button "Desactivar" [ref=e3662] [cursor=pointer]
+                - cell "×" [ref=e3664]:
+                  - button "×" [ref=e3665]
+              - 'row "🇺🇾UY 🔥 urgent ⚡ ¡De taquito! {origin} → {destination} -{pct}% 💥 Desde {price} {currency}. ¡Es ya o nunca, botija! ×" [ref=e3666]':
+                - cell "🇺🇾UY" [ref=e3667]
+                - cell "🔥 urgent" [ref=e3668]:
+                  - generic [ref=e3669]: 🔥 urgent
+                - 'cell "⚡ ¡De taquito! {origin} → {destination} -{pct}% 💥 Desde {price} {currency}. ¡Es ya o nunca, botija!" [ref=e3670]':
+                  - paragraph [ref=e3671]: "⚡ ¡De taquito! {origin} → {destination} -{pct}% 💥"
+                  - paragraph [ref=e3672]: "Desde {price} {currency}. ¡Es ya o nunca, botija!"
+                - cell [ref=e3673]:
+                  - button "Desactivar" [ref=e3674] [cursor=pointer]
+                - cell "×" [ref=e3676]:
+                  - button "×" [ref=e3677]
+              - 'row "🇻🇪VE 🔄 reeng. ¿Todavía pensás en {destination}, chamo? 🛫 Viste {price} {currency}. ¡Dale pana! ×" [ref=e3678]':
+                - cell "🇻🇪VE" [ref=e3679]
+                - cell "🔄 reeng." [ref=e3680]:
+                  - generic [ref=e3681]: 🔄 reeng.
+                - 'cell "¿Todavía pensás en {destination}, chamo? 🛫 Viste {price} {currency}. ¡Dale pana!" [ref=e3682]':
+                  - paragraph [ref=e3683]: "¿Todavía pensás en {destination}, chamo? 🛫"
+                  - paragraph [ref=e3684]: "Viste {price} {currency}. ¡Dale pana!"
+                - cell [ref=e3685]:
+                  - button "Desactivar" [ref=e3686] [cursor=pointer]
+                - cell "×" [ref=e3688]:
+                  - button "×" [ref=e3689]
+              - 'row "🇻🇪VE 🔄 reeng. {destination} te está esperando, pana ✈️ Viste {price} {currency}. ¡No joda, es el momento! ×" [ref=e3690]':
+                - cell "🇻🇪VE" [ref=e3691]
+                - cell "🔄 reeng." [ref=e3692]:
+                  - generic [ref=e3693]: 🔄 reeng.
+                - 'cell "{destination} te está esperando, pana ✈️ Viste {price} {currency}. ¡No joda, es el momento!" [ref=e3694]':
+                  - paragraph [ref=e3695]: "{destination} te está esperando, pana ✈️"
+                  - paragraph [ref=e3696]: "Viste {price} {currency}. ¡No joda, es el momento!"
+                - cell [ref=e3697]:
+                  - button "Desactivar" [ref=e3698] [cursor=pointer]
+                - cell "×" [ref=e3700]:
+                  - button "×" [ref=e3701]
+              - 'row "🇻🇪VE ✈️ soft Chamo, {origin} → {destination} bajó {pct}% ✈️ Desde {price} {currency}. ¡Chévere, pana! ×" [ref=e3702]':
+                - cell "🇻🇪VE" [ref=e3703]
+                - cell "✈️ soft" [ref=e3704]:
+                  - generic [ref=e3705]: ✈️ soft
+                - 'cell "Chamo, {origin} → {destination} bajó {pct}% ✈️ Desde {price} {currency}. ¡Chévere, pana!" [ref=e3706]':
+                  - paragraph [ref=e3707]: "Chamo, {origin} → {destination} bajó {pct}% ✈️"
+                  - paragraph [ref=e3708]: "Desde {price} {currency}. ¡Chévere, pana!"
+                - cell [ref=e3709]:
+                  - button "Desactivar" [ref=e3710] [cursor=pointer]
+                - cell "×" [ref=e3712]:
+                  - button "×" [ref=e3713]
+              - 'row "🇻🇪VE ✈️ soft Pana, ¡mira esto! {origin} → {destination} -{pct}% Sale desde {price} {currency}. ¡Burda de chévere! ×" [ref=e3714]':
+                - cell "🇻🇪VE" [ref=e3715]
+                - cell "✈️ soft" [ref=e3716]:
+                  - generic [ref=e3717]: ✈️ soft
+                - 'cell "Pana, ¡mira esto! {origin} → {destination} -{pct}% Sale desde {price} {currency}. ¡Burda de chévere!" [ref=e3718]':
+                  - paragraph [ref=e3719]: "Pana, ¡mira esto! {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3720]: "Sale desde {price} {currency}. ¡Burda de chévere!"
+                - cell [ref=e3721]:
+                  - button "Desactivar" [ref=e3722] [cursor=pointer]
+                - cell "×" [ref=e3724]:
+                  - button "×" [ref=e3725]
+              - 'row "🇻🇪VE ✈️ soft ✈️ {origin} → {destination} bajó {pct}%, no joda! Desde {price} {currency}. ¡Qué vaina más bacán! ×" [ref=e3726]':
+                - cell "🇻🇪VE" [ref=e3727]
+                - cell "✈️ soft" [ref=e3728]:
+                  - generic [ref=e3729]: ✈️ soft
+                - 'cell "✈️ {origin} → {destination} bajó {pct}%, no joda! Desde {price} {currency}. ¡Qué vaina más bacán!" [ref=e3730]':
+                  - paragraph [ref=e3731]: "✈️ {origin} → {destination} bajó {pct}%, no joda!"
+                  - paragraph [ref=e3732]: "Desde {price} {currency}. ¡Qué vaina más bacán!"
+                - cell [ref=e3733]:
+                  - button "Desactivar" [ref=e3734] [cursor=pointer]
+                - cell "×" [ref=e3736]:
+                  - button "×" [ref=e3737]
+              - 'row "🇻🇪VE 💸 strong 💸 ¡Chévere total! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Dale, chamo! ×" [ref=e3738]':
+                - cell "🇻🇪VE" [ref=e3739]
+                - cell "💸 strong" [ref=e3740]:
+                  - generic [ref=e3741]: 💸 strong
+                - 'cell "💸 ¡Chévere total! {origin} → {destination} bajó {pct}% Desde {price} {currency}. ¡Dale, chamo!" [ref=e3742]':
+                  - paragraph [ref=e3743]: "💸 ¡Chévere total! {origin} → {destination} bajó {pct}%"
+                  - paragraph [ref=e3744]: "Desde {price} {currency}. ¡Dale, chamo!"
+                - cell [ref=e3745]:
+                  - button "Desactivar" [ref=e3746] [cursor=pointer]
+                - cell "×" [ref=e3748]:
+                  - button "×" [ref=e3749]
+              - 'row "🇻🇪VE 💸 strong 🔥 Gran bajada: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡No joda, es verdad! ×" [ref=e3750]':
+                - cell "🇻🇪VE" [ref=e3751]
+                - cell "💸 strong" [ref=e3752]:
+                  - generic [ref=e3753]: 💸 strong
+                - 'cell "🔥 Gran bajada: {origin} → {destination} -{pct}% Desde {price} {currency}. ¡No joda, es verdad!" [ref=e3754]':
+                  - paragraph [ref=e3755]: "🔥 Gran bajada: {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3756]: "Desde {price} {currency}. ¡No joda, es verdad!"
+                - cell [ref=e3757]:
+                  - button "Desactivar" [ref=e3758] [cursor=pointer]
+                - cell "×" [ref=e3760]:
+                  - button "×" [ref=e3761]
+              - 'row "🇻🇪VE 💸 strong Pana, ¡esto está burda de barato! ✈️ {origin} → {destination}: -{pct}%, desde {price} {currency}. ×" [ref=e3762]':
+                - cell "🇻🇪VE" [ref=e3763]
+                - cell "💸 strong" [ref=e3764]:
+                  - generic [ref=e3765]: 💸 strong
+                - 'cell "Pana, ¡esto está burda de barato! ✈️ {origin} → {destination}: -{pct}%, desde {price} {currency}." [ref=e3766]':
+                  - paragraph [ref=e3767]: Pana, ¡esto está burda de barato! ✈️
+                  - paragraph [ref=e3768]: "{origin} → {destination}: -{pct}%, desde {price} {currency}."
+                - cell [ref=e3769]:
+                  - button "Desactivar" [ref=e3770] [cursor=pointer]
+                - cell "×" [ref=e3772]:
+                  - button "×" [ref=e3773]
+              - 'row "🇻🇪VE 🔥 urgent 🔥 ¡No joda, qué precio! {origin} → {destination} -{pct}% ¡Solo {price} {currency}! ¡Dale ya, chamo! ×" [ref=e3774]':
+                - cell "🇻🇪VE" [ref=e3775]
+                - cell "🔥 urgent" [ref=e3776]:
+                  - generic [ref=e3777]: 🔥 urgent
+                - 'cell "🔥 ¡No joda, qué precio! {origin} → {destination} -{pct}% ¡Solo {price} {currency}! ¡Dale ya, chamo!" [ref=e3778]':
+                  - paragraph [ref=e3779]: "🔥 ¡No joda, qué precio! {origin} → {destination} -{pct}%"
+                  - paragraph [ref=e3780]: "¡Solo {price} {currency}! ¡Dale ya, chamo!"
+                - cell [ref=e3781]:
+                  - button "Desactivar" [ref=e3782] [cursor=pointer]
+                - cell "×" [ref=e3784]:
+                  - button "×" [ref=e3785]
+              - 'row "🇻🇪VE 🔥 urgent ⚡ ¡Burda de oferta! {origin} → {destination} -{pct}% 💥 Desde {price} {currency}. ¡Es ahora, pana! ×" [ref=e3786]':
+                - cell "🇻🇪VE" [ref=e3787]
+                - cell "🔥 urgent" [ref=e3788]:
+                  - generic [ref=e3789]: 🔥 urgent
+                - 'cell "⚡ ¡Burda de oferta! {origin} → {destination} -{pct}% 💥 Desde {price} {currency}. ¡Es ahora, pana!" [ref=e3790]':
+                  - paragraph [ref=e3791]: "⚡ ¡Burda de oferta! {origin} → {destination} -{pct}% 💥"
+                  - paragraph [ref=e3792]: "Desde {price} {currency}. ¡Es ahora, pana!"
+                - cell [ref=e3793]:
+                  - button "Desactivar" [ref=e3794] [cursor=pointer]
+                - cell "×" [ref=e3796]:
+                  - button "×" [ref=e3797]
+        - generic [ref=e3798]:
+          - generic [ref=e3799]:
+            - generic [ref=e3800]: 🤖
+            - heading "Generar templates con IA" [level=2] [ref=e3801]
+          - generic [ref=e3802]:
+            - generic [ref=e3803]:
+              - generic [ref=e3804]: País
+              - combobox [ref=e3806]:
+                - option "🌍 Genérico (*)"
+                - option "🇦🇷 Argentina (AR)" [selected]
+                - option "🇧🇷 Brasil (BR)"
+                - option "🇨🇱 Chile (CL)"
+                - option "🇨🇴 Colombia (CO)"
+                - option "🇪🇸 España (ES)"
+                - option "🇲🇽 México (MX)"
+                - option "🇵🇪 Perú (PE)"
+                - option "🇵🇾 Paraguay (PY)"
+                - option "🇺🇾 Uruguay (UY)"
+                - option "🇻🇪 Venezuela (VE)"
+                - option "✏️ Otro país..."
+            - generic [ref=e3807]:
+              - generic [ref=e3808]: Nivel
+              - combobox [ref=e3809]:
+                - option "Soft" [selected]
+                - option "Strong"
+                - option "Urgent"
+                - option "Reengagement"
+            - generic [ref=e3810]:
+              - generic [ref=e3811]: Cantidad
+              - combobox [ref=e3812]:
+                - option "3 templates"
+                - option "5 templates" [selected]
+                - option "8 templates"
+                - option "10 templates"
+                - option "15 templates"
+                - option "20 templates"
+            - button "✨ Generar" [ref=e3813]:
+              - generic [ref=e3814]: ✨
+              - text: Generar
+          - paragraph [ref=e3815]: Se genera una vista previa. Podés revisar y elegir cuáles guardar antes de confirmar.
+  - generic [ref=e979]: "30"
