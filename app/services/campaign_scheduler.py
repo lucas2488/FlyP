@@ -9,9 +9,14 @@ campaign_calendar que deban ejecutarse hoy:
 
 Para cada match: crea una Campaign draft y la dispara vía execute_campaign().
 Es idempotente: no crea duplicados si ya existe una campaña para esa fecha/slot.
+
+Campañas semanales (Lun/Mié/Vie): broadcast vía FCM topic "flypromociones_AR".
+Llega a TODOS los usuarios suscritos al topic, sin filtro de segmento.
+Se rota entre varios mensajes genéricos para no repetir siempre el mismo.
 """
 
 import logging
+import random
 from datetime import date, datetime, timedelta
 
 import pytz
@@ -26,6 +31,20 @@ _AR_TZ = pytz.timezone("America/Argentina/Buenos_Aires")
 
 # Tolerancia para detectar si "es la hora" del slot (±30 minutos)
 _HOUR_TOLERANCE_MINUTES = 30
+
+# Topic FCM para broadcast a todos los usuarios AR
+_DEFAULT_TOPIC = "flypromociones_AR"
+
+# Pool de mensajes para campañas semanales — rotan aleatoriamente
+_WEEKLY_MESSAGES = [
+    ("✈️ ¿A dónde viajás esta semana?", "Las mejores ofertas de vuelos te están esperando. ¡Entrá y buscá!"),
+    ("🔥 Ofertas de vuelos de hoy", "Precios bajos en las rutas más buscadas. No te los pierdas."),
+    ("🚀 ¡Tu próximo viaje empieza acá!", "Chequeá los vuelos con los mejores precios del momento."),
+    ("💰 Vuelos baratos disponibles", "Encontrá pasajes al mejor precio antes de que se agoten."),
+    ("🌍 ¿Ya planeaste tu próximo viaje?", "Mirá las ofertas que tenemos hoy para vos."),
+    ("✈️ Ofertas frescas de vuelos", "Los mejores precios actualizados. ¡Entrá y encontrá el tuyo!"),
+    ("⚡ Precios que no duran", "Aprovechá las mejores tarifas aéreas de hoy. ¡Buscá ahora!"),
+]
 
 
 async def check_scheduled_campaigns() -> None:
@@ -99,7 +118,7 @@ async def _maybe_create_and_fire(
     _DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
     day_name = _DAY_NAMES[today_ar.weekday()]
     if slot.slot_type == "weekly":
-        label = f"Campaña semanal {day_name} {today_ar.strftime('%d/%m')} — Heavy Searcher"
+        label = f"Campaña semanal {day_name} {today_ar.strftime('%d/%m')} — Broadcast"
     else:
         label = slot.label or f"Campaña especial {today_ar}"
 
@@ -114,14 +133,35 @@ async def _maybe_create_and_fire(
         logger.debug(f"campaign_scheduler: campaña '{label}' ya existe para hoy, saltando")
         return 0
 
+    # Elegir mensaje rotativo para campañas semanales
+    is_weekly = slot.slot_type == "weekly"
+    custom_title: str | None = None
+    custom_body: str | None = None
+    target_topic: str | None = None
+    segment: str | None = None
+
+    if is_weekly:
+        # Broadcast via FCM topic — llega a TODOS los usuarios suscritos
+        target_topic = _DEFAULT_TOPIC
+        segment = None  # no filtrar por segmento, topic llega a todos
+        title, body = random.choice(_WEEKLY_MESSAGES)
+        custom_title = title
+        custom_body = body
+    else:
+        # Campaña especial (feriado): mensaje personalizado ya viene en slot.label
+        segment = "heavy_searcher"
+
     # Crear campaña automática
     campaign = Campaign(
         name=label,
-        segment="heavy_searcher",  # segmento por defecto para campañas automáticas
+        segment=segment,
         status="draft",
         scheduled_at=now_utc,
         campaign_type="top_auto",
         category_tag=slot.label,
+        target_topic=target_topic,
+        custom_title=custom_title,
+        custom_body=custom_body,
     )
     db.add(campaign)
     await db.flush()

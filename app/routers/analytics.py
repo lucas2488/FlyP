@@ -107,7 +107,7 @@ async def get_overview(
 
 # ---------------------------------------------------------------------------
 # GET /analytics/top-routes
-# Rutas más buscadas (desde search_events)
+# Rutas más buscadas — usa price_watches (fuente real de datos de búsqueda)
 # ---------------------------------------------------------------------------
 @router.get("/top-routes")
 async def get_top_routes(
@@ -115,19 +115,18 @@ async def get_top_routes(
     db: AsyncSession = Depends(get_db),
     _: str = Depends(verify_api_key),
 ) -> list:
-    day_trunc = func.date_trunc("day", SearchEvent.occurred_at)
-
     result = await db.execute(
         select(
-            SearchEvent.origin,
-            SearchEvent.destination,
-            func.count().label("search_count"),
-            func.min(SearchEvent.best_price).label("min_price"),
-            func.avg(SearchEvent.best_price).label("avg_price"),
-            func.max(SearchEvent.occurred_at).label("last_seen"),
+            PriceWatch.origin,
+            PriceWatch.destination,
+            func.count(func.distinct(PriceWatch.user_id)).label("search_count"),
+            func.min(PriceWatch.last_price).label("min_price"),
+            func.avg(PriceWatch.last_price).label("avg_price"),
+            func.max(PriceWatch.last_checked).label("last_seen"),
         )
-        .group_by(SearchEvent.origin, SearchEvent.destination)
-        .order_by(func.count().desc())
+        .where(PriceWatch.is_active.is_(True))
+        .group_by(PriceWatch.origin, PriceWatch.destination)
+        .order_by(func.count(func.distinct(PriceWatch.user_id)).desc())
         .limit(limit)
     )
 
