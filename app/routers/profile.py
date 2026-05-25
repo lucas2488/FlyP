@@ -12,7 +12,10 @@ router = APIRouter()
 
 @router.post("/profile", response_model=WebhookResponse)
 async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(UserProfile).where(UserProfile.user_id == data.userId))
+    # Si userId viene null (nunca debería, pero por seguridad) usamos fcmToken como fallback
+    user_id = data.userId or data.fcmToken
+
+    result = await db.execute(select(UserProfile).where(UserProfile.user_id == user_id))
     profile = result.scalar_one_or_none()
 
     skyscanner_headers = None
@@ -25,7 +28,7 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
 
     if profile is None:
         profile = UserProfile(
-            user_id=data.userId,
+            user_id=user_id,
             fcm_token=data.fcmToken,
             app_version=data.appVersion,
             device_model=data.deviceModel,
@@ -56,7 +59,7 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
         )
         db.add(profile)
         # Encolar notificación de bienvenida (se enviará 24h después)
-        await enqueue_welcome_notification(db, data.userId)
+        await enqueue_welcome_notification(db, user_id)
     else:
         profile.fcm_token = data.fcmToken
         profile.app_version = data.appVersion
@@ -93,7 +96,7 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
     if data.lastSearchOriginIata and data.lastSearchDestinationIata:
         await _upsert_price_watch(
             db=db,
-            user_id=data.userId,
+            user_id=user_id,
             origin=data.lastSearchOriginIata,
             destination=data.lastSearchDestinationIata,
         )
@@ -113,7 +116,7 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
         )
 
     await db.commit()
-    return WebhookResponse(success=True, message="Profile saved", userId=data.userId)
+    return WebhookResponse(success=True, message="Profile saved", userId=user_id)
 
 
 async def _upsert_price_watch(db: AsyncSession, user_id: str, origin: str, destination: str):

@@ -2,10 +2,10 @@ import logging
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from app.database import get_db
-from app.models import PriceSnapshot, PriceWatch, PriceMonth, UserProfile
+from app.models import PriceSnapshot, PriceWatch, PriceHistory, PriceMonth
 from app.schemas import PriceCalendarRequest, MonthCalendarRequest
 from app.services import notification_engine
 
@@ -15,8 +15,9 @@ router = APIRouter()
 
 # ---------------------------------------------------------------------------
 # POST /events/price-calendar
-# Recibido desde fetchPriceCalendar. Identificador: fcm_token.
-# Guarda precios diarios, actualiza price_watch y evalúa bajadas de precio.
+# Recibido desde fetchPriceCalendar. Sin identificador de usuario.
+# Los precios son datos de RUTA — se comparan contra PriceHistory global
+# y se notifica a TODOS los price_watches activos para esa ruta.
 # ---------------------------------------------------------------------------
 @router.post("/events/price-calendar")
 async def receive_price_calendar(
@@ -25,26 +26,14 @@ async def receive_price_calendar(
 ):
     low_days = [d for d in data.days if d.group == "low"]
     if not low_days:
-        return {"success": True, "queued": False, "reason": "no_low_prices"}
-
-    # Buscar usuario por FCM token
-    user_result = await db.execute(
-        select(UserProfile).where(UserProfile.fcm_token == data.fcm_token)
-        .order_by(UserProfile.updated_at.desc())
-    )
-    user = user_result.scalars().first()
-    if not user:
-        logger.warning(f"price-calendar: fcm_token no encontrado, guardando igualmente sin user")
-        user_id = data.fcm_token  # fallback: usar token como id
-    else:
-        user_id = user.user_id
+        return {"success": True, "notified": 0, "reason": "no_low_prices"}
 
     min_price = min(d.price for d in low_days)
 
-    # 1. Insertar snapshots (solo días "low")
+    # 1. Guardar snapshots de los días "low" (sin user_id — dato de ruta)
     for dp in low_days:
         db.add(PriceSnapshot(
-            user_id=user_id,
+            user_id=None,
             origin=data.origin_iata,
             destination=data.destination_iata,
             snapshot_date=dp.day,
@@ -53,57 +42,66 @@ async def receive_price_calendar(
             currency=data.currency,
         ))
 
-    # 2. Obtener o crear price_watch
-    watch_result = await db.execute(
-        select(PriceWatch).where(
+    # 2. Obtener precio de referencia global para esta ruta desde PriceHistory
+    history_result = await db.execute(
+        select(PriceHistory)
+        .where(
             and_(
-                PriceWatch.user_id == user_id,
-                PriceWatch.origin == data.origin_iata,
-                PriceWatch.destination == data.destination_iata,
+                PriceHistory.origin == data.origin_iata,
+                PriceHistory.destination == data.destination_iata,
+                PriceHistory.currency == data.currency,
             )
         )
+        .order_by(PriceHistory.checked_at.desc())
+        .limit(1)
     )
-    watch = watch_result.scalar_one_or_none()
+    history = history_result.scalar_one_or_none()
+    reference_price = history.min_price if history else None
 
-    if watch is None:
-        watch = PriceWatch(
-            user_id=user_id,
-            origin=data.origin_iata,
-            destination=data.destination_iata,
-            is_active=True,
-            last_search_best_price=min_price,
-            interest_score=0,
-            notification_count=0,
+    # 3. Si bajó el precio → notificar a TODOS los usuarios con price_watch activo
+    notified_count = 0
+    if reference_price and reference_price > 0 and min_price < reference_price:
+        watches_result = await db.execute(
+            select(PriceWatch).where(
+                and_(
+                    PriceWatch.origin == data.origin_iata,
+                    PriceWatch.destination == data.destination_iata,
+                    PriceWatch.is_active == True,
+                )
+            )
         )
-        db.add(watch)
-        await db.flush()
-        queued = False
-    else:
-        watch.is_active = True
-        reference_price = watch.last_search_best_price
+        watches = watches_result.scalars().all()
 
-        queued = False
-        if reference_price and reference_price > 0:
+        for watch in watches:
             queued = await notification_engine.evaluate_price_drop(
                 db=db,
-                user_id=user_id,
+                user_id=watch.user_id,
                 origin=data.origin_iata,
                 destination=data.destination_iata,
                 new_price=min_price,
                 reference_price=reference_price,
                 currency=data.currency,
             )
+            if queued:
+                notified_count += 1
 
-        if reference_price is None or min_price < reference_price:
-            watch.last_search_best_price = min_price
+    # 4. Actualizar PriceHistory si el precio bajó (o es el primer registro)
+    if reference_price is None or min_price < reference_price:
+        db.add(PriceHistory(
+            origin=data.origin_iata,
+            destination=data.destination_iata,
+            min_price=min_price,
+            currency=data.currency,
+        ))
 
     await db.commit()
 
+    ref_str = f"{reference_price:.0f}" if reference_price else "none"
     logger.info(
         f"price-calendar: {data.origin_iata}->{data.destination_iata} "
-        f"min={min_price:.0f} {data.currency} queued={queued}"
+        f"min={min_price:.0f} {data.currency} ref={ref_str} notified={notified_count}"
     )
-    return {"success": True, "queued": queued, "min_price": min_price}
+    return {"success": True, "min_price": min_price, "notified": notified_count}
 
 
 # ---------------------------------------------------------------------------
@@ -133,6 +131,7 @@ async def receive_month_calendar(
         row = existing.scalar_one_or_none()
         if row is None:
             db.add(PriceMonth(
+                user_id=None,
                 origin=data.origin_iata,
                 destination=data.destination_iata,
                 year=m.year,

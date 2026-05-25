@@ -120,7 +120,7 @@ class PriceSnapshot(Base):
     __tablename__ = "price_snapshots"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String, index=True)
+    user_id: Mapped[str | None] = mapped_column(String, index=True)  # nullable — dato de ruta
     origin: Mapped[str] = mapped_column(String(10))
     destination: Mapped[str] = mapped_column(String(10))
     trip_type: Mapped[str | None] = mapped_column(String(20))

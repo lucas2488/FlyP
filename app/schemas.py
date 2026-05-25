@@ -3,8 +3,8 @@ from typing import Optional
 
 
 class UserProfileData(BaseModel):
-    userId: str
-    fcmToken: str
+    userId: Optional[str] = None   # anon ID inestable — puede venir null
+    fcmToken: str                  # identificador real del dispositivo
     appVersion: Optional[str] = None
     deviceModel: Optional[str] = None
     osVersion: Optional[str] = None
@@ -52,7 +52,6 @@ class DayPriceDTO(BaseModel):
 
 
 class PriceCalendarRequest(BaseModel):
-    fcm_token: str        # identificador del dispositivo
     origin_iata: str
     destination_iata: str
     currency: str
