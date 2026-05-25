@@ -12,7 +12,7 @@ Es idempotente: no crea duplicados si ya existe una campaña para esa fecha/slot
 """
 
 import logging
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 
 import pytz
 from sqlalchemy import select
@@ -33,8 +33,8 @@ async def check_scheduled_campaigns() -> None:
     Job horario. Revisa campaign_calendar y crea campañas automáticas
     cuando corresponda según la hora/fecha en Argentina.
     """
-    now_utc = datetime.now(tz=timezone.utc)
-    now_ar = now_utc.astimezone(_AR_TZ)
+    now_utc = datetime.utcnow()
+    now_ar = datetime.now(_AR_TZ)
     today_ar = now_ar.date()
 
     logger.info(
