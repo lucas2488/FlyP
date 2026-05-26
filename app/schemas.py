@@ -77,6 +77,7 @@ class MonthCalendarRequest(BaseModel):
 class FavoriteRouteDTO(BaseModel):
     origin: str
     destination: str
+    trip_type: Optional[str] = None   # "ROUND_TRIP" | "ONE_WAY"
 
 
 class SyncFavoritesRequest(BaseModel):

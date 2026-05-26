@@ -11,8 +11,10 @@ logging.basicConfig(
 import firebase_admin
 from firebase_admin import credentials
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from app.database import engine, Base
 from app.config import settings
@@ -126,6 +128,12 @@ app.include_router(favorites.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 app.include_router(campaigns.router, prefix="/api/v1")
 app.include_router(internal.router, prefix="/api/v1")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logger.warning(f"422 {request.method} {request.url.path} — {exc.errors()}")
+    return JSONResponse(status_code=422, content={"detail": exc.errors()})
 
 
 @app.get("/api/v1/health")

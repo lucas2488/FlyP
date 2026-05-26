@@ -27,6 +27,6 @@ async def mark_notification_opened(
     if item.opened_at is not None:
         return {"success": True, "already_opened": True}
 
-    item.opened_at = datetime.now(timezone.utc)
+    item.opened_at = datetime.utcnow()
     await db.commit()
     return {"success": True, "already_opened": False}

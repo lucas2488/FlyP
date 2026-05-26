@@ -193,15 +193,20 @@ class UserFavorite(Base):
     """
     Rutas favoritas sincronizadas desde el Android (FavoriteSSDao).
     Se hace full-replace en cada POST /api/v1/favorites:
-    se eliminan todas las del usuario y se insertan las nuevas.
+    se eliminan todas las del fcm_token y se insertan las nuevas.
+
+    Identificador real: fcm_token (siempre presente, aunque no haya login).
+    user_id: NULL cuando el usuario no está registrado; se rellena cuando existe perfil.
     Nota: usa flyp_user_favorites para evitar colisión con tablas de n8n.
     """
     __tablename__ = "flyp_user_favorites"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String, index=True)
+    user_id: Mapped[str | None] = mapped_column(String, index=True)      # NULL si no hay login
+    fcm_token: Mapped[str | None] = mapped_column(Text, index=True)      # identificador real del dispositivo
     origin_iata: Mapped[str] = mapped_column(String(10))
     destination_iata: Mapped[str] = mapped_column(String(10))
+    trip_type: Mapped[str | None] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 

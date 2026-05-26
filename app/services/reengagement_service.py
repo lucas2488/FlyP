@@ -82,7 +82,7 @@ async def process_reengagement_queue() -> None:
     """
     logger.info("reengagement_service: checking for candidates...")
     async with AsyncSessionLocal() as db:
-        now = datetime.now(timezone.utc)
+        now = datetime.utcnow()  # naive UTC — coincide con TIMESTAMP WITHOUT TIME ZONE en DB
         window_max = now - timedelta(minutes=settings.reengagement_window_min_minutes)
         window_min = now - timedelta(minutes=settings.reengagement_window_max_minutes)
 
