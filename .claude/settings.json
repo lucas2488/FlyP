@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh root@178.105.195.245 *)",
+      "Bash(scp * root@178.105.195.245:*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add app/*)",
+      "Bash(git add alembic/*)",
+      "Bash(git commit*)",
+      "Bash(find app -name *.py*)",
+      "Bash(grep -rn * app/)",
+      "Bash(ls alembic/versions/)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(rm -rf *)",
+      "Bash(docker compose down*)"
+    ]
+  }
+}

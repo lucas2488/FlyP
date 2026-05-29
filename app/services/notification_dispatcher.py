@@ -161,7 +161,7 @@ async def _process_single(db: AsyncSession, item: NotificationQueue) -> None:
     """Procesa un item de la queue: obtiene token, elige template, envía y actualiza estado."""
     # Obtener perfil de usuario (FCM token + país para selección de template)
     user_result = await db.execute(
-        select(UserProfile).where(UserProfile.user_id == item.user_id)
+        select(UserProfile).where(UserProfile.fcm_token == item.user_id)
     )
     user = user_result.scalar_one_or_none()
 

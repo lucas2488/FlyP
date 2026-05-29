@@ -216,6 +216,59 @@ async def get_notifications(
 
 
 # ---------------------------------------------------------------------------
+# GET /analytics/notifications/history
+# Historial reciente de notification_log con paginación y filtro por tipo
+# ---------------------------------------------------------------------------
+@router.get("/notifications/history")
+async def get_notification_history(
+    limit: int = 100,
+    offset: int = 0,
+    type: str | None = None,
+    days: int = 7,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    since = datetime.utcnow() - timedelta(days=days)
+
+    q = (
+        select(NotificationLog)
+        .where(NotificationLog.sent_at >= since)
+        .order_by(NotificationLog.sent_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    if type:
+        q = q.where(NotificationLog.type == type)
+
+    result = await db.execute(q)
+    items = result.scalars().all()
+
+    count_q = select(func.count()).select_from(NotificationLog).where(NotificationLog.sent_at >= since)
+    if type:
+        count_q = count_q.where(NotificationLog.type == type)
+    total = await db.scalar(count_q) or 0
+
+    return {
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "items": [
+            {
+                "id": item.id,
+                "user_id": item.user_id[:20] + "…" if item.user_id and len(item.user_id) > 20 else item.user_id,
+                "type": item.type,
+                "origin": item.origin,
+                "destination": item.destination,
+                "price": item.price,
+                "delivery_status": item.delivery_status,
+                "sent_at": item.sent_at.isoformat() if item.sent_at else None,
+            }
+            for item in items
+        ],
+    }
+
+
+# ---------------------------------------------------------------------------
 # GET /analytics/revenue
 # Clicks en affiliate links (Impact.com)
 # ---------------------------------------------------------------------------

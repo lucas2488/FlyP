@@ -130,7 +130,8 @@ async def _send_welcome(db: AsyncSession, item: NotificationQueue, now: datetime
     """Intenta enviar la notificación de bienvenida para un item de la queue."""
 
     # 1. Obtener perfil (FCM token + país)
-    user = await db.get(UserProfile, item.user_id)
+    user_result = await db.execute(select(UserProfile).where(UserProfile.fcm_token == item.user_id))
+    user = user_result.scalar_one_or_none()
     if not user or not user.fcm_token:
         item.status = "skipped"
         item.error_msg = "no_fcm_token"

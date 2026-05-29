@@ -35,7 +35,7 @@ def upgrade() -> None:
            TRUE),
           ('AR', 'welcome',
            '¡Listo para despegar! 🎉',
-           'Ahora recibís alertas de vuelos baratos. ¡Ahorrá en tu próximo viaje con FlyP!',
+           'Ahora recibís alertas de vuelos baratos. ¡Ahorrá en tu próximo viaje con Fly Promociones!',
            TRUE),
           ('MX', 'welcome',
            '¡Bienvenido a FlyPromociones! ✈️',

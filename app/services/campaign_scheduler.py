@@ -9,12 +9,14 @@ campaign_calendar que deban ejecutarse hoy:
 
 Para cada match: crea una Campaign draft y la dispara vía execute_campaign().
 Es idempotente: no crea duplicados si ya existe una campaña para esa fecha/slot.
+Si la campaña ya existe como 'draft' (pre-seeded desde el dashboard), la ejecuta.
 
 Campañas semanales (Lun/Mié/Vie): broadcast vía FCM topic "flypromociones_AR".
 Llega a TODOS los usuarios suscritos al topic, sin filtro de segmento.
 Se rota entre varios mensajes genéricos para no repetir siempre el mismo.
 """
 
+import asyncio
 import logging
 import random
 from datetime import date, datetime, timedelta
@@ -24,6 +26,7 @@ from sqlalchemy import select
 
 from app.database import AsyncSessionLocal
 from app.models import Campaign, CampaignCalendar
+from app.services.campaign_engine import execute_campaign
 
 logger = logging.getLogger(__name__)
 
@@ -111,9 +114,11 @@ async def _maybe_create_and_fire(
     now_utc: datetime,
 ) -> int:
     """
-    Verifica que no exista ya una campaña automática para este slot/fecha.
-    Si no existe, crea una Campaign draft y la dispara.
-    Retorna 1 si disparó, 0 si ya existía.
+    Verifica si ya existe una campaña automática para este slot/fecha.
+    - Si no existe: la crea y la dispara.
+    - Si existe como 'draft' (pre-seeded): la dispara sin recrear.
+    - Si existe con otro status (sending/sent/failed): la ignora.
+    Retorna 1 si disparó, 0 en caso contrario.
     """
     _DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
     day_name = _DAY_NAMES[today_ar.weekday()]
@@ -123,14 +128,27 @@ async def _maybe_create_and_fire(
         label = slot.label or f"Campaña especial {today_ar}"
 
     # Idempotencia: buscar campaña con mismo nombre y fecha de hoy
-    existing = await db.execute(
+    existing_result = await db.execute(
         select(Campaign).where(
             Campaign.name == label,
             Campaign.scheduled_at >= datetime.combine(today_ar, datetime.min.time()),
         )
     )
-    if existing.scalar_one_or_none():
-        logger.debug(f"campaign_scheduler: campaña '{label}' ya existe para hoy, saltando")
+    existing = existing_result.scalar_one_or_none()
+    if existing:
+        if existing.status == "draft":
+            # Campaña pre-seeded que nunca se ejecutó → ejecutar ahora
+            logger.info(
+                f"campaign_scheduler: campaña '{label}' existe como draft "
+                f"(id={existing.id}), ejecutando ahora"
+            )
+            await db.commit()
+            asyncio.create_task(execute_campaign(existing.id))
+            return 1
+        logger.debug(
+            f"campaign_scheduler: campaña '{label}' ya existe "
+            f"(id={existing.id}, status={existing.status}), saltando"
+        )
         return 0
 
     # Elegir mensaje rotativo para campañas semanales
@@ -172,10 +190,8 @@ async def _maybe_create_and_fire(
         f"(id={campaign_id}, slot_id={slot.id})"
     )
 
-    # Ejecutar en background para no bloquear el scheduler
-    import asyncio
-    from app.services.campaign_engine import execute_campaign
-    asyncio.create_task(execute_campaign(campaign_id))
-
+    # Commit primero, luego task — evita race condition donde execute_campaign
+    # abre nueva sesión y no encuentra la campaña todavía no commiteada
     await db.commit()
+    asyncio.create_task(execute_campaign(campaign_id))
     return 1

@@ -7,8 +7,9 @@ from app.database import Base
 class UserProfile(Base):
     __tablename__ = "user_profiles"
 
-    user_id: Mapped[str] = mapped_column(String, primary_key=True)
-    fcm_token: Mapped[str | None] = mapped_column(Text)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    fcm_token: Mapped[str] = mapped_column(Text, unique=True)   # identidad real del dispositivo
+    user_id: Mapped[str | None] = mapped_column(String)         # nullable — reservado para auth futura
     app_version: Mapped[str | None] = mapped_column(String(20))
     device_model: Mapped[str | None] = mapped_column(String(100))
     os_version: Mapped[str | None] = mapped_column(String(50))
@@ -44,7 +45,7 @@ class PriceWatch(Base):
     __tablename__ = "price_watches"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String, index=True)
+    user_id: Mapped[str | None] = mapped_column(String, index=True)  # almacena fcm_token del dispositivo
     origin: Mapped[str] = mapped_column(String(10))
     destination: Mapped[str] = mapped_column(String(10))
     trip_type: Mapped[str | None] = mapped_column(String(20))
@@ -135,7 +136,7 @@ class SearchEvent(Base):
     __tablename__ = "search_events"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String, index=True)
+    user_id: Mapped[str | None] = mapped_column(String, index=True)  # almacena fcm_token del dispositivo
     origin: Mapped[str] = mapped_column(String(10))
     destination: Mapped[str] = mapped_column(String(10))
     trip_type: Mapped[str | None] = mapped_column(String(20))
@@ -151,7 +152,7 @@ class NotificationQueue(Base):
     __tablename__ = "notification_queue"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(String, index=True)
+    user_id: Mapped[str | None] = mapped_column(String, index=True)  # almacena fcm_token del dispositivo
     origin: Mapped[str] = mapped_column(String(10))
     destination: Mapped[str] = mapped_column(String(10))
     price_raw: Mapped[float] = mapped_column(Float)
@@ -272,7 +273,7 @@ class CampaignSend(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     campaign_id: Mapped[int] = mapped_column(Integer, ForeignKey("campaigns.id"), index=True)
-    user_id: Mapped[str] = mapped_column(String, index=True)
+    user_id: Mapped[str | None] = mapped_column(String, index=True)  # almacena fcm_token del dispositivo
     status: Mapped[str] = mapped_column(String(20), default="pending")  # pending|sent|failed|skipped
     sent_at: Mapped[datetime | None] = mapped_column(DateTime)
     opened_at: Mapped[datetime | None] = mapped_column(DateTime)

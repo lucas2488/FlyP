@@ -63,7 +63,7 @@ async def evaluate_price_drop(
 
     # 2. Verificar FCM token
     user_result = await db.execute(
-        select(UserProfile).where(UserProfile.user_id == user_id)
+        select(UserProfile).where(UserProfile.fcm_token == user_id)
     )
     user = user_result.scalar_one_or_none()
     if not user or not user.fcm_token:

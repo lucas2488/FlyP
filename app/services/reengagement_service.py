@@ -156,7 +156,7 @@ async def _process_candidate(db: AsyncSession, event: SearchEvent, now: datetime
 
     # 3. Obtener perfil (FCM token + país para selección de template)
     user_result = await db.execute(
-        select(UserProfile).where(UserProfile.user_id == event.user_id)
+        select(UserProfile).where(UserProfile.fcm_token == event.user_id)
     )
     user = user_result.scalar_one_or_none()
     if not user or not user.fcm_token:

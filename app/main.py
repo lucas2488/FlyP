@@ -24,6 +24,7 @@ from app.services.reengagement_service import process_reengagement_queue
 from app.services.segment_service import recalculate_segments
 from app.services.campaign_scheduler import check_scheduled_campaigns
 from app.services.welcome_service import process_welcome_notifications
+from app.services.cleanup_service import purge_old_queue_items
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -89,13 +90,24 @@ async def lifespan(app: FastAPI):
         id="welcome_dispatcher",
         replace_existing=True,
     )
+    # Limpieza de notification_queue — borra items viejos (sent/failed/skipped > 7 días)
+    scheduler.add_job(
+        purge_old_queue_items,
+        "cron",
+        hour=4,
+        minute=0,
+        timezone="America/Argentina/Buenos_Aires",
+        id="queue_cleanup",
+        replace_existing=True,
+    )
     scheduler.start()
     logger.info(
         f"APScheduler started — notification dispatcher every 30 min, "
         f"reengagement dispatcher every {settings.reengagement_check_interval_minutes} min, "
         f"segment recalculator daily 3am AR, "
         f"campaign scheduler every 1h, "
-        f"welcome dispatcher every 1h"
+        f"welcome dispatcher every 1h, "
+        f"queue cleanup daily 4am AR"
     )
 
     yield

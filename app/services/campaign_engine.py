@@ -235,30 +235,29 @@ async def _send_to_user(db: AsyncSession, campaign: Campaign, user: UserProfile)
             body = template.body_template
 
     # Enviar FCM
-    try:
-        await firebase_service.send_notification(
-            token=user.fcm_token,
-            title=title,
-            body=body,
-            data={
-                "type": "campaign",
-                "campaign_id": str(campaign.id),
-                "origin_iata": origin,
-                "destination_iata": destination,
-                "click_action": "OPEN_SEARCH",
-            },
-        )
+    success = firebase_service.send_notification(
+        token=user.fcm_token,
+        title=title,
+        body=body,
+        data={
+            "type": "campaign",
+            "campaign_id": str(campaign.id),
+            "origin_iata": origin,
+            "destination_iata": destination,
+            "click_action": "OPEN_SEARCH",
+        },
+    )
+    if success:
         cs.status = "sent"
         cs.sent_at = datetime.utcnow()
         cs.fcm_response = "ok"
         await db.commit()
         return "sent"
-
-    except Exception as exc:
+    else:
         cs.status = "failed"
-        cs.fcm_response = str(exc)[:500]
+        cs.fcm_response = "firebase_send_failed"
         await db.commit()
-        logger.debug(f"campaign_engine: FCM falló para {user.user_id}: {exc}")
+        logger.debug(f"campaign_engine: FCM falló para {user.user_id}")
         return "failed"
 
 
@@ -277,14 +276,14 @@ async def _pick_route(
     """
     # Ruta fija en la campaña
     if campaign.campaign_type == "route" and campaign.route_origin and campaign.route_destination:
-        excluded = await get_excluded_routes(db, user.user_id)
+        excluded = await get_excluded_routes(db, user.fcm_token)
         key = (campaign.route_origin, campaign.route_destination)
         if key in excluded:
             return None, None
         return campaign.route_origin, campaign.route_destination
 
     # Ruta automática (top rutas del usuario)
-    excluded = await get_excluded_routes(db, user.user_id)
+    excluded = await get_excluded_routes(db, user.fcm_token)
 
     # Top-5 rutas buscadas por el usuario
     top_routes_result = await db.execute(
@@ -293,7 +292,7 @@ async def _pick_route(
             SearchEvent.destination,
             func.count().label("cnt"),
         )
-        .where(SearchEvent.user_id == user.user_id)
+        .where(SearchEvent.user_id == user.fcm_token)
         .group_by(SearchEvent.origin, SearchEvent.destination)
         .order_by(func.count().desc())
         .limit(5)
@@ -316,7 +315,7 @@ async def _pick_route(
             SearchEvent.destination,
             func.count().label("cnt"),
         )
-        .join(UserProfile, UserProfile.user_id == SearchEvent.user_id)
+        .join(UserProfile, UserProfile.fcm_token == SearchEvent.user_id)
         .where(UserProfile.user_segment == (campaign.segment or "casual"))
         .group_by(SearchEvent.origin, SearchEvent.destination)
         .order_by(func.count().desc())
