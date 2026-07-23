@@ -14,7 +14,7 @@ from sqlalchemy import select, func, and_
 from app.database import get_db
 from app.models import (
     UserProfile, PriceWatch, NotificationLog,
-    ImpactLinkLog, SearchEvent,
+    ImpactLinkLog, SearchEvent, NotificationQueue, NotificationTemplate, PriceSnapshot,
 )
 from app.config import settings
 
@@ -206,11 +206,48 @@ async def get_notifications(
     failed = total_failed or 0
     delivery_rate = round((total - failed) / total * 100, 1) if total > 0 else 0.0
 
+    # Open rate — notification_queue retiene 7 días; la ventana de open rate es 7 días fijos
+    queue_since = datetime.utcnow() - timedelta(days=7)
+    opens_res = await db.execute(
+        select(
+            NotificationQueue.drop_level,
+            func.count().label("sent"),
+            func.count(NotificationQueue.opened_at).label("opened"),
+        )
+        .where(
+            NotificationQueue.status == "sent",
+            NotificationQueue.sent_at >= queue_since,
+            NotificationQueue.notification_type == "price_drop",
+        )
+        .group_by(NotificationQueue.drop_level)
+    )
+    open_by_level: dict = {}
+    total_q_sent = 0
+    total_q_opened = 0
+    for r in opens_res.all():
+        if r.drop_level:
+            open_by_level[r.drop_level] = (r.sent, r.opened)
+            total_q_sent += r.sent
+            total_q_opened += r.opened
+
+    open_rate_pct = round(total_q_opened / total_q_sent * 100, 1) if total_q_sent > 0 else 0.0
+
+    # Enriquecer by_type con open_rate_pct por nivel (solo price_drop)
+    by_type_enriched = []
+    for t in by_type:
+        level_data = open_by_level.get(t["type"])
+        t["open_rate_pct"] = (
+            round(level_data[1] / level_data[0] * 100, 1) if level_data and level_data[0] > 0 else None
+        )
+        by_type_enriched.append(t)
+
     return {
         "total_sent":        total,
         "total_failed":      failed,
         "delivery_rate_pct": delivery_rate,
-        "by_type":           by_type,
+        "opens_total":       total_q_opened,
+        "open_rate_pct":     open_rate_pct,
+        "by_type":           by_type_enriched,
         "by_day":            list(by_day_map.values()),
     }
 
@@ -266,6 +303,58 @@ async def get_notification_history(
             for item in items
         ],
     }
+
+
+# ---------------------------------------------------------------------------
+# GET /analytics/notifications/template-health
+# Alerta: países activos sin templates configurados para algún nivel
+# ---------------------------------------------------------------------------
+@router.get("/notifications/template-health")
+async def get_template_health(
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> list:
+    now_ms = int(time.time() * 1000)
+    thirty_days_ms = 30 * 24 * 3600 * 1000
+
+    countries_res = await db.execute(
+        select(UserProfile.selected_country, func.count().label("user_count"))
+        .where(
+            UserProfile.selected_country.isnot(None),
+            UserProfile.last_app_open >= now_ms - thirty_days_ms,
+        )
+        .group_by(UserProfile.selected_country)
+        .order_by(func.count().desc())
+    )
+    active_countries = {
+        r.selected_country: r.user_count
+        for r in countries_res.all()
+        if r.selected_country
+    }
+
+    templates_res = await db.execute(
+        select(NotificationTemplate.country_code, NotificationTemplate.drop_level)
+        .where(NotificationTemplate.is_active.is_(True))
+        .distinct()
+    )
+    covered = {(r.country_code, r.drop_level) for r in templates_res.all()}
+    wildcard_levels = {lvl for (cc, lvl) in covered if cc == "*"}
+
+    required_levels = ["soft", "strong", "urgent"]
+    result = []
+    for country, user_count in active_countries.items():
+        missing = [
+            lvl for lvl in required_levels
+            if (country, lvl) not in covered and lvl not in wildcard_levels
+        ]
+        result.append({
+            "country":        country,
+            "user_count":     user_count,
+            "missing_levels": missing,
+            "ok":             len(missing) == 0,
+        })
+
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -377,6 +466,101 @@ async def get_price_watches(
         "total_active": total_active or 0,
         "total_all":    total_all or 0,
         "top_routes":   top_routes,
+    }
+
+
+# ---------------------------------------------------------------------------
+# GET /analytics/route-prices
+# Calendario de precios por fecha de VIAJE de una ruta puntual — para que
+# marketing arme placas con precios vigentes.
+#
+# Importante sobre price_snapshots:
+#   - snapshot_date  = fecha del vuelo (día de salida que devuelve el calendario)
+#   - received_at    = cuándo lo recibimos (momento de la observación)
+# Por eso el filtro `days` es sobre received_at (precios FRESCOS, vistos en los
+# últimos N días) y el agrupado/orden es por snapshot_date (fecha de viaje).
+# Además se excluyen vuelos ya pasados (snapshot_date >= hoy): no se venden.
+# ---------------------------------------------------------------------------
+@router.get("/route-prices")
+async def get_route_prices(
+    origin: str,
+    destination: str,
+    days: int = 30,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    origin = origin.upper()
+    destination = destination.upper()
+    days = max(1, min(days, 365))  # acotar entrada: evita negativos / valores absurdos
+
+    observed_since = datetime.utcnow() - timedelta(days=days)     # ventana de observación
+    today_str = datetime.utcnow().strftime("%Y-%m-%d")            # solo vuelos a futuro
+
+    # Moneda dominante entre los precios recientes, para no promediar ARS con USD
+    currency_res = await db.execute(
+        select(PriceSnapshot.currency, func.count().label("c"))
+        .where(and_(
+            PriceSnapshot.origin == origin,
+            PriceSnapshot.destination == destination,
+            PriceSnapshot.received_at >= observed_since,
+        ))
+        .group_by(PriceSnapshot.currency)
+        .order_by(func.count().desc())
+    )
+    currency_rows = currency_res.all()
+    dominant_currency = currency_rows[0].currency if currency_rows else None
+
+    by_day = []
+    if dominant_currency is not None:
+        by_day_res = await db.execute(
+            select(
+                PriceSnapshot.snapshot_date,
+                func.min(PriceSnapshot.price_raw).label("min_price"),
+                func.avg(PriceSnapshot.price_raw).label("avg_price"),
+                func.max(PriceSnapshot.price_raw).label("max_price"),
+                func.count().label("count"),
+            )
+            .where(and_(
+                PriceSnapshot.origin == origin,
+                PriceSnapshot.destination == destination,
+                PriceSnapshot.currency == dominant_currency,
+                PriceSnapshot.received_at >= observed_since,   # precios frescos
+                PriceSnapshot.snapshot_date >= today_str,      # vuelos a futuro
+            ))
+            .group_by(PriceSnapshot.snapshot_date)
+            .order_by(PriceSnapshot.snapshot_date)
+        )
+        by_day = [
+            {
+                "date":      r.snapshot_date,
+                "min_price": round(float(r.min_price), 2),
+                "avg_price": round(float(r.avg_price), 2),
+                "max_price": round(float(r.max_price), 2),
+                "count":     r.count,
+            }
+            for r in by_day_res.all()
+        ]
+
+    # Meta histórica de la ruta (todo el histórico, sin filtros) en una sola query
+    meta_row = (await db.execute(
+        select(
+            func.max(PriceSnapshot.received_at).label("last_seen"),
+            func.count().label("total"),
+        )
+        .where(and_(
+            PriceSnapshot.origin == origin,
+            PriceSnapshot.destination == destination,
+        ))
+    )).one()
+
+    return {
+        "origin":          origin,
+        "destination":     destination,
+        "currency":        dominant_currency,
+        "days":            days,
+        "total_snapshots": meta_row.total or 0,
+        "last_seen":       meta_row.last_seen.isoformat() if meta_row.last_seen else None,
+        "by_day":          by_day,
     }
 
 

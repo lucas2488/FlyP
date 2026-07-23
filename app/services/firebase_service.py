@@ -6,14 +6,16 @@ logger = logging.getLogger(__name__)
 
 def send_notification(fcm_token: str, title: str, body: str, data: dict) -> bool:
     """
-    Envía una notificación FCM a un dispositivo.
-    El dict `data` debe tener las keys que espera FlightNotification.kt:
-      link, origin, destination, description, imageUrl, price, company
+    Envía una notificación FCM a un dispositivo como mensaje data-only (sin campo notification).
+    Esto garantiza que onMessageReceived() siempre sea llamado en Android, incluso con la app
+    en background, permitiendo que la app construya la notificación del sistema con los extras
+    necesarios para el tracking de apertura (notification_id → POST /notifications/{id}/opened).
     Retorna True si exitoso.
     """
+    full_data = {**data, "title": title, "body": body}
     message = messaging.Message(
-        notification=messaging.Notification(title=title, body=body),
-        data={k: str(v) for k, v in data.items()},
+        data={k: str(v) for k, v in full_data.items()},
+        android=messaging.AndroidConfig(priority="high"),
         token=fcm_token,
     )
     try:
@@ -32,9 +34,10 @@ def send_to_topic(topic: str, title: str, body: str, data: dict) -> bool:
     Una sola llamada a la API de Firebase entrega a todos los dispositivos suscritos.
     Retorna True si exitoso.
     """
+    full_data = {**data, "title": title, "body": body}
     message = messaging.Message(
-        notification=messaging.Notification(title=title, body=body),
-        data={k: str(v) for k, v in data.items()},
+        data={k: str(v) for k, v in full_data.items()},
+        android=messaging.AndroidConfig(priority="high"),
         topic=topic,
     )
     try:
@@ -53,9 +56,10 @@ def send_multicast(tokens: list[str], title: str, body: str, data: dict) -> tupl
     """
     if not tokens:
         return 0, 0
+    full_data = {**data, "title": title, "body": body}
     message = messaging.MulticastMessage(
-        notification=messaging.Notification(title=title, body=body),
-        data={k: str(v) for k, v in data.items()},
+        data={k: str(v) for k, v in full_data.items()},
+        android=messaging.AndroidConfig(priority="high"),
         tokens=tokens,
     )
     try:

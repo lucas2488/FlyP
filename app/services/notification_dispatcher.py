@@ -1,6 +1,7 @@
 import logging
 import random
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +13,42 @@ from app.services.airport_resolver import resolve_airports
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+# Mapa país → timezone para quiet hours
+_COUNTRY_TZ: dict[str, str] = {
+    "AR": "America/Argentina/Buenos_Aires",
+    "BR": "America/Sao_Paulo",
+    "MX": "America/Mexico_City",
+    "CL": "America/Santiago",
+    "CO": "America/Bogota",
+    "PE": "America/Lima",
+    "UY": "America/Montevideo",
+    "PY": "America/Asuncion",
+    "BO": "America/La_Paz",
+    "EC": "America/Guayaquil",
+    "VE": "America/Caracas",
+}
+_QUIET_START = 22  # hora local: de 22h a 8h no se envía
+_QUIET_END   = 8
+_SEND_HOUR   = 8   # se retrasa a las 8am local
+
+
+def _next_send_time_utc(country_code: str | None) -> datetime:
+    """Retorna la próxima 8am local del usuario como datetime UTC naive."""
+    tz = ZoneInfo(_COUNTRY_TZ.get(country_code or "AR", "America/Argentina/Buenos_Aires"))
+    now_local = datetime.now(tz)
+    target = now_local.replace(hour=_SEND_HOUR, minute=0, second=0, microsecond=0)
+    if now_local >= target:
+        target += timedelta(days=1)
+    return target.astimezone(timezone.utc).replace(tzinfo=None)
+
+
+def _is_quiet_hours(country_code: str | None) -> bool:
+    """True si la hora local del usuario está en el rango 22h-8h (cruza medianoche)."""
+    tz = ZoneInfo(_COUNTRY_TZ.get(country_code or "AR", "America/Argentina/Buenos_Aires"))
+    hour = datetime.now(tz).hour
+    return hour >= _QUIET_START or hour < _QUIET_END
+
 
 # Fallback hardcodeado — usado si la tabla notification_templates está vacía
 # o si hubo un error de BD.
@@ -90,7 +127,7 @@ def _build_notification_payload(
     Construye title, body y data dict para el FCM message.
     El data dict matchea FlightNotification.kt del Android:
       link, origin, destination, description, imageUrl, price, company,
-      notification_queue_id (para el endpoint /notifications/{id}/opened)
+      notification_id (para el endpoint /notifications/{id}/opened)
     """
     pct = int(item.pct_drop * 100)
     currency_symbol = item.currency
@@ -111,10 +148,9 @@ def _build_notification_payload(
         "origin": item.origin,
         "destination": item.destination,
         "description": f"Bajó {pct}%",
-        "imageUrl": "",
         "price": str(int(item.price_raw)),
-        "company": "",
-        "notification_queue_id": str(item.id),  # Android lo devuelve en POST /notifications/{id}/opened
+        "Company": "Fly Promociones",
+        "notification_id": str(item.id),  # Android lo usa en POST /notifications/{id}/opened
     }
     return title, body, data
 
@@ -171,27 +207,56 @@ async def _process_single(db: AsyncSession, item: NotificationQueue) -> None:
         logger.warning(f"Skipped {item.id}: no FCM token for user {item.user_id}")
         return
 
-    # Verificar max notificaciones por día
-    from sqlalchemy import func as sqlfunc
-    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-    count_result = await db.execute(
-        select(sqlfunc.count(NotificationQueue.id)).where(
-            and_(
-                NotificationQueue.user_id == item.user_id,
-                NotificationQueue.status == "sent",
-                NotificationQueue.sent_at >= today_start,
-            )
+    # Quiet hours: no enviar entre 0h-7h en la timezone del usuario
+    drop_level = item.drop_level or "soft"
+    if _is_quiet_hours(user.selected_country):
+        item.scheduled_at = _next_send_time_utc(user.selected_country)
+        logger.info(
+            f"Delayed {item.id} (quiet hours for {user.selected_country}): "
+            f"rescheduled to {item.scheduled_at}"
         )
-    )
-    sent_today = count_result.scalar_one()
-    if sent_today >= settings.max_notifications_per_user_per_day:
-        item.status = "skipped"
-        item.error_msg = f"daily_limit_reached ({sent_today})"
-        logger.info(f"Skipped {item.id}: daily limit for user {item.user_id}")
         return
 
+    # Cap diario — urgent tiene su propio límite independiente del de soft/strong
+    from sqlalchemy import func as sqlfunc
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    if drop_level == "urgent":
+        urgent_today_result = await db.execute(
+            select(sqlfunc.count(NotificationQueue.id)).where(
+                and_(
+                    NotificationQueue.user_id == item.user_id,
+                    NotificationQueue.status == "sent",
+                    NotificationQueue.sent_at >= today_start,
+                    NotificationQueue.drop_level == "urgent",
+                )
+            )
+        )
+        urgent_today = urgent_today_result.scalar_one()
+        if urgent_today >= settings.max_urgent_per_user_per_day:
+            item.status = "skipped"
+            item.error_msg = f"urgent_daily_limit_reached ({urgent_today})"
+            logger.info(f"Skipped {item.id}: urgent daily limit for user {item.user_id}")
+            return
+    else:
+        non_urgent_result = await db.execute(
+            select(sqlfunc.count(NotificationQueue.id)).where(
+                and_(
+                    NotificationQueue.user_id == item.user_id,
+                    NotificationQueue.status == "sent",
+                    NotificationQueue.sent_at >= today_start,
+                    NotificationQueue.drop_level != "urgent",
+                )
+            )
+        )
+        sent_today = non_urgent_result.scalar_one()
+        if sent_today >= settings.max_notifications_per_user_per_day:
+            item.status = "skipped"
+            item.error_msg = f"daily_limit_reached ({sent_today})"
+            logger.info(f"Skipped {item.id}: daily limit for user {item.user_id}")
+            return
+
     # Seleccionar template según país del usuario y nivel de bajada
-    drop_level = item.drop_level or "soft"
     template = await _pick_template(db, user.selected_country, drop_level)
 
     # Resolver nombres legibles de aeropuertos (ej: "EZE" → "Buenos Aires")

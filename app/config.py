@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     environment: str = "development"
     notification_cooldown_hours: int = 48
     notification_queue_batch_size: int = 100
-    max_notifications_per_user_per_day: int = 2
+    max_notifications_per_user_per_day: int = 2   # soft + strong (urgent no cuenta aquí)
+    max_urgent_per_user_per_day: int = 1           # límite independiente para urgentes
     analytics_api_key: str = "analytics-changeme"
     cors_origins: str = "*"  # comma-separated list or "*"
 

@@ -112,7 +112,7 @@ async def _upsert_price_watch(db: AsyncSession, fcm_token: str, origin: str, des
             PriceWatch.destination == destination,
         )
     )
-    watch = result.scalar_one_or_none()
+    watch = result.scalars().first()
     if watch is None:
         db.add(PriceWatch(user_id=fcm_token, origin=origin, destination=destination, trip_type="ONE_WAY"))
     else:
