@@ -2,7 +2,8 @@ import json
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from app.database import get_db
 from app.models import UserProfile, PriceWatch, AirportCache
@@ -95,10 +96,20 @@ async def save_user_profile(data: UserProfileData, db: AsyncSession = Depends(ge
 
     if data.lastSearchOriginIata and data.lastSearchDestinationIata:
         await _upsert_price_watch(db, fcm_token, data.lastSearchOriginIata, data.lastSearchDestinationIata)
-        await _upsert_airport(db, data.lastSearchOriginIata, data.lastSearchOrigin,
-                              data.lastSearchOriginCountry, data.lastSearchOriginGeoId)
-        await _upsert_airport(db, data.lastSearchDestinationIata, data.lastSearchDestination,
-                              data.lastSearchDestinationCountry, data.lastSearchDestinationGeoId)
+        # Upsert de aeropuertos en orden determinístico (por IATA) para que todas
+        # las transacciones tomen los locks en el mismo orden → sin deadlocks entre
+        # requests que comparten aeropuertos populares (AEP, BUEA, etc.).
+        airports = sorted(
+            [
+                (data.lastSearchOriginIata, data.lastSearchOrigin,
+                 data.lastSearchOriginCountry, data.lastSearchOriginGeoId),
+                (data.lastSearchDestinationIata, data.lastSearchDestination,
+                 data.lastSearchDestinationCountry, data.lastSearchDestinationGeoId),
+            ],
+            key=lambda a: a[0],
+        )
+        for iata, name, country, geo_id in airports:
+            await _upsert_airport(db, iata, name, country, geo_id)
 
     await db.commit()
     return WebhookResponse(success=True, message="Profile saved", userId=None)
@@ -127,14 +138,23 @@ async def _upsert_airport(
     geo_id: str | None = None,
     place_id: str | None = None,
 ):
-    result = await db.execute(select(AirportCache).where(AirportCache.iata_code == iata_code))
-    airport = result.scalar_one_or_none()
-    if airport is None:
-        db.add(AirportCache(iata_code=iata_code, name=name, country=country,
-                            geo_id=geo_id, place_id=place_id, times_searched=1))
-    else:
-        airport.times_searched = (airport.times_searched or 0) + 1
-        if name and not airport.name:       airport.name = name
-        if country and not airport.country: airport.country = country
-        if geo_id and not airport.geo_id:   airport.geo_id = geo_id
-        if place_id and not airport.place_id: airport.place_id = place_id
+    # Upsert atómico en una sola sentencia (INSERT ... ON CONFLICT). Evita el
+    # patrón SELECT-luego-UPDATE, que alargaba el lock y perdía incrementos bajo
+    # concurrencia. times_searched se incrementa en la DB de forma atómica.
+    insert_stmt = pg_insert(AirportCache).values(
+        iata_code=iata_code, name=name, country=country,
+        geo_id=geo_id, place_id=place_id, times_searched=1,
+    )
+    upsert = insert_stmt.on_conflict_do_update(
+        index_elements=["iata_code"],
+        set_={
+            "times_searched": AirportCache.times_searched + 1,
+            "last_seen_at":   func.now(),
+            # Completar solo si el campo estaba vacío (no pisar datos existentes).
+            "name":     func.coalesce(AirportCache.name,     insert_stmt.excluded.name),
+            "country":  func.coalesce(AirportCache.country,  insert_stmt.excluded.country),
+            "geo_id":   func.coalesce(AirportCache.geo_id,   insert_stmt.excluded.geo_id),
+            "place_id": func.coalesce(AirportCache.place_id, insert_stmt.excluded.place_id),
+        },
+    )
+    await db.execute(upsert)
