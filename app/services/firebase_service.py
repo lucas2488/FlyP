@@ -36,6 +36,9 @@ def send_to_topic(topic: str, title: str, body: str, data: dict) -> bool:
     """
     full_data = {**data, "title": title, "body": body}
     message = messaging.Message(
+        # Bloque notification: Android muestra la notif aunque la app esté cerrada.
+        # Sin esto, el mensaje era data-only y no se veía con la app killeada.
+        notification=messaging.Notification(title=title, body=body),
         data={k: str(v) for k, v in full_data.items()},
         android=messaging.AndroidConfig(priority="high"),
         topic=topic,
