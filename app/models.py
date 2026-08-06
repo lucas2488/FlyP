@@ -97,6 +97,25 @@ class ImpactLinkLog(Base):
     clicked_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
+class ImpactLink(Base):
+    """
+    Cache de tracking links de Impact.com por deeplink.
+    Se pre-crean al abrir el detalle del vuelo (prewarm) y se reusan en el click
+    (resolve), para desacoplar creación de uso. Dedup por hash SHA-256 del deeplink
+    (la url es muy larga para un índice único directo).
+    """
+    __tablename__ = "impact_links"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    url_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)  # SHA-256 hex
+    url: Mapped[str] = mapped_column(Text)                                       # deeplink crudo
+    impact_url: Mapped[str | None] = mapped_column(Text)                         # TrackingURL creada
+    status: Mapped[str] = mapped_column(String(10), default="pending")           # pending|ready|failed
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime)
+    use_count: Mapped[int] = mapped_column(Integer, default=0)
+
+
 class AirportCache(Base):
     """
     Cache de aeropuertos vistos en búsquedas de usuarios.

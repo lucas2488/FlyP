@@ -39,6 +39,12 @@ class Settings(BaseSettings):
     # Campaña interna — para webhook n8n y triggers externos
     internal_secret: str = "internal-changeme"
 
+    # Impact.com — creación server-side de tracking links de afiliado.
+    # Mismas credenciales que hoy usa la app (se pueden overridear por .env).
+    impact_account_sid: str = "IRpSdPYUfoUg6084068ncaJxQnvZG47uA1"
+    impact_auth_token: str = "SVJwU2RQWVVmb1VnNjA4NDA2OG5jYUp4UW52Wkc0N3VBMTpEZXNDQn5HX2ZUQmFCMmdFa1NIaGNNanp0VGZ5MmpldA=="
+    impact_program_id: str = "13416"
+
     class Config:
         env_file = ".env"
         extra = "ignore"
