@@ -181,16 +181,75 @@ Para que n8n pueda enviar emails (recuperar contraseña, notificaciones):
 
 ## Actualizar la API tras cambios de código
 
-```bash
-# Desde la Mac, copiar los archivos modificados
-scp -r app/ root@IP:/root/FlyP/
-scp requirements.txt root@IP:/root/FlyP/
+> ⚠️ **REGLA DE ORO: commitear a git ANTES de deployar.**
+> El server (`/root/FlyP`) **no es un checkout de git** — son archivos sueltos que
+> se actualizan por `scp`. Si deployás por `scp` sin commitear, git queda
+> desactualizado respecto a lo que corre en producción. Eso ya pasó: features
+> vivas (open rate, template-health) y hasta bugs quedaron **invisibles en el
+> historial**, y un deploy desde git les hubiera hecho rollback. Para evitarlo,
+> el orden es **siempre**: commit + push → scp → verificar que el server == git.
 
-# En el servidor
-cd /root/FlyP
-docker compose -f docker-compose.yml build api
-docker compose -f docker-compose.yml up -d api
+### Paso a paso
+
+```bash
+# 1. Commitear y pushear PRIMERO (git = fuente de verdad)
+git add -A
+git commit -m "descripción del cambio"
+git push origin main
+
+# 2. Backup del archivo/dir en el server (por si hay que revertir)
+ssh root@IP "cp /root/FlyP/app/routers/X.py /root/FlyP/app/routers/X.py.bak_$(date +%Y%m%d_%H%M%S)"
+
+# 3. Copiar SOLO los archivos cambiados (no 'scp -r app/' a ciegas:
+#    puede pisar cambios que existan únicamente en el server)
+scp app/routers/X.py root@IP:/root/FlyP/app/routers/X.py
+
+# 4. Rebuild + restart del contenedor api
+#    (el CMD del Dockerfile corre 'alembic upgrade head' al arrancar,
+#     así que las migraciones nuevas se aplican solas)
+ssh root@IP "cd /root/FlyP && docker compose -f docker-compose.yml build api && docker compose -f docker-compose.yml up -d api"
+
+# 5. VERIFICAR que el server quedó igual a git (hash por hash)
+git show HEAD:app/routers/X.py | shasum -a 256
+ssh root@IP "shasum -a 256 /root/FlyP/app/routers/X.py"
+#   → los dos hashes deben coincidir
+
+# 6. Verificar salud + comportamiento
+curl https://api.flypromociones.com/api/v1/health
 ```
+
+### ⚠️ Antes de tocar un archivo que ya existe en el server
+
+Como el server puede tener cambios que **no están en git** (deployados por scp en
+el pasado), **nunca sobrescribas a ciegas**. Primero compará:
+
+```bash
+# ¿El archivo del server coincide con git HEAD?
+git show HEAD:app/routers/X.py | shasum -a 256
+ssh root@IP "shasum -a 256 /root/FlyP/app/routers/X.py"
+```
+
+- **Coinciden** → editás tu copia local y la subís tranquilo.
+- **NO coinciden** → el server tiene algo que git no. Bajá el archivo del server
+  (`scp root@IP:/root/FlyP/... /tmp/`), diffealo contra tu local, y aplicá tu
+  cambio **encima de la versión del server** para no perder nada. Después
+  commiteá esa versión reconciliada para que git vuelva a estar al día.
+
+### Migraciones de base de datos
+
+Si el cambio incluye una migración Alembic nueva:
+
+```bash
+scp alembic/versions/00XX_descripcion.py root@IP:/root/FlyP/alembic/versions/
+# El rebuild+restart del paso 4 la aplica solo (alembic upgrade head).
+# Verificar:
+ssh root@IP "docker exec flyp-postgres-1 psql -U fly_user -d fly_db -t -c 'SELECT version_num FROM alembic_version;'"
+```
+
+### Mejora recomendada (a futuro)
+
+Convertir `/root/FlyP` en un checkout de git para deployar con `git pull` +
+rebuild en vez de `scp` suelto. Elimina de raíz el problema de drift.
 
 ---
 
