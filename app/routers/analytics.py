@@ -15,6 +15,7 @@ from app.database import get_db
 from app.models import (
     UserProfile, PriceWatch, NotificationLog,
     ImpactLinkLog, SearchEvent, NotificationQueue, NotificationTemplate, PriceSnapshot,
+    ImpactLink,
 )
 from app.config import settings
 
@@ -561,6 +562,59 @@ async def get_route_prices(
         "total_snapshots": meta_row.total or 0,
         "last_seen":       meta_row.last_seen.isoformat() if meta_row.last_seen else None,
         "by_day":          by_day,
+    }
+
+
+# ---------------------------------------------------------------------------
+# GET /analytics/impact-links
+# Estado del cache de tracking links de Impact (prewarm/resolve).
+# ---------------------------------------------------------------------------
+@router.get("/impact-links")
+async def get_impact_links(
+    limit: int = 50,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    day_ago = datetime.utcnow() - timedelta(days=1)
+
+    total     = await db.scalar(select(func.count()).select_from(ImpactLink))
+    ready     = await db.scalar(select(func.count()).select_from(ImpactLink).where(ImpactLink.status == "ready"))
+    pending   = await db.scalar(select(func.count()).select_from(ImpactLink).where(ImpactLink.status == "pending"))
+    failed    = await db.scalar(select(func.count()).select_from(ImpactLink).where(ImpactLink.status == "failed"))
+    total_clicks = await db.scalar(select(func.coalesce(func.sum(ImpactLink.use_count), 0)).select_from(ImpactLink))
+    created_24h  = await db.scalar(
+        select(func.count()).select_from(ImpactLink).where(ImpactLink.created_at >= day_ago)
+    )
+    # De los que se usaron (clickeados) vs creados → hit rate del cache
+    used = await db.scalar(select(func.count()).select_from(ImpactLink).where(ImpactLink.use_count > 0))
+
+    rows = await db.execute(
+        select(ImpactLink)
+        .order_by(func.coalesce(ImpactLink.last_used_at, ImpactLink.created_at).desc())
+        .limit(min(limit, 200))
+    )
+    items = [
+        {
+            "id":           r.id,
+            "url":          r.url,
+            "impact_url":   r.impact_url,
+            "status":       r.status,
+            "use_count":    r.use_count,
+            "created_at":   r.created_at.isoformat() if r.created_at else None,
+            "last_used_at": r.last_used_at.isoformat() if r.last_used_at else None,
+        }
+        for r in rows.scalars().all()
+    ]
+
+    return {
+        "total":        total or 0,
+        "ready":        ready or 0,
+        "pending":      pending or 0,
+        "failed":       failed or 0,
+        "used":         used or 0,
+        "total_clicks": int(total_clicks or 0),
+        "created_24h":  created_24h or 0,
+        "items":        items,
     }
 
 
