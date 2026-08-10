@@ -487,6 +487,7 @@ async def get_route_prices(
     origin: str,
     destination: str,
     days: int = 30,
+    currency: str | None = None,   # moneda a mostrar; default ARS si está disponible
     db: AsyncSession = Depends(get_db),
     _: str = Depends(verify_api_key),
 ) -> dict:
@@ -497,7 +498,7 @@ async def get_route_prices(
     observed_since = datetime.utcnow() - timedelta(days=days)     # ventana de observación
     today_str = datetime.utcnow().strftime("%Y-%m-%d")            # solo vuelos a futuro
 
-    # Moneda dominante entre los precios recientes, para no promediar ARS con USD
+    # Monedas disponibles para la ruta en la ventana (ordenadas por frecuencia)
     currency_res = await db.execute(
         select(PriceSnapshot.currency, func.count().label("c"))
         .where(and_(
@@ -509,10 +510,21 @@ async def get_route_prices(
         .order_by(func.count().desc())
     )
     currency_rows = currency_res.all()
-    dominant_currency = currency_rows[0].currency if currency_rows else None
+    available = [{"currency": r.currency, "count": r.c} for r in currency_rows]
+    available_codes = [r.currency for r in currency_rows]
+
+    # Moneda a mostrar: la pedida (si existe para la ruta) → ARS por defecto → la dominante
+    if currency and currency.upper() in available_codes:
+        selected_currency = currency.upper()
+    elif "ARS" in available_codes:
+        selected_currency = "ARS"
+    elif available_codes:
+        selected_currency = available_codes[0]
+    else:
+        selected_currency = None
 
     by_day = []
-    if dominant_currency is not None:
+    if selected_currency is not None:
         by_day_res = await db.execute(
             select(
                 PriceSnapshot.snapshot_date,
@@ -524,7 +536,7 @@ async def get_route_prices(
             .where(and_(
                 PriceSnapshot.origin == origin,
                 PriceSnapshot.destination == destination,
-                PriceSnapshot.currency == dominant_currency,
+                PriceSnapshot.currency == selected_currency,
                 PriceSnapshot.received_at >= observed_since,   # precios frescos
                 PriceSnapshot.snapshot_date >= today_str,      # vuelos a futuro
             ))
@@ -555,13 +567,14 @@ async def get_route_prices(
     )).one()
 
     return {
-        "origin":          origin,
-        "destination":     destination,
-        "currency":        dominant_currency,
-        "days":            days,
-        "total_snapshots": meta_row.total or 0,
-        "last_seen":       meta_row.last_seen.isoformat() if meta_row.last_seen else None,
-        "by_day":          by_day,
+        "origin":               origin,
+        "destination":          destination,
+        "currency":             selected_currency,
+        "available_currencies": available,
+        "days":                 days,
+        "total_snapshots":      meta_row.total or 0,
+        "last_seen":            meta_row.last_seen.isoformat() if meta_row.last_seen else None,
+        "by_day":               by_day,
     }
 
 
