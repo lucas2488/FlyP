@@ -236,7 +236,7 @@ async def _send_to_user(db: AsyncSession, campaign: Campaign, user: UserProfile)
 
     # Enviar FCM
     success = firebase_service.send_notification(
-        token=user.fcm_token,
+        fcm_token=user.fcm_token,
         title=title,
         body=body,
         data={
