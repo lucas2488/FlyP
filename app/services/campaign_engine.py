@@ -167,21 +167,22 @@ async def _send_to_user(db: AsyncSession, campaign: Campaign, user: UserProfile)
     Envía la notificación a un usuario individual.
     Devuelve: 'sent' | 'failed' | 'skipped'
     """
-    # Idempotencia: ¿ya fue enviado?
+    # Idempotencia: ¿ya fue enviado? (por fcm_token — el user_id anónimo es NULL
+    # para casi todos; usarlo rompía la idempotencia y salteaba a todos)
     exists = await db.execute(
         select(CampaignSend).where(
             CampaignSend.campaign_id == campaign.id,
-            CampaignSend.user_id == user.user_id,
+            CampaignSend.user_id == user.fcm_token,
             CampaignSend.status == "sent",
         )
     )
     if exists.scalar_one_or_none():
         return "skipped"
 
-    # Crear registro en campaign_sends (estado pending)
+    # Crear registro en campaign_sends (estado pending) — identificado por fcm_token
     cs = CampaignSend(
         campaign_id=campaign.id,
-        user_id=user.user_id,
+        user_id=user.fcm_token,
         status="pending",
     )
     db.add(cs)
