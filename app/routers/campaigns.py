@@ -56,7 +56,11 @@ api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
 async def verify_api_key(api_key: str = Security(api_key_header)) -> str:
-    if not api_key or api_key != settings.analytics_api_key:
+    # Acepta la key del dashboard (analytics) o la dedicada de ChatGPT (si está seteada).
+    valid_keys = {settings.analytics_api_key}
+    if settings.chatgpt_api_key:
+        valid_keys.add(settings.chatgpt_api_key)
+    if not api_key or api_key not in valid_keys:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
     return api_key
 
@@ -157,6 +161,8 @@ def _sd_to_dict(sd: SpecialDate) -> dict:
 async def list_campaigns(
     status: str | None = None,
     segment: str | None = None,
+    since: date | None = None,   # filtra por scheduled_at >= since (inclusive)
+    until: date | None = None,   # filtra por scheduled_at <= until 23:59 (inclusive)
     limit: int = 50,
     db: AsyncSession = Depends(get_db),
     _: str = Depends(verify_api_key),
@@ -166,6 +172,10 @@ async def list_campaigns(
         q = q.where(Campaign.status == status)
     if segment:
         q = q.where(Campaign.segment == segment)
+    if since:
+        q = q.where(Campaign.scheduled_at >= datetime.combine(since, datetime.min.time()))
+    if until:
+        q = q.where(Campaign.scheduled_at <= datetime.combine(until, datetime.max.time()))
     result = await db.execute(q)
     return [_campaign_to_dict(c) for c in result.scalars().all()]
 

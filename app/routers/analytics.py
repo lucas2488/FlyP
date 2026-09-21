@@ -24,7 +24,11 @@ api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
 async def verify_api_key(api_key: str = Security(api_key_header)) -> str:
-    if not api_key or api_key != settings.analytics_api_key:
+    # Acepta la key del dashboard (analytics) o la dedicada de ChatGPT (si está seteada).
+    valid_keys = {settings.analytics_api_key}
+    if settings.chatgpt_api_key:
+        valid_keys.add(settings.chatgpt_api_key)
+    if not api_key or api_key not in valid_keys:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
     return api_key
 
