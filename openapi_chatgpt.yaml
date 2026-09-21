@@ -1,0 +1,304 @@
+openapi: 3.1.0
+info:
+  title: Fly Promociones — API de Marketing
+  version: "1.0.0"
+  description: >
+    API para gestionar campañas de notificaciones y consultar métricas de Fly Promociones.
+    Pensada para que un GPT personalizado la use como Action.
+
+
+    REGLAS CLAVE PARA CAMPAÑAS:
+
+    - Para que la notificación le llegue a TODOS los usuarios, poné target_topic = "flypromociones_AR".
+    En ese caso el segmento se ignora (va broadcast al topic).
+
+    - Para enviar solo a un segmento (envío per-user), poné segment y dejá target_topic vacío.
+
+    - scheduled_at va en hora Argentina (ISO sin zona), ej "2026-09-25T10:00:00". El scheduler
+    la dispara sola a esa fecha/hora (no la envíes a mano salvo que quieras enviarla ya).
+
+    - Una campaña recién creada queda como borrador (status=draft). Solo se pueden editar/borrar
+    campañas draft o scheduled; las ya enviadas (sent) no.
+servers:
+  - url: https://api.flypromociones.com/api/v1
+security:
+  - apiKeyAuth: []
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  schemas:
+    CampaignInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Nombre interno de la campaña (2-200 chars). Requerido al crear."
+        target_topic:
+          type: string
+          nullable: true
+          description: "flypromociones_AR = broadcast a TODOS los suscriptos (ignora el segmento). Vacío/omitido = envío per-user solo al segmento elegido."
+        segment:
+          type: string
+          nullable: true
+          enum: [heavy_searcher, casual, inactive, new_user]
+          description: "Segmento destino (solo aplica si NO hay target_topic). Omitir = todos."
+        custom_title:
+          type: string
+          nullable: true
+          description: "Título del push (máx 300)."
+        custom_body:
+          type: string
+          nullable: true
+          description: "Cuerpo del push."
+        scheduled_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: "Fecha y hora de envío en hora Argentina (ISO sin zona), ej 2026-09-25T10:00:00."
+        campaign_type:
+          type: string
+          nullable: true
+          enum: [route, top_auto, category]
+          description: "Tipo (solo relevante en envío per-user; con topic se ignora). Default top_auto."
+        route_origin:
+          type: string
+          nullable: true
+          description: "IATA origen (solo si campaign_type=route), ej BUEA."
+        route_destination:
+          type: string
+          nullable: true
+          description: "IATA destino (solo si campaign_type=route), ej JUJ."
+        category_tag:
+          type: string
+          nullable: true
+          description: "Categoría (solo si campaign_type=category)."
+paths:
+  /analytics/overview:
+    get:
+      operationId: getOverview
+      summary: KPIs generales del producto
+      description: "Usuarios totales/activos, búsquedas, price watches, clicks de afiliado, notificaciones."
+      responses:
+        "200":
+          description: OK
+  /analytics/notifications:
+    get:
+      operationId: getNotifications
+      summary: Métricas de notificaciones enviadas
+      parameters:
+        - name: days
+          in: query
+          description: "Ventana en días."
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: "total_sent, total_failed, delivery_rate_pct, opens_total, open_rate_pct, by_type, by_day."
+  /analytics/notifications/history:
+    get:
+      operationId: getNotificationsHistory
+      summary: Historial de envíos individuales
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 7
+        - name: type
+          in: query
+          description: "welcome, urgent, soft o strong."
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: "Filas de notification_log paginadas."
+  /analytics/top-routes:
+    get:
+      operationId: getTopRoutes
+      summary: Rutas más buscadas
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: "origin, destination, search_count, min/avg price, last_seen."
+  /analytics/route-prices:
+    get:
+      operationId: getRoutePrices
+      summary: Calendario de precios de una ruta (por fecha de viaje)
+      parameters:
+        - name: origin
+          in: query
+          required: true
+          description: "IATA origen, ej BUEA."
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          description: "IATA destino, ej JUJ."
+          schema:
+            type: string
+        - name: currency
+          in: query
+          description: "Moneda (ej ARS, USD). Default ARS si existe para la ruta."
+          schema:
+            type: string
+        - name: days
+          in: query
+          description: "Ventana de precios recientes."
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: "currency, available_currencies, total_snapshots, last_seen, by_day con date/min_price/avg_price/max_price/count."
+  /admin/campaigns:
+    get:
+      operationId: listCampaigns
+      summary: Listar campañas (con filtros)
+      parameters:
+        - name: status
+          in: query
+          description: "draft, scheduled, sending, sent o failed."
+          schema:
+            type: string
+        - name: segment
+          in: query
+          schema:
+            type: string
+        - name: since
+          in: query
+          description: "scheduled_at mayor o igual a esta fecha (YYYY-MM-DD)."
+          schema:
+            type: string
+            format: date
+        - name: until
+          in: query
+          description: "scheduled_at menor o igual a esta fecha (YYYY-MM-DD)."
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: "Lista de campañas."
+    post:
+      operationId: createCampaign
+      summary: Crear una campaña (queda como borrador programado)
+      description: "Crea la campaña en estado draft. Si le ponés scheduled_at, el scheduler la dispara sola a esa fecha/hora. Para broadcast a todos, poné target_topic=flypromociones_AR."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignInput"
+      responses:
+        "201":
+          description: "Campaña creada (incluye id y status=draft)."
+  /admin/campaigns/{campaign_id}:
+    get:
+      operationId: getCampaign
+      summary: Ver una campaña
+      parameters:
+        - name: campaign_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Datos completos (incluye scheduled_at, target_topic, status)."
+        "404":
+          description: No existe.
+    patch:
+      operationId: updateCampaign
+      summary: Modificar una campaña (solo draft o scheduled)
+      description: "Editar fecha, textos, segmento, ruta, topic. Si mandás scheduled_at, pasa a status=scheduled. Falla 409 si ya fue enviada."
+      parameters:
+        - name: campaign_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignInput"
+      responses:
+        "200":
+          description: "Campaña actualizada."
+        "409":
+          description: "Ya fue enviada, no se puede editar."
+    delete:
+      operationId: deleteCampaign
+      summary: Borrar una campaña (solo borradores)
+      description: "Elimina la campaña. Solo funciona si status=draft; 409 en cualquier otro caso."
+      parameters:
+        - name: campaign_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Borrada.
+        "409":
+          description: "Solo se pueden borrar borradores."
+  /admin/campaigns/{campaign_id}/send:
+    post:
+      operationId: sendCampaign
+      summary: Enviar una campaña AHORA
+      description: "Dispara la campaña inmediatamente (no espera al scheduled_at). Solo draft o scheduled."
+      parameters:
+        - name: campaign_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Encolada para envío."
+  /admin/campaigns/{campaign_id}/stats:
+    get:
+      operationId: getCampaignStats
+      summary: Resultado de envío de una campaña
+      parameters:
+        - name: campaign_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "sent, opened, failed, skipped, open_rate_pct."
+  /admin/campaigns/segment-counts:
+    get:
+      operationId: getSegmentCounts
+      summary: Cantidad de usuarios por segmento (con FCM token activo)
+      responses:
+        "200":
+          description: "Objeto segmento a cantidad."
