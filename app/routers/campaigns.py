@@ -201,7 +201,9 @@ async def create_campaign(
         scheduled_at=body.scheduled_at,
         custom_title=body.custom_title,
         custom_body=body.custom_body,
-        target_topic=body.target_topic,
+        # Default: si no se especifica topic, va al broadcast de todos (flypromociones_AR).
+        # Así toda campaña creada por ChatGPT/API llega a todos aunque olvide el topic.
+        target_topic=body.target_topic or "flypromociones_AR",
     )
     db.add(c)
     await db.commit()
