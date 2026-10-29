@@ -203,8 +203,12 @@ def build_items(rows) -> list[dict]:
         if not sky:
             continue
         if "_orig_id" in sky:
-            sky["origin"] = ids.get(sky.pop("_orig_id"))
-            sky["destination"] = ids.get(sky.pop("_dest_id"))
+            # Se devuelven también los ids crudos: si no se pudieron traducir, el
+            # dashboard muestra el id interno de SS en lugar del código.
+            sky["origin_id"] = sky.pop("_orig_id")
+            sky["destination_id"] = sky.pop("_dest_id")
+            sky["origin"] = ids.get(sky["origin_id"])
+            sky["destination"] = ids.get(sky["destination_id"])
         for k in ("_legs", "_raw_orig", "_raw_dest"):
             sky.pop(k, None)
     return items
