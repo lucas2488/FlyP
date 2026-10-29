@@ -3,7 +3,8 @@ Analytics router — expone métricas agregadas para el dashboard de marketing.
 Autenticación: header X-API-Key debe coincidir con settings.analytics_api_key
 """
 import time
-from datetime import datetime, timedelta
+from datetime import date, datetime, time as dt_time, timedelta, timezone
+from zoneinfo import ZoneInfo
 from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, HTTPException, Security
@@ -18,6 +19,7 @@ from app.models import (
     ImpactLink,
 )
 from app.config import settings
+from app.services import outbound_clicks
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
@@ -670,3 +672,46 @@ async def get_airports(
         }
         for a in result.scalars().all()
     ]
+
+
+# ---------------------------------------------------------------------------
+# GET /analytics/outbound-clicks
+# Clicks en links externos (impact_link_log), clasificados y con el link de
+# Skyscanner (u=) desarmado. Fechas en día Argentina.
+# ---------------------------------------------------------------------------
+_AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
+
+
+@router.get("/outbound-clicks")
+async def get_outbound_clicks(
+    date_from: date | None = None,
+    date_to: date | None = None,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(verify_api_key),
+) -> dict:
+    today_ar = datetime.now(_AR_TZ).date()
+    date_to = date_to or today_ar
+    date_from = date_from or (date_to - timedelta(days=6))
+    if date_from > date_to:
+        raise HTTPException(status_code=400, detail="date_from no puede ser posterior a date_to")
+    if (date_to - date_from).days > 92:
+        raise HTTPException(status_code=400, detail="El rango máximo es de 93 días")
+
+    # clicked_at se guarda en UTC naive → convertir los bordes del día AR a UTC naive.
+    start = datetime.combine(date_from, dt_time.min, _AR_TZ).astimezone(timezone.utc).replace(tzinfo=None)
+    end = datetime.combine(date_to + timedelta(days=1), dt_time.min, _AR_TZ).astimezone(timezone.utc).replace(tzinfo=None)
+
+    rows = await db.execute(
+        select(ImpactLinkLog)
+        .where(ImpactLinkLog.clicked_at >= start, ImpactLinkLog.clicked_at < end)
+        .order_by(ImpactLinkLog.clicked_at.desc())
+        .limit(5000)
+    )
+    items = outbound_clicks.build_items(rows.scalars().all())
+
+    return {
+        "date_from": date_from.isoformat(),
+        "date_to":   date_to.isoformat(),
+        "total":     len(items),
+        "items":     items,
+    }
