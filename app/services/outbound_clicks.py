@@ -28,6 +28,16 @@ _CONFIG_LEGS_RE = re.compile(r"/config/(.+)$")
 _DEEPLINK_PLACES_RE = re.compile(r"/(\d+)\.(\d+)\.(\d{4}-\d{2}-\d{2})([^/]*)/air/")
 _HOTEL_SEGMENTS = {"hoteles", "hoteis", "hotels"}
 _CITY_SUFFIX_RE = re.compile(r"-(hoteles|hoteis|hotels|hotel)$")
+_LOWER_WORDS = {"de", "del", "da", "do", "dos", "das", "la", "las", "los", "el", "y"}
+# Los slugs vienen sin tildes; corregimos los que más aparecen.
+_SLUG_FIXES = {"Espana": "España", "Sao Paulo": "São Paulo", "Peru": "Perú", "Mexico": "México"}
+
+
+def _slug_title(slug: str) -> str:
+    """'rio-de-janeiro' → 'Rio de Janeiro'."""
+    words = slug.lower().split("-")
+    out = " ".join(w if i and w in _LOWER_WORDS else w.capitalize() for i, w in enumerate(words))
+    return _SLUG_FIXES.get(out, out)
 
 
 def extract_u(url: str) -> str | None:
@@ -115,8 +125,8 @@ def _parse_skyscanner(target: str) -> dict | None:
 
     segs = [s for s in path.split("/") if s]
     if len(segs) >= 3 and segs[0].lower() in _HOTEL_SEGMENTS:
-        city = _CITY_SUFFIX_RE.sub("", segs[2].lower()).replace("-", " ").title()
-        country = segs[1].replace("-", " ").title()
+        city = _slug_title(_CITY_SUFFIX_RE.sub("", segs[2].lower()))
+        country = _slug_title(segs[1])
         return {
             "type": "hotel",
             "city": city,
