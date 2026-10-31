@@ -18,7 +18,7 @@ from fastapi.responses import JSONResponse
 
 from app.database import engine, Base
 from app.config import settings
-from app.routers import profile, impact, events, analytics, notifications, favorites, admin, campaigns, internal
+from app.routers import profile, impact, events, analytics, notifications, favorites, admin, campaigns, internal, price_alerts
 from app.services.notification_dispatcher import process_notification_queue
 from app.services.reengagement_service import process_reengagement_queue
 from app.services.segment_service import recalculate_segments
@@ -140,6 +140,7 @@ app.include_router(favorites.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 app.include_router(campaigns.router, prefix="/api/v1")
 app.include_router(internal.router, prefix="/api/v1")
+app.include_router(price_alerts.router, prefix="/api/v1")
 
 
 @app.exception_handler(RequestValidationError)

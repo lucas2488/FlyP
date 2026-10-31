@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     analytics_api_key: str = "analytics-changeme"
     # Key dedicada para ChatGPT (misma API, revocable por separado). Vacía = deshabilitada.
     chatgpt_api_key: str = ""
+    # Key del proceso que consulta precios de las alertas (celular / compu). Vacía = deshabilitado.
+    checker_api_key: str = ""
     cors_origins: str = "*"  # comma-separated list or "*"
 
     # Multi-level price-drop thresholds
