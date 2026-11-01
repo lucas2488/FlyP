@@ -290,6 +290,11 @@ def build_searches(alerts: list[dict]) -> list[dict]:
             "country": first["country"],
             "alerts_count": len(group),
             "alert_ids": [a["id"] for a in group],
+            # Alertas completas (mismo objeto que el dashboard) + alert_id para la app de admin.
+            "alerts": [
+                {"alert_id": a["id"], **a}
+                for a in sorted(group, key=lambda a: a["created_at"] or "")
+            ],
             "searchable": bool(first["origin"]["entity_id"] and first["destination"]["entity_id"]),
             "last_price": latest["last_price"] if latest else None,
             "last_checked_at": latest["last_checked_at"] if latest else None,
