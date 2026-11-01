@@ -661,3 +661,45 @@ class AdmobSyncRun(Base):
     rows: Mapped[int | None] = mapped_column(Integer)
     error: Mapped[str | None] = mapped_column(Text)
     detail: Mapped[dict | None] = mapped_column(JSONB)
+
+
+# ---------------------------------------------------------------------------
+# Alertas de precio (Firestore users/{uid}/alerts): historial de lo que reporta el buscador
+# (POST /checker/results) y de los avisos enviados. Firestore guarda el estado actual
+# (lastPrice, lowestPrice, lastCheckedAt, lastNotifiedAt); acá queda la historia.
+# ---------------------------------------------------------------------------
+
+class PriceAlertCheck(Base):
+    """Un precio reportado por el buscador para una búsqueda (search_key)."""
+    __tablename__ = "price_alert_checks"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    search_key: Mapped[str] = mapped_column(String(32), index=True)
+    worker_id: Mapped[str | None] = mapped_column(String(64))
+    price: Mapped[Decimal | None] = mapped_column(Numeric(18, 4))
+    currency: Mapped[str | None] = mapped_column(String(8))
+    status: Mapped[str] = mapped_column(String(24))      # ok | error | unknown_search | currency_mismatch | invalid_price
+    error: Mapped[str | None] = mapped_column(Text)
+    alerts_updated: Mapped[int] = mapped_column(Integer, default=0)
+    alerts_notified: Mapped[int] = mapped_column(Integer, default=0)
+    checked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+
+class PriceAlertNotification(Base):
+    """Un aviso de bajada creado en users/{uid}/notifications y su push."""
+    __tablename__ = "price_alert_notifications"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    alert_path: Mapped[str] = mapped_column(String(160), index=True)    # users/{uid}/alerts/{id}
+    notice_id: Mapped[str] = mapped_column(String(64))
+    search_key: Mapped[str] = mapped_column(String(32))
+    price: Mapped[Decimal] = mapped_column(Numeric(18, 4))
+    previous_price: Mapped[Decimal | None] = mapped_column(Numeric(18, 4))
+    target_price: Mapped[Decimal | None] = mapped_column(Numeric(18, 4))
+    currency: Mapped[str | None] = mapped_column(String(8))
+    reason: Mapped[str] = mapped_column(String(24))      # target | drop
+    devices: Mapped[int] = mapped_column(Integer, default=0)
+    pushes_sent: Mapped[int] = mapped_column(Integer, default=0)
+    devices_removed: Mapped[int] = mapped_column(Integer, default=0)
+    push_errors: Mapped[list | None] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
