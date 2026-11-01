@@ -29,9 +29,11 @@ from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
+import pytz
+
 import firebase_admin
 from firebase_admin import firestore, messaging
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from app.database import AsyncSessionLocal
 from app.models import PriceAlertCheck, PriceAlertNotification
@@ -71,6 +73,7 @@ class AlertOutcome:
     title: str | None = None
     body: str | None = None
     copy_source: str | None = None      # llm | template
+    push_scheduled_for: str | None = None   # horario de silencio: cuándo sale el push
 
 
 @dataclass
@@ -327,11 +330,16 @@ def _apply(results: list[ResultIn], groups: dict, last_prices: dict[str, float],
                     # 2b. …después el push.
                     title, body = llm or push_texts(a, r.price, reason)
                     oc.title, oc.body, oc.copy_source = title, body, "llm" if llm else "template"
-                    p = _send_push(db, uid, notice_ref.id, title, body)
+                    due = quiet_until(a.get("country"), now)
+                    if due:
+                        # Horario de silencio: el aviso ya está en la bandeja; el push sale a las 9 locales.
+                        oc.push_scheduled_for = due.isoformat()
+                    else:
+                        p = _send_push(db, uid, notice_ref.id, title, body)
+                        oc.devices, oc.pushes_sent, oc.devices_removed, oc.push_errors = p["devices"], p["sent"], p["removed"], p["errors"]
                     # 2c. Anti-spam.
                     ref.update({"lastNotifiedAt": now})
                     oc.action = "notified"
-                    oc.devices, oc.pushes_sent, oc.devices_removed, oc.push_errors = p["devices"], p["sent"], p["removed"], p["errors"]
                 elif why_not == "antispam":
                     oc.action = "skipped_antispam"
             except Exception as e:  # p. ej. la alerta se borró mientras tanto
@@ -388,6 +396,10 @@ async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool 
                     target_price=_dec(a.get("targetPrice")), currency=(r.currency or "").upper(), reason=x.reason,
                     devices=x.devices, pushes_sent=x.pushes_sent, devices_removed=x.devices_removed,
                     push_errors=x.push_errors or None, title=x.title, body=x.body, copy_source=x.copy_source,
+                    push_status="scheduled" if x.push_scheduled_for else "sent",
+                    push_due_at=datetime.fromisoformat(x.push_scheduled_for) if x.push_scheduled_for else None,
+                    push_sent_at=None if x.push_scheduled_for else now,
+                    uid=uid,
                 ))
         await db.commit()
     # El dashboard y GET /checker/searches tienen que ver los precios nuevos.
@@ -459,3 +471,83 @@ async def _generate_copies(results: list[ResultIn], groups: dict, last_prices: d
         return {}
     outs = await asyncio.gather(*(j for _, j in jobs), return_exceptions=True)
     return {path: (o.title, o.body) for (path, _), o in zip(jobs, outs) if o is not None and not isinstance(o, Exception)}
+
+
+# ---------------------------------------------------------------------------
+# Horario de silencio: de 22:00 a 9:00 (hora local del país de la alerta) el push espera.
+# El aviso de la bandeja se crea igual en el momento; el push sale a las 9:00 locales.
+# ---------------------------------------------------------------------------
+
+QUIET_FROM, QUIET_TO = 22, 9
+# Países con varios husos: el principal. El resto sale de pytz.country_timezones.
+MAIN_TZ = {
+    "AR": "America/Argentina/Buenos_Aires", "BR": "America/Sao_Paulo", "MX": "America/Mexico_City",
+    "US": "America/New_York", "CA": "America/Toronto", "AU": "Australia/Sydney", "RU": "Europe/Moscow",
+    "CL": "America/Santiago", "EC": "America/Guayaquil", "ES": "Europe/Madrid", "PT": "Europe/Lisbon",
+    "CO": "America/Bogota", "ID": "Asia/Jakarta", "CD": "Africa/Kinshasa", "KZ": "Asia/Almaty",
+}
+DEFAULT_TZ = "America/Argentina/Buenos_Aires"
+
+
+def country_tz(country: str | None) -> ZoneInfo:
+    c = (country or "").upper()
+    name = MAIN_TZ.get(c) or (pytz.country_timezones.get(c) or [DEFAULT_TZ])[0]
+    try:
+        return ZoneInfo(name)
+    except Exception:
+        return ZoneInfo(DEFAULT_TZ)
+
+
+def quiet_until(country: str | None, now: datetime) -> datetime | None:
+    """None si se puede mandar ya; si es horario de silencio, las próximas 9:00 locales (UTC)."""
+    local = now.astimezone(country_tz(country))
+    if QUIET_TO <= local.hour < QUIET_FROM:
+        return None
+    day = local.date() if local.hour < QUIET_TO else local.date() + timedelta(days=1)
+    return datetime.combine(day, time(QUIET_TO, 0), local.tzinfo).astimezone(timezone.utc)
+
+
+def _send_due(rows: list[tuple]) -> list[dict]:
+    """Manda los pushes que esperaban. Bloqueante. rows: (id, uid, alert_path, notice_id, title, body)."""
+    db = firestore.client()
+    out = []
+    for nid, uid, alert_path, notice_id, title, body in rows:
+        alert = db.document(alert_path).get()
+        notice = db.collection("users").document(uid).collection("notifications").document(notice_id).get()
+        if not alert.exists or (alert.to_dict() or {}).get("status") != "active" or not notice.exists:
+            out.append({"id": nid, "status": "cancelled", "detail": "la alerta o el aviso ya no están"})
+            continue
+        try:
+            p = _send_push(db, uid, notice_id, title, body)
+            out.append({"id": nid, "status": "sent", **p})
+        except Exception as e:
+            out.append({"id": nid, "status": "failed", "detail": f"{type(e).__name__}: {e}"[:300]})
+    return out
+
+
+async def send_scheduled_pushes() -> None:
+    """Job (cada 15 min): manda los pushes cuyo horario de silencio terminó."""
+    try:
+        firebase_admin.get_app()
+    except ValueError:
+        return
+    N = PriceAlertNotification
+    async with AsyncSessionLocal() as db:
+        rows = (await db.execute(
+            select(N.id, N.uid, N.alert_path, N.notice_id, N.title, N.body)
+            .where(N.push_status == "scheduled", N.push_due_at <= _now()).order_by(N.push_due_at).limit(500)
+        )).all()
+    if not rows:
+        return
+    results = await asyncio.to_thread(_send_due, [tuple(r) for r in rows])
+    async with AsyncSessionLocal() as db:
+        for r in results:
+            values = {"push_status": r["status"], "push_sent_at": _now() if r["status"] == "sent" else None}
+            if r["status"] == "sent":
+                values.update(devices=r["devices"], pushes_sent=r["sent"], devices_removed=r["removed"],
+                              push_errors=r["errors"] or None)
+            else:
+                values["push_errors"] = [{"error": r.get("detail")}]
+            await db.execute(update(N).where(N.id == r["id"]).values(**values))
+        await db.commit()
+    logger.info("price_alerts: %d pushes en espera procesados", len(results))

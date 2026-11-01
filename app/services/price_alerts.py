@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 CACHE_TTL_SECONDS = 60
 # Una búsqueda consultada hace menos que esto no se vuelve a ofrecer al checker.
-RECHECK_AFTER = timedelta(hours=20)
+RECHECK_AFTER = timedelta(hours=10)   # permite buscar dos veces por día
 # "A punto de dispararse": el objetivo está a menos de este % del precio de referencia.
 NEAR_TARGET_RATIO = 0.02
 

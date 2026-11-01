@@ -28,6 +28,7 @@ from app.services.welcome_service import process_welcome_notifications
 from app.services.cleanup_service import purge_old_queue_items
 from app.services import impact_sync
 from app.services import admob_sync
+from app.services.price_alert_results import send_scheduled_pushes
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -123,6 +124,14 @@ async def lifespan(app: FastAPI):
     )
     # AdMob: reporte principal de hoy y ayer cada hora; inventario + 7 reportes de los
     # últimos 7 días a las 8am Córdoba. Al arrancar hace la carga inicial si falta.
+    # Avisos de precio: pushes que esperaron el horario de silencio (22 a 9 hora local)
+    scheduler.add_job(
+        send_scheduled_pushes,
+        "interval",
+        minutes=15,
+        id="price_alert_scheduled_pushes",
+        replace_existing=True,
+    )
     scheduler.add_job(
         admob_sync.sync_hourly,
         "interval",

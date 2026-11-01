@@ -705,4 +705,8 @@ class PriceAlertNotification(Base):
     title: Mapped[str | None] = mapped_column(Text)            # texto del push (y del aviso si es de Claude)
     body: Mapped[str | None] = mapped_column(Text)
     copy_source: Mapped[str | None] = mapped_column(String(16))  # llm | template
+    uid: Mapped[str | None] = mapped_column(String(128))
+    push_status: Mapped[str | None] = mapped_column(String(16), index=True)  # sent | scheduled | cancelled | failed
+    push_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))   # horario de silencio
+    push_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)

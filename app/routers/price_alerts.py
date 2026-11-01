@@ -55,7 +55,7 @@ async def get_checker_searches(
     limit: int = Query(50, ge=1, le=500),
     _: str = Depends(verify_checker_key),
 ):
-    """Búsquedas únicas pendientes de consultar (no revisadas en las últimas 20 h)."""
+    """Búsquedas únicas pendientes de consultar (no revisadas en las últimas 10 h)."""
     data = await _load()
     now = datetime.now(timezone.utc)
     searches, total = price_alerts.pending_searches(data["searches"], now, limit)
