@@ -59,6 +59,7 @@ class ResultIn:
     currency: str | None
     error: str | None = None
     itinerary_id: str | None = None      # id del vuelo de Skyscanner (opcional)
+    claim_id: str | None = None          # reserva de POST /checker/claim (obligatoria para la app)
 
 
 @dataclass
@@ -369,27 +370,131 @@ async def _last_notified_prices(paths: list[str]) -> dict[str, float]:
     return {p: float(v) for p, v in rows}
 
 
-async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool = False) -> list[ResultOut]:
-    keys = {r.search_key for r in results}
-    groups = await asyncio.to_thread(_read_alerts, keys)
-    paths = [f"users/{uid}/alerts/{aid}" for g in groups.values() for uid, aid, _ in g]
-    last_prices = await _last_notified_prices(paths)
+VERIFY_TOLERANCE = 0.10      # otro aparato "confirma" una bajada rara si su precio está a ±10 %
+
+
+def _reference_price(alerts: list[tuple[str, str, dict]]) -> float | None:
+    """Último precio conocido de la búsqueda (el lastPrice más reciente) o, si nunca se consultó, el base."""
+    checked = [(a.get("lastCheckedAt"), _num(a.get("lastPrice"))) for _, _, a in alerts]
+    checked = [(t, p) for t, p in checked if t and p]
+    if checked:
+        return max(checked, key=lambda x: x[0])[1]
+    bases = [_num(a.get("baselinePrice")) for _, _, a in alerts]
+    bases = [b for b in bases if b]
+    return min(bases) if bases else None
+
+
+async def _verification(search_key: str):
+    from app.models import PriceAlertVerification as V
+    async with AsyncSessionLocal() as db:
+        return (await db.execute(select(V).where(V.search_key == search_key, V.status == "pending")
+                                 .order_by(V.created_at.desc()).limit(1))).scalar_one_or_none()
+
+
+async def _resolve_verification(vid: int, status: str, price: float | None, by: str | None, now: datetime) -> None:
+    from app.models import PriceAlertVerification as V
+    async with AsyncSessionLocal() as db:
+        await db.execute(update(V).where(V.id == vid).values(
+            status=status, resolved_price=Decimal(str(price)) if price is not None else None,
+            resolved_by=by, resolved_at=now))
+        await db.commit()
+
+
+async def _new_verification(r: ResultIn, ref: float | None, worker, now: datetime) -> None:
+    from app.models import PriceAlertVerification as V
+    async with AsyncSessionLocal() as db:
+        db.add(V(search_key=r.search_key, price=Decimal(str(r.price)), currency=(r.currency or "").upper() or None,
+                 reference_price=Decimal(str(ref)) if ref else None, itinerary_id=r.itinerary_id,
+                 device_id=worker.device_id or worker.worker_id, source=worker.source, created_at=now))
+        await db.commit()
+
+
+async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool = False, worker=None) -> list[ResultOut]:
+    from app.services import app_settings
+    from app.services.price_alert_claims import Worker, check_claim, finish_claims, load_claims
+
+    worker = worker or Worker("admin", None, worker_id)
     now = _now()
-    copies = {} if dry_run else await _generate_copies(results, groups, last_prices, now)
-    out = await asyncio.to_thread(_apply, results, groups, last_prices, dry_run, now, copies)
+    cfg = await app_settings.get_all()
+    gated: dict[int, ResultOut] = {}        # índice → resultado que no pasa (no toca Firestore)
+    info: dict[int, dict] = {i: {} for i in range(len(results))}
+    claim_status: dict[str, str] = {}
+
+    # 1) Reservas: la app solo puede mandar resultados de búsquedas que tiene reservadas.
+    claims = await load_claims([r.claim_id for r in results if r.claim_id])
+    for i, r in enumerate(results):
+        if worker.source == "app" and not r.claim_id:
+            gated[i] = ResultOut(r.search_key, "claim_required", "la app tiene que reservar la búsqueda con /checker/claim")
+            continue
+        if r.claim_id:
+            why = check_claim(claims.get(r.claim_id), r.search_key, worker, now)
+            if why:
+                gated[i] = ResultOut(r.search_key, "invalid_claim", why)
+                continue
+            ok = not r.error and r.price is not None and r.price > 0
+            claim_status[r.claim_id] = "done" if ok else "failed"
+
+    # 2) Alertas de las búsquedas que pasaron.
+    keys = {r.search_key for i, r in enumerate(results) if i not in gated}
+    groups = await asyncio.to_thread(_read_alerts, keys) if keys else {}
+
+    # 3) Bajada respecto del último precio conocido y doble verificación (si está prendida).
+    for i, r in enumerate(results):
+        if i in gated or r.error or r.price is None or not (r.price > 0):
+            continue
+        alerts = groups.get(r.search_key) or []
+        if not alerts or (r.currency or "").upper() != str(alerts[0][2].get("currency") or "").upper():
+            continue
+        ref = _reference_price(alerts)
+        drop = round((ref - r.price) / ref * 100, 2) if ref else None
+        rare = drop is not None and drop > cfg["double_check_threshold_pct"]
+        info[i].update(reference_price=ref, drop_pct=drop, rare=rare)
+        if not cfg["double_check_enabled"] or dry_run:
+            continue
+        pending = await _verification(r.search_key)
+        me = worker.device_id or worker.worker_id
+        if pending is not None and (worker.source == "admin" or pending.device_id != me):
+            close = abs(r.price - float(pending.price)) / float(pending.price) <= VERIFY_TOLERANCE
+            await _resolve_verification(pending.id, "confirmed" if close else "rejected", r.price, me, now)
+            info[i]["verification"] = "confirmed" if close else "rejected"
+            if close or worker.source == "admin" or not rare:
+                continue                                    # confirmada, o FlyAdmin (confiable), o precio normal
+        elif pending is not None:
+            gated[i] = ResultOut(r.search_key, "pending_verification", "esperando que otro aparato confirme la bajada")
+            info[i]["verification"] = "pending"
+            continue
+        if rare and worker.source == "app":
+            await _new_verification(r, ref, worker, now)
+            gated[i] = ResultOut(r.search_key, "pending_verification",
+                                 f"bajada de {drop} % (más que el umbral): se confirma con otro aparato antes de avisar")
+            info[i]["verification"] = "pending"
+
+    # 4) Escribir y avisar los que pasaron.
+    passed = [r for i, r in enumerate(results) if i not in gated]
+    last_prices = {}
+    copies = {}
+    if passed:
+        paths = [f"users/{uid}/alerts/{aid}" for k in {r.search_key for r in passed} for uid, aid, _ in groups.get(k, [])]
+        last_prices = await _last_notified_prices(paths)
+        if not dry_run:
+            copies = await _generate_copies(passed, groups, last_prices, now)
+    applied = iter(await asyncio.to_thread(_apply, passed, groups, last_prices, dry_run, now, copies)) if passed else iter([])
+    out = [gated[i] if i in gated else next(applied) for i in range(len(results))]
     if dry_run:
         return out
 
-    by_key = {r.search_key: r for r in results}
+    await finish_claims(claim_status, now)
     async with AsyncSessionLocal() as db:
-        for o in out:
-            r = by_key[o.search_key]
+        for i, (r, o) in enumerate(zip(results, out)):
+            m = info[i]
             db.add(PriceAlertCheck(
-                search_key=o.search_key, worker_id=worker_id,
+                search_key=o.search_key, worker_id=worker.worker_id or worker_id,
                 price=Decimal(str(r.price)) if r.price is not None else None,
                 currency=(r.currency or "").upper() or None, status=o.status, error=o.detail if o.status != "ok" else None,
                 alerts_updated=len(o.alerts), alerts_notified=sum(1 for x in o.alerts if x.action == "notified"),
-                itinerary_id=r.itinerary_id,
+                itinerary_id=r.itinerary_id, source=worker.source, device_id=worker.device_id, claim_id=r.claim_id,
+                reference_price=Decimal(str(m["reference_price"])) if m.get("reference_price") else None,
+                drop_pct=m.get("drop_pct"), rare=m.get("rare"), verification=m.get("verification"),
             ))
             group = {aid: (uid, a) for uid, aid, a in groups.get(o.search_key, [])}
             for x in o.alerts:

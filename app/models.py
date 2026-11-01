@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
-from sqlalchemy import BigInteger, Boolean, Date, Float, ForeignKey, Integer, Numeric, String, Text, DateTime, func
+from sqlalchemy import BigInteger, Boolean, Date, Float, ForeignKey, Index, Integer, Numeric, String, Text, DateTime, func, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
@@ -683,6 +683,13 @@ class PriceAlertCheck(Base):
     alerts_updated: Mapped[int] = mapped_column(Integer, default=0)
     alerts_notified: Mapped[int] = mapped_column(Integer, default=0)
     itinerary_id: Mapped[str | None] = mapped_column(String(256))   # id del vuelo de Skyscanner (opcional)
+    source: Mapped[str | None] = mapped_column(String(16))       # admin | app
+    device_id: Mapped[str | None] = mapped_column(String(128), index=True)
+    claim_id: Mapped[str | None] = mapped_column(String(64))
+    reference_price: Mapped[Decimal | None] = mapped_column(Numeric(18, 4))   # último precio conocido de la búsqueda
+    drop_pct: Mapped[float | None] = mapped_column(Float)                     # bajada vs. reference_price
+    rare: Mapped[bool | None] = mapped_column(Boolean)                        # bajada sobre el umbral de doble verificación
+    verification: Mapped[str | None] = mapped_column(String(16))              # pending | confirmed | rejected
     checked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
 
 
@@ -714,3 +721,55 @@ class PriceAlertNotification(Base):
     push_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))   # horario de silencio
     push_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+
+
+class PriceAlertClaim(Base):
+    """
+    Reserva de una búsqueda (search_key) para un aparato o para FlyAdmin, por unos minutos.
+    Una sola reserva 'open' por búsqueda (índice único parcial): dos pedidos simultáneos
+    nunca reciben la misma. Ver DESIGN_crowd_checker.md.
+    """
+    __tablename__ = "price_alert_claims"
+    __table_args__ = (
+        Index("ux_price_alert_claims_open_search", "search_key", unique=True, postgresql_where=text("status = 'open'")),
+    )
+
+    claim_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    search_key: Mapped[str] = mapped_column(String(32), index=True)
+    source: Mapped[str] = mapped_column(String(16))              # admin | app
+    device_id: Mapped[str | None] = mapped_column(String(128), index=True)
+    session_id: Mapped[str | None] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(16), default="open")   # open | done | failed | expired
+    purpose: Mapped[str] = mapped_column(String(16), default="check") # check | verify (doble verificación)
+    claimed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class PriceAlertVerification(Base):
+    """Bajada 'rara' esperando que otro aparato (o FlyAdmin) la confirme antes de avisar."""
+    __tablename__ = "price_alert_verifications"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    search_key: Mapped[str] = mapped_column(String(32), index=True)
+    price: Mapped[Decimal] = mapped_column(Numeric(18, 4))
+    currency: Mapped[str | None] = mapped_column(String(8))
+    reference_price: Mapped[Decimal | None] = mapped_column(Numeric(18, 4))
+    itinerary_id: Mapped[str | None] = mapped_column(String(256))
+    device_id: Mapped[str | None] = mapped_column(String(128))   # quién la reportó primero
+    source: Mapped[str | None] = mapped_column(String(16))
+    status: Mapped[str] = mapped_column(String(16), default="pending")   # pending | confirmed | rejected | expired
+    resolved_price: Mapped[Decimal | None] = mapped_column(Numeric(18, 4))
+    resolved_by: Mapped[str | None] = mapped_column(String(128))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AppSetting(Base):
+    """Ajustes editables desde el dashboard sin redeploy (clave → valor JSON)."""
+    __tablename__ = "app_settings"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    value: Mapped[dict | list | int | float | bool | str | None] = mapped_column(JSONB)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
