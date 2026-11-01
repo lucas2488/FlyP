@@ -68,6 +68,9 @@ class AlertOutcome:
     devices: int = 0
     devices_removed: int = 0
     push_errors: list = field(default_factory=list)
+    title: str | None = None
+    body: str | None = None
+    copy_source: str | None = None      # llm | template
 
 
 @dataclass
@@ -177,7 +180,8 @@ def _flight_day_end(a: dict) -> datetime | None:
     return datetime.combine(d, time(23, 59, 59), FLIGHT_TZ).astimezone(timezone.utc)
 
 
-def notice_doc(alert_id: str, a: dict, price: float, now: datetime) -> dict:
+def notice_doc(alert_id: str, a: dict, price: float, now: datetime,
+               title: str | None = None, body: str | None = None) -> dict:
     """Documento de users/{uid}/notifications. Nombres y valores iguales a los de la alerta."""
     doc = {k: a.get(k) for k in NOTICE_SEARCH_FIELDS}
     trip = str(a.get("tripType") or "").upper()          # contrato: nombre del enum, en mayúscula
@@ -191,8 +195,9 @@ def notice_doc(alert_id: str, a: dict, price: float, now: datetime) -> dict:
         "dateMode": mode,
         "price": float(price),
         "previousPrice": _num(a.get("baselinePrice")),
-        "title": None,           # la app arma el texto en el idioma del teléfono
-        "body": None,
+        # Con texto de Claude va el mismo del push; si es None la app lo arma en el idioma del teléfono.
+        "title": title,
+        "body": body,
         "createdAt": now,
         "expiresAt": expires,
         "read": False,
@@ -276,10 +281,10 @@ def _send_push(db, uid: str, notice_id: str, title: str, body: str) -> dict:
 # Proceso
 # ---------------------------------------------------------------------------
 
-def _apply(results: list[ResultIn], groups: dict, last_prices: dict[str, float], dry_run: bool) -> list[ResultOut]:
+def _apply(results: list[ResultIn], groups: dict, last_prices: dict[str, float], dry_run: bool,
+           now: datetime, copies: dict[str, tuple[str, str]]) -> list[ResultOut]:
     """Escribe en Firestore y manda pushes. Bloqueante (SDK sync)."""
     db = None if dry_run else firestore.client()
-    now = _now()
     out: list[ResultOut] = []
     for r in results:
         if r.error:
@@ -316,10 +321,12 @@ def _apply(results: list[ResultIn], groups: dict, last_prices: dict[str, float],
                 if reason:
                     # 2a. Primero el aviso…
                     notice_ref = db.collection("users").document(uid).collection("notifications").document()
-                    notice_ref.set(notice_doc(alert_id, a, r.price, now))
+                    llm = copies.get(path)
+                    notice_ref.set(notice_doc(alert_id, a, r.price, now, *(llm or (None, None))))
                     oc.notice_id = notice_ref.id
                     # 2b. …después el push.
-                    title, body = push_texts(a, r.price, reason)
+                    title, body = llm or push_texts(a, r.price, reason)
+                    oc.title, oc.body, oc.copy_source = title, body, "llm" if llm else "template"
                     p = _send_push(db, uid, notice_ref.id, title, body)
                     # 2c. Anti-spam.
                     ref.update({"lastNotifiedAt": now})
@@ -354,7 +361,9 @@ async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool 
     groups = await asyncio.to_thread(_read_alerts, keys)
     paths = [f"users/{uid}/alerts/{aid}" for g in groups.values() for uid, aid, _ in g]
     last_prices = await _last_notified_prices(paths)
-    out = await asyncio.to_thread(_apply, results, groups, last_prices, dry_run)
+    now = _now()
+    copies = {} if dry_run else await _generate_copies(results, groups, last_prices, now)
+    out = await asyncio.to_thread(_apply, results, groups, last_prices, dry_run, now, copies)
     if dry_run:
         return out
 
@@ -378,7 +387,7 @@ async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool 
                     price=Decimal(str(r.price)), previous_price=_dec(a.get("baselinePrice")),
                     target_price=_dec(a.get("targetPrice")), currency=(r.currency or "").upper(), reason=x.reason,
                     devices=x.devices, pushes_sent=x.pushes_sent, devices_removed=x.devices_removed,
-                    push_errors=x.push_errors or None,
+                    push_errors=x.push_errors or None, title=x.title, body=x.body, copy_source=x.copy_source,
                 ))
         await db.commit()
     # El dashboard y GET /checker/searches tienen que ver los precios nuevos.
@@ -389,3 +398,64 @@ async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool 
 def _dec(v) -> Decimal | None:
     n = _num(v)
     return Decimal(str(n)) if n is not None else None
+
+
+# ---------------------------------------------------------------------------
+# Texto con Claude (app/services/push_copy.py). Si falla, queda la plantilla.
+# ---------------------------------------------------------------------------
+
+TRIP_LBL = {
+    "es": ("ida y vuelta", "solo ida", "todo"), "pt": ("ida e volta", "só ida", "todo o mês de"),
+    "en": ("round trip", "one way", "anytime in"),
+}
+
+
+def _dm(v) -> str:
+    v = str(v or "")
+    return f"{v[8:10]}/{v[5:7]}" if len(v) >= 10 else v
+
+
+def _trip_txt(a: dict, lang: str) -> str:
+    rt, ow, month = TRIP_LBL[lang]
+    kind = rt if str(a.get("tripType") or "").upper() == "ROUND_TRIP" else ow
+    if str(a.get("dateMode") or "").lower() == "month" and a.get("month"):
+        return f"{kind}, {month} {a['month']}"
+    if a.get("returnDate"):
+        return f"{kind}, {_dm(a.get('departureDate'))} → {_dm(a.get('returnDate'))}"
+    return f"{kind}, {_dm(a.get('departureDate'))}"
+
+
+async def _generate_copies(results: list[ResultIn], groups: dict, last_prices: dict[str, float],
+                           now: datetime) -> dict[str, tuple[str, str]]:
+    """Para cada alerta que va a avisar: (título, texto) escritos por Claude, en paralelo."""
+    from app.services import push_copy
+
+    jobs = []
+    for r in results:
+        if r.error or r.price is None or not (r.price > 0):
+            continue
+        for uid, alert_id, a in groups.get(r.search_key, []):
+            if (r.currency or "").upper() != str(a.get("currency") or "").upper():
+                continue
+            path = f"users/{uid}/alerts/{alert_id}"
+            reason, _ = decide(a, r.price, last_prices.get(path), now)
+            if not reason:
+                continue
+            lang = _lang(a.get("country"))
+            cur = str(a.get("currency") or "")
+            base = _num(a.get("baselinePrice"))
+            pct = round((1 - r.price / base) * 100) if base else None
+            jobs.append((path, push_copy.generate(
+                country=str(a.get("country") or ""),
+                origin=a.get("originName") or a.get("originIata") or "",
+                destination=a.get("destinationName") or a.get("destinationIata") or "",
+                trip=_trip_txt(a, lang),
+                price_txt=_money(r.price, cur, lang),
+                previous_txt=_money(base, cur, lang) if base else None,
+                pct=pct if pct and pct > 0 else None,
+                reason=reason,
+            )))
+    if not jobs:
+        return {}
+    outs = await asyncio.gather(*(j for _, j in jobs), return_exceptions=True)
+    return {path: (o.title, o.body) for (path, _), o in zip(jobs, outs) if o is not None and not isinstance(o, Exception)}

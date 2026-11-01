@@ -12,3 +12,4 @@ firebase-admin==6.6.0
 psycopg2-binary==2.9.10
 openai>=1.30.0
 pytz>=2024.1
+anthropic>=2.3.0

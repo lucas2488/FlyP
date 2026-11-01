@@ -702,4 +702,7 @@ class PriceAlertNotification(Base):
     pushes_sent: Mapped[int] = mapped_column(Integer, default=0)
     devices_removed: Mapped[int] = mapped_column(Integer, default=0)
     push_errors: Mapped[list | None] = mapped_column(JSONB)
+    title: Mapped[str | None] = mapped_column(Text)            # texto del push (y del aviso si es de Claude)
+    body: Mapped[str | None] = mapped_column(Text)
+    copy_source: Mapped[str | None] = mapped_column(String(16))  # llm | template
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
