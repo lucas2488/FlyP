@@ -75,6 +75,7 @@ class CheckerResult(BaseModel):
     price: float | None = Field(None, description="Precio TOTAL de la búsqueda (todos los pasajeros), como baselinePrice")
     currency: str | None = Field(None, max_length=8, description="Moneda del precio; tiene que ser la de la búsqueda")
     error: str | None = Field(None, max_length=500, description="Si la búsqueda falló, el motivo (no se toca la alerta)")
+    itinerary_id: str | None = Field(None, max_length=256, description="Opcional: id del itinerario de Skyscanner del precio (como originalItineraryId del share)")
 
 
 class CheckerResultsIn(BaseModel):
@@ -92,7 +93,7 @@ async def checker_results(body: CheckerResultsIn, dry_run: bool = Query(False, a
     """
     try:
         out = await price_alert_results.process(
-            [price_alert_results.ResultIn(r.search_key, r.price, r.currency, r.error) for r in body.results],
+            [price_alert_results.ResultIn(r.search_key, r.price, r.currency, r.error, r.itinerary_id) for r in body.results],
             body.worker_id, dry_run,
         )
     except FirestoreUnavailable as e:

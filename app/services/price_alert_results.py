@@ -58,6 +58,7 @@ class ResultIn:
     price: float | None
     currency: str | None
     error: str | None = None
+    itinerary_id: str | None = None      # id del vuelo de Skyscanner (opcional)
 
 
 @dataclass
@@ -184,7 +185,7 @@ def _flight_day_end(a: dict) -> datetime | None:
 
 
 def notice_doc(alert_id: str, a: dict, price: float, now: datetime,
-               title: str | None = None, body: str | None = None) -> dict:
+               title: str | None = None, body: str | None = None, itinerary_id: str | None = None) -> dict:
     """Documento de users/{uid}/notifications. Nombres y valores iguales a los de la alerta."""
     doc = {k: a.get(k) for k in NOTICE_SEARCH_FIELDS}
     trip = str(a.get("tripType") or "").upper()          # contrato: nombre del enum, en mayúscula
@@ -207,6 +208,10 @@ def notice_doc(alert_id: str, a: dict, price: float, now: datetime,
         "readAt": None,
     })
     doc["childAges"] = [int(x) for x in (a.get("childAges") or [])]
+    if itinerary_id:
+        # Opcional: el vuelo puntual del precio (como originalItineraryId del share). Las apps
+        # que no lo conocen lo ignoran y abren la búsqueda.
+        doc["itineraryId"] = itinerary_id
     return doc
 
 
@@ -325,7 +330,7 @@ def _apply(results: list[ResultIn], groups: dict, last_prices: dict[str, float],
                     # 2a. Primero el aviso…
                     notice_ref = db.collection("users").document(uid).collection("notifications").document()
                     llm = copies.get(path)
-                    notice_ref.set(notice_doc(alert_id, a, r.price, now, *(llm or (None, None))))
+                    notice_ref.set(notice_doc(alert_id, a, r.price, now, *(llm or (None, None)), itinerary_id=r.itinerary_id))
                     oc.notice_id = notice_ref.id
                     # 2b. …después el push.
                     title, body = llm or push_texts(a, r.price, reason)
@@ -384,6 +389,7 @@ async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool 
                 price=Decimal(str(r.price)) if r.price is not None else None,
                 currency=(r.currency or "").upper() or None, status=o.status, error=o.detail if o.status != "ok" else None,
                 alerts_updated=len(o.alerts), alerts_notified=sum(1 for x in o.alerts if x.action == "notified"),
+                itinerary_id=r.itinerary_id,
             ))
             group = {aid: (uid, a) for uid, aid, a in groups.get(o.search_key, [])}
             for x in o.alerts:
@@ -399,7 +405,7 @@ async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool 
                     push_status="scheduled" if x.push_scheduled_for else "sent",
                     push_due_at=datetime.fromisoformat(x.push_scheduled_for) if x.push_scheduled_for else None,
                     push_sent_at=None if x.push_scheduled_for else now,
-                    uid=uid, country=(str(a.get("country") or "").upper() or None),
+                    uid=uid, itinerary_id=r.itinerary_id, country=(str(a.get("country") or "").upper() or None),
                     route=f"{a.get('originName') or ''} ({a.get('originIata') or ''}) → {a.get('destinationName') or ''} ({a.get('destinationIata') or ''})"[:160],
                 ))
         await db.commit()
@@ -609,7 +615,7 @@ async def dashboard_history(days: int, limit: int) -> dict:
             "id": r.id, "created_at": r.created_at.isoformat(), "alert_id": r.alert_path.rsplit("/", 1)[-1],
             "route": r.route, "country": r.country, "currency": r.currency, "reason": r.reason,
             "price": f(r.price), "previous_price": f(r.previous_price), "target_price": f(r.target_price),
-            "title": r.title, "body": r.body, "copy_source": r.copy_source,
+            "title": r.title, "body": r.body, "copy_source": r.copy_source, "itinerary_id": r.itinerary_id,
             "push_status": r.push_status, "push_due_at": r.push_due_at.isoformat() if r.push_due_at else None,
             "push_sent_at": r.push_sent_at.isoformat() if r.push_sent_at else None,
             "devices": r.devices, "pushes_sent": r.pushes_sent, "devices_removed": r.devices_removed,
