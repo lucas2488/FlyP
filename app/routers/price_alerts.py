@@ -103,3 +103,10 @@ async def checker_results(body: CheckerResultsIn, dry_run: bool = Query(False, a
         "notified": sum(1 for o in out for a in o.alerts if a.action in ("notified", "would_notify")),
         "results": [asdict(o) for o in out],
     }
+
+
+@router.get("/analytics/price-alerts/notifications")
+async def price_alert_notifications(days: int = Query(30, ge=1, le=365), limit: int = Query(200, ge=1, le=1000),
+                                    _: str = Depends(verify_api_key)):
+    """Avisos de bajada enviados (con el mensaje exacto) y precios consultados, por día (hora Argentina)."""
+    return await price_alert_results.dashboard_history(days, limit)

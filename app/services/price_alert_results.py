@@ -399,7 +399,8 @@ async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool 
                     push_status="scheduled" if x.push_scheduled_for else "sent",
                     push_due_at=datetime.fromisoformat(x.push_scheduled_for) if x.push_scheduled_for else None,
                     push_sent_at=None if x.push_scheduled_for else now,
-                    uid=uid,
+                    uid=uid, country=(str(a.get("country") or "").upper() or None),
+                    route=f"{a.get('originName') or ''} ({a.get('originIata') or ''}) → {a.get('destinationName') or ''} ({a.get('destinationIata') or ''})"[:160],
                 ))
         await db.commit()
     # El dashboard y GET /checker/searches tienen que ver los precios nuevos.
@@ -551,3 +552,68 @@ async def send_scheduled_pushes() -> None:
             await db.execute(update(N).where(N.id == r["id"]).values(**values))
         await db.commit()
     logger.info("price_alerts: %d pushes en espera procesados", len(results))
+
+
+# ---------------------------------------------------------------------------
+# Dashboard: avisos enviados y precios consultados por día
+# ---------------------------------------------------------------------------
+
+AR_TZ = "America/Argentina/Buenos_Aires"
+
+
+async def dashboard_history(days: int, limit: int) -> dict:
+    from sqlalchemy import Date, cast, func
+
+    since = _now() - timedelta(days=days)
+    N, C = PriceAlertNotification, PriceAlertCheck
+    async with AsyncSessionLocal() as db:
+        nd = cast(func.timezone(AR_TZ, N.created_at), Date)
+        daily = (await db.execute(
+            select(nd, func.count(),
+                   func.count().filter(N.reason == "drop"), func.count().filter(N.reason == "target"),
+                   func.count().filter(N.push_status == "scheduled"), func.count().filter(N.push_status == "cancelled"),
+                   func.coalesce(func.sum(N.pushes_sent), 0), func.count().filter(N.copy_source == "llm"))
+            .where(N.created_at >= since).group_by(nd).order_by(nd)
+        )).all()
+        cd = cast(func.timezone(AR_TZ, C.checked_at), Date)
+        checks = (await db.execute(
+            select(cd, func.count(), func.count().filter(C.status != "ok"), func.coalesce(func.sum(C.alerts_updated), 0),
+                   func.count(func.distinct(C.worker_id)))
+            .where(C.checked_at >= since).group_by(cd).order_by(cd)
+        )).all()
+        rows = (await db.execute(
+            select(N).where(N.created_at >= since).order_by(N.created_at.desc()).limit(limit)
+        )).scalars().all()
+        last_check = await db.scalar(select(func.max(C.checked_at)))
+
+    # Nombre / email / invitado del dueño desde Firestore (caché de 60 s); si la alerta se borró, queda la foto.
+    users: dict[str, dict] = {}
+    try:
+        data = await price_alerts.load()
+        for a in data["alerts"]:
+            users[a["id"]] = a["user"]
+    except Exception:
+        pass
+
+    def f(v):
+        return float(v) if v is not None else None
+
+    return {
+        "days": days,
+        "last_check_at": last_check.isoformat() if last_check else None,
+        "daily": [{"date": d.isoformat(), "notified": n, "drop": dr, "target": tg, "scheduled": sc,
+                   "cancelled": ca, "pushes_sent": int(ps), "llm": llm} for d, n, dr, tg, sc, ca, ps, llm in daily],
+        "checks_daily": [{"date": d.isoformat(), "checks": n, "errors": e, "alerts_updated": int(u), "workers": w}
+                         for d, n, e, u, w in checks],
+        "items": [{
+            "id": r.id, "created_at": r.created_at.isoformat(), "alert_id": r.alert_path.rsplit("/", 1)[-1],
+            "route": r.route, "country": r.country, "currency": r.currency, "reason": r.reason,
+            "price": f(r.price), "previous_price": f(r.previous_price), "target_price": f(r.target_price),
+            "title": r.title, "body": r.body, "copy_source": r.copy_source,
+            "push_status": r.push_status, "push_due_at": r.push_due_at.isoformat() if r.push_due_at else None,
+            "push_sent_at": r.push_sent_at.isoformat() if r.push_sent_at else None,
+            "devices": r.devices, "pushes_sent": r.pushes_sent, "devices_removed": r.devices_removed,
+            "push_errors": r.push_errors or [],
+            "user": users.get(r.alert_path.rsplit("/", 1)[-1]),
+        } for r in rows],
+    }

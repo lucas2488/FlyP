@@ -706,6 +706,8 @@ class PriceAlertNotification(Base):
     body: Mapped[str | None] = mapped_column(Text)
     copy_source: Mapped[str | None] = mapped_column(String(16))  # llm | template
     uid: Mapped[str | None] = mapped_column(String(128))
+    route: Mapped[str | None] = mapped_column(String(160))      # "Buenos Aires (BUE) → Miami (MIA)", foto al avisar
+    country: Mapped[str | None] = mapped_column(String(8))       # mercado de la alerta
     push_status: Mapped[str | None] = mapped_column(String(16), index=True)  # sent | scheduled | cancelled | failed
     push_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))   # horario de silencio
     push_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
