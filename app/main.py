@@ -77,11 +77,11 @@ async def lifespan(app: FastAPI):
         id="segment_recalculator",
         replace_existing=True,
     )
-    # Dispatcher de campañas automáticas — cada hora
+    # Dispatcher de campañas programadas — cada 15 minutos
     scheduler.add_job(
         check_scheduled_campaigns,
         "interval",
-        hours=1,
+        minutes=15,
         id="campaign_scheduler",
         replace_existing=True,
     )
@@ -158,7 +158,7 @@ async def lifespan(app: FastAPI):
         f"APScheduler started — notification dispatcher every 30 min, "
         f"reengagement dispatcher every {settings.reengagement_check_interval_minutes} min, "
         f"segment recalculator daily 3am AR, "
-        f"campaign scheduler every 1h, "
+        f"campaign scheduler every 15 min, "
         f"welcome dispatcher every 1h, "
         f"queue cleanup daily 4am AR"
     )
