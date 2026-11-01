@@ -71,6 +71,8 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       ANALYTICS_API_KEY: ${ANALYTICS_API_KEY}
       CHECKER_API_KEY: ${CHECKER_API_KEY}
+      IMPACT_REPORTS_ACCOUNT_SID: ${IMPACT_REPORTS_ACCOUNT_SID}
+      IMPACT_REPORTS_AUTH_TOKEN: ${IMPACT_REPORTS_AUTH_TOKEN}
     volumes:
       - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     depends_on:

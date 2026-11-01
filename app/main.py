@@ -1,6 +1,7 @@
 import logging
 import sys
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta, timezone
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,13 +19,14 @@ from fastapi.responses import JSONResponse
 
 from app.database import engine, Base
 from app.config import settings
-from app.routers import profile, impact, events, analytics, notifications, favorites, admin, campaigns, internal, price_alerts
+from app.routers import profile, impact, events, analytics, notifications, favorites, admin, campaigns, internal, price_alerts, affiliate
 from app.services.notification_dispatcher import process_notification_queue
 from app.services.reengagement_service import process_reengagement_queue
 from app.services.segment_service import recalculate_segments
 from app.services.campaign_scheduler import check_scheduled_campaigns
 from app.services.welcome_service import process_welcome_notifications
 from app.services.cleanup_service import purge_old_queue_items
+from app.services import impact_sync
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -100,6 +102,31 @@ async def lifespan(app: FastAPI):
         id="queue_cleanup",
         replace_existing=True,
     )
+    # Reporte de afiliados (Impact): Actions + reporte diario cada 6h; ClickExport,
+    # facturas y programas a las 6am Córdoba. Al arrancar corre lo que falte (carga inicial).
+    scheduler.add_job(
+        impact_sync.sync_every_6h,
+        "interval",
+        hours=6,
+        id="impact_sync_6h",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        impact_sync.sync_daily,
+        "cron",
+        hour=6,
+        minute=0,
+        timezone="America/Argentina/Cordoba",
+        id="impact_sync_daily",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        impact_sync.bootstrap,
+        "date",
+        run_date=datetime.now(timezone.utc) + timedelta(seconds=60),
+        id="impact_sync_bootstrap",
+        replace_existing=True,
+    )
     scheduler.start()
     logger.info(
         f"APScheduler started — notification dispatcher every 30 min, "
@@ -141,6 +168,7 @@ app.include_router(admin.router, prefix="/api/v1")
 app.include_router(campaigns.router, prefix="/api/v1")
 app.include_router(internal.router, prefix="/api/v1")
 app.include_router(price_alerts.router, prefix="/api/v1")
+app.include_router(affiliate.router, prefix="/api/v1")
 
 
 @app.exception_handler(RequestValidationError)

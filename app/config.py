@@ -49,6 +49,15 @@ class Settings(BaseSettings):
     impact_auth_token: str = "SVJwU2RQWVVmb1VnNjA4NDA2OG5jYUp4UW52Wkc0N3VBMTpEZXNDQn5HX2ZUQmFCMmdFa1NIaGNNanp0VGZ5MmpldA=="
     impact_program_id: str = "13416"
 
+    # Impact.com — token "Dashboard reportes" (solo lectura) para el reporte de afiliados.
+    # Distinto del de arriba (que crea links): NO se mezclan. Vacíos = sync deshabilitado.
+    impact_reports_account_sid: str = ""
+    impact_reports_auth_token: str = ""
+    # Id del reporte de rendimiento diario de Impact (ver GET /affiliate/impact-reports).
+    impact_performance_report_id: str = "partner_performance_by_day"
+    # ClickExport: Impact permite 10 por día; usamos como máximo esto (margen para reintentos).
+    impact_click_export_daily_budget: int = 8
+
     class Config:
         env_file = ".env"
         extra = "ignore"

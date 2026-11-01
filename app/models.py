@@ -1,5 +1,7 @@
 from datetime import date, datetime
-from sqlalchemy import BigInteger, Boolean, Date, Float, ForeignKey, Integer, String, Text, DateTime, func
+from decimal import Decimal
+from sqlalchemy import BigInteger, Boolean, Date, Float, ForeignKey, Integer, Numeric, String, Text, DateTime, func
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
@@ -338,3 +340,158 @@ class CampaignCalendar(Base):
     label: Mapped[str | None] = mapped_column(String(200))
     advance_days: Mapped[int] = mapped_column(Integer, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+# ---------------------------------------------------------------------------
+# Reporte de afiliados (Impact) — datos sincronizados con el token de solo lectura.
+# Flujo: Impact → app/services/impact_sync.py → estas tablas → /api/v1/affiliate/*
+# Fechas en timestamptz (UTC); se agrupan en hora de Córdoba al consultar.
+# ---------------------------------------------------------------------------
+
+class ImpactProgram(Base):
+    __tablename__ = "impact_programs"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    name: Mapped[str | None] = mapped_column(Text)
+    raw: Mapped[dict] = mapped_column(JSONB)
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ImpactAction(Base):
+    """Conversión (venta). Upsert por id: cambia de estado y monto con el tiempo."""
+    __tablename__ = "impact_actions"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    campaign_id: Mapped[str | None] = mapped_column(String(32))
+    campaign_name: Mapped[str | None] = mapped_column(Text)
+    action_tracker_id: Mapped[str | None] = mapped_column(String(32))
+    action_tracker_name: Mapped[str | None] = mapped_column(Text)
+    state: Mapped[str | None] = mapped_column(String(16), index=True)
+    payout: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    amount: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    currency: Mapped[str | None] = mapped_column(String(8))
+    event_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+    locking_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+    creation_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cleared_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    referring_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    referring_type: Mapped[str | None] = mapped_column(String(64))
+    referring_domain: Mapped[str | None] = mapped_column(Text)
+    sub_id1: Mapped[str | None] = mapped_column(Text)
+    sub_id2: Mapped[str | None] = mapped_column(Text)
+    sub_id3: Mapped[str | None] = mapped_column(Text)
+    shared_id: Mapped[str | None] = mapped_column(Text)
+    oid: Mapped[str | None] = mapped_column(Text)
+    delta_payout: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    delta_amount: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    intended_payout: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    intended_amount: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    ad_id: Mapped[str | None] = mapped_column(String(64))
+    promo_code: Mapped[str | None] = mapped_column(Text)
+    event_code: Mapped[str | None] = mapped_column(Text)
+    customer_city: Mapped[str | None] = mapped_column(Text)
+    customer_region: Mapped[str | None] = mapped_column(Text)
+    customer_country: Mapped[str | None] = mapped_column(String(64))
+    customer_area: Mapped[str | None] = mapped_column(Text)
+    raw: Mapped[dict] = mapped_column(JSONB)
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ImpactClick(Base):
+    """Click individual (ClickExport). Se reemplazan todos los de un export_date por corrida."""
+    __tablename__ = "impact_clicks"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    export_date: Mapped[date] = mapped_column(Date, index=True)
+    external_id: Mapped[str | None] = mapped_column(String(64))
+    event_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+    program_id: Mapped[str | None] = mapped_column(String(32))
+    program_name: Mapped[str | None] = mapped_column(Text)
+    ad_id: Mapped[str | None] = mapped_column(String(64))
+    ad_name: Mapped[str | None] = mapped_column(Text)
+    ad_type: Mapped[str | None] = mapped_column(String(64))
+    product_sku: Mapped[str | None] = mapped_column(Text)
+    media_id: Mapped[str | None] = mapped_column(String(64))
+    shared_id: Mapped[str | None] = mapped_column(Text)
+    sub_id1: Mapped[str | None] = mapped_column(Text)
+    sub_id2: Mapped[str | None] = mapped_column(Text)
+    sub_id3: Mapped[str | None] = mapped_column(Text)
+    customer_country: Mapped[str | None] = mapped_column(String(64))
+    customer_region: Mapped[str | None] = mapped_column(Text)
+    customer_city: Mapped[str | None] = mapped_column(Text)
+    customer_area: Mapped[str | None] = mapped_column(Text)
+    ip_hash: Mapped[str | None] = mapped_column(Text)
+    device_type: Mapped[str | None] = mapped_column(String(64))
+    device_family: Mapped[str | None] = mapped_column(Text)
+    browser: Mapped[str | None] = mapped_column(Text)
+    os: Mapped[str | None] = mapped_column(Text)
+    referring_url: Mapped[str | None] = mapped_column(Text)
+    referring_domain: Mapped[str | None] = mapped_column(Text)
+    landing_page_url: Mapped[str | None] = mapped_column(Text)
+    traffic_source: Mapped[str | None] = mapped_column(Text)
+    traffic_category: Mapped[str | None] = mapped_column(Text)
+    unique_click: Mapped[bool | None] = mapped_column(Boolean)
+    payout: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    deal_name: Mapped[str | None] = mapped_column(Text)
+    deal_type: Mapped[str | None] = mapped_column(Text)
+    raw: Mapped[dict] = mapped_column(JSONB)
+
+
+class ImpactDailyPerformance(Base):
+    """Totales por día del reporte de rendimiento (incluye hoy; no gasta ClickExport)."""
+    __tablename__ = "impact_daily_performance"
+
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    clicks: Mapped[int | None] = mapped_column(Integer)
+    unique_clicks: Mapped[int | None] = mapped_column(Integer)
+    actions: Mapped[int | None] = mapped_column(Integer)
+    payout: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    sale_amount: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    currency: Mapped[str | None] = mapped_column(String(8))
+    raw: Mapped[list] = mapped_column(JSONB)
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ImpactInvoice(Base):
+    __tablename__ = "impact_invoices"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    created_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+    currency: Mapped[str | None] = mapped_column(String(8))
+    total_amount: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    total_vat_amount: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    status: Mapped[str | None] = mapped_column(String(16))      # PAID | OVERDUE | PENDING (de los LineItems)
+    due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    paid_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    line_items: Mapped[list] = mapped_column(JSONB)
+    detailed_line_items: Mapped[list] = mapped_column(JSONB)
+    raw: Mapped[dict] = mapped_column(JSONB)
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ImpactClickExport(Base):
+    """Estado del ClickExport de cada día (máx. 10 por día en Impact)."""
+    __tablename__ = "impact_click_exports"
+
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    status: Mapped[str] = mapped_column(String(16))             # running | completed | failed
+    job_id: Mapped[str | None] = mapped_column(String(64))
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    rows: Mapped[int | None] = mapped_column(Integer)
+    error: Mapped[str | None] = mapped_column(Text)
+    requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ImpactSyncRun(Base):
+    """Cada corrida de sincronización. De acá sale el 'Actualizado hace X h'."""
+    __tablename__ = "impact_sync_runs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    kind: Mapped[str] = mapped_column(String(32), index=True)   # actions | actions_backfill | performance | ...
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(16), default="running")  # running | ok | error | skipped
+    rows: Mapped[int | None] = mapped_column(Integer)
+    error: Mapped[str | None] = mapped_column(Text)
+    detail: Mapped[dict | None] = mapped_column(JSONB)
