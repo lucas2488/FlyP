@@ -19,7 +19,7 @@ from fastapi.responses import JSONResponse
 
 from app.database import engine, Base
 from app.config import settings
-from app.routers import profile, impact, events, analytics, notifications, favorites, admin, campaigns, internal, price_alerts, affiliate
+from app.routers import profile, impact, events, analytics, notifications, favorites, admin, campaigns, internal, price_alerts, affiliate, admob
 from app.services.notification_dispatcher import process_notification_queue
 from app.services.reengagement_service import process_reengagement_queue
 from app.services.segment_service import recalculate_segments
@@ -27,6 +27,7 @@ from app.services.campaign_scheduler import check_scheduled_campaigns
 from app.services.welcome_service import process_welcome_notifications
 from app.services.cleanup_service import purge_old_queue_items
 from app.services import impact_sync
+from app.services import admob_sync
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -120,6 +121,31 @@ async def lifespan(app: FastAPI):
         id="impact_sync_daily",
         replace_existing=True,
     )
+    # AdMob: reporte principal de hoy y ayer cada hora; inventario + 7 reportes de los
+    # últimos 7 días a las 8am Córdoba. Al arrancar hace la carga inicial si falta.
+    scheduler.add_job(
+        admob_sync.sync_hourly,
+        "interval",
+        hours=1,
+        id="admob_sync_hourly",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        admob_sync.sync_daily,
+        "cron",
+        hour=8,
+        minute=0,
+        timezone="America/Argentina/Cordoba",
+        id="admob_sync_daily",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        admob_sync.bootstrap,
+        "date",
+        run_date=datetime.now(timezone.utc) + timedelta(seconds=90),
+        id="admob_sync_bootstrap",
+        replace_existing=True,
+    )
     scheduler.add_job(
         impact_sync.bootstrap,
         "date",
@@ -169,6 +195,7 @@ app.include_router(campaigns.router, prefix="/api/v1")
 app.include_router(internal.router, prefix="/api/v1")
 app.include_router(price_alerts.router, prefix="/api/v1")
 app.include_router(affiliate.router, prefix="/api/v1")
+app.include_router(admob.router, prefix="/api/v1")
 
 
 @app.exception_handler(RequestValidationError)

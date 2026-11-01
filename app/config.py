@@ -58,6 +58,18 @@ class Settings(BaseSettings):
     # ClickExport: Impact permite 10 por día; usamos como máximo esto (margen para reintentos).
     impact_click_export_daily_budget: int = 8
 
+    # AdMob (solo lectura, scope admob.readonly) para el dashboard de AdMob. Vacíos = sync deshabilitado.
+    admob_client_id: str = ""
+    admob_client_secret: str = ""
+    admob_refresh_token: str = ""
+    admob_publisher_id: str = ""
+    # Apps que el dashboard muestra por defecto (Fly Promociones Android e iOS), separadas por coma.
+    admob_default_app_ids: str = (
+        "ca-app-pub-5835169978148884~6304079048,ca-app-pub-5835169978148884~4364423051"
+    )
+    # Carga inicial: meses hacia atrás.
+    admob_history_months: int = 24
+
     class Config:
         env_file = ".env"
         extra = "ignore"

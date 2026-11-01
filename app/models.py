@@ -495,3 +495,169 @@ class ImpactSyncRun(Base):
     rows: Mapped[int | None] = mapped_column(Integer)
     error: Mapped[str | None] = mapped_column(Text)
     detail: Mapped[dict | None] = mapped_column(JSONB)
+
+
+# ---------------------------------------------------------------------------
+# AdMob — datos sincronizados con el scope admob.readonly.
+# Flujo: AdMob API → app/services/admob_sync.py → estas tablas → /api/v1/admob/*
+# `date` es el día de AdMob (hora de Los Ángeles). Montos en la moneda de la cuenta,
+# ya convertidos de micros. Se guardan métricas base; los ratios se calculan al agregar.
+# ---------------------------------------------------------------------------
+
+class AdmobAccount(Base):
+    __tablename__ = "admob_account"
+
+    publisher_id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    reporting_time_zone: Mapped[str | None] = mapped_column(String(64))
+    currency: Mapped[str | None] = mapped_column(String(8))
+    raw: Mapped[dict] = mapped_column(JSONB)
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AdmobApp(Base):
+    __tablename__ = "admob_apps"
+
+    app_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    platform: Mapped[str | None] = mapped_column(String(16))
+    name: Mapped[str | None] = mapped_column(Text)
+    app_store_id: Mapped[str | None] = mapped_column(Text)
+    approval_state: Mapped[str | None] = mapped_column(String(32))
+    raw: Mapped[dict] = mapped_column(JSONB)
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AdmobAdUnit(Base):
+    __tablename__ = "admob_ad_units"
+
+    ad_unit_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    app_id: Mapped[str | None] = mapped_column(String(64), index=True)
+    name: Mapped[str | None] = mapped_column(Text)
+    format: Mapped[str | None] = mapped_column(String(32))
+    ad_types: Mapped[list] = mapped_column(JSONB)
+    raw: Mapped[dict] = mapped_column(JSONB)
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AdmobDaily(Base):
+    """R4: DATE × APP × AD_UNIT × FORMAT × PLATFORM × COUNTRY."""
+    __tablename__ = "admob_daily"
+
+    date: Mapped[date] = mapped_column(Date, primary_key=True)
+    app_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    ad_unit_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    format: Mapped[str] = mapped_column(String(32), primary_key=True)
+    platform: Mapped[str] = mapped_column(String(16), primary_key=True)
+    country: Mapped[str] = mapped_column(String(8), primary_key=True)
+    app_name: Mapped[str | None] = mapped_column(Text)
+    ad_unit_name: Mapped[str | None] = mapped_column(Text)
+    requests: Mapped[int] = mapped_column(BigInteger, default=0)
+    matched: Mapped[int] = mapped_column(BigInteger, default=0)
+    impressions: Mapped[int] = mapped_column(BigInteger, default=0)
+    clicks: Mapped[int] = mapped_column(BigInteger, default=0)
+    earnings: Mapped[Decimal] = mapped_column(Numeric(18, 6), default=0)
+    currency: Mapped[str | None] = mapped_column(String(8))
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AdmobDailyVersion(Base):
+    """R5–R7: DATE × APP × PLATFORM × (APP_VERSION_NAME | MOBILE_OS_VERSION | GMA_SDK_VERSION)."""
+    __tablename__ = "admob_daily_versions"
+
+    date: Mapped[date] = mapped_column(Date, primary_key=True)
+    dimension_type: Mapped[str] = mapped_column(String(16), primary_key=True)   # app_version | os_version | sdk_version
+    app_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    platform: Mapped[str] = mapped_column(String(16), primary_key=True)
+    version: Mapped[str] = mapped_column(String(64), primary_key=True)
+    requests: Mapped[int] = mapped_column(BigInteger, default=0)
+    matched: Mapped[int] = mapped_column(BigInteger, default=0)
+    impressions: Mapped[int] = mapped_column(BigInteger, default=0)
+    clicks: Mapped[int] = mapped_column(BigInteger, default=0)
+    earnings: Mapped[Decimal] = mapped_column(Numeric(18, 6), default=0)
+    currency: Mapped[str | None] = mapped_column(String(8))
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AdmobDailyServing(Base):
+    """R8: DATE × APP × PLATFORM × FORMAT × SERVING_RESTRICTION."""
+    __tablename__ = "admob_daily_serving"
+
+    date: Mapped[date] = mapped_column(Date, primary_key=True)
+    app_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    platform: Mapped[str] = mapped_column(String(16), primary_key=True)
+    format: Mapped[str] = mapped_column(String(32), primary_key=True)
+    serving_restriction: Mapped[str] = mapped_column(String(64), primary_key=True)
+    requests: Mapped[int] = mapped_column(BigInteger, default=0)
+    matched: Mapped[int] = mapped_column(BigInteger, default=0)
+    impressions: Mapped[int] = mapped_column(BigInteger, default=0)
+    clicks: Mapped[int] = mapped_column(BigInteger, default=0)
+    earnings: Mapped[Decimal] = mapped_column(Numeric(18, 6), default=0)
+    currency: Mapped[str | None] = mapped_column(String(8))
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AdmobDailyAdType(Base):
+    """R9: DATE × APP × PLATFORM × FORMAT × AD_TYPE (sin solicitudes: incompatibles con AD_TYPE)."""
+    __tablename__ = "admob_daily_ad_type"
+
+    date: Mapped[date] = mapped_column(Date, primary_key=True)
+    app_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    platform: Mapped[str] = mapped_column(String(16), primary_key=True)
+    format: Mapped[str] = mapped_column(String(32), primary_key=True)
+    ad_type: Mapped[str] = mapped_column(String(32), primary_key=True)
+    impressions: Mapped[int] = mapped_column(BigInteger, default=0)
+    clicks: Mapped[int] = mapped_column(BigInteger, default=0)
+    earnings: Mapped[Decimal] = mapped_column(Numeric(18, 6), default=0)
+    currency: Mapped[str | None] = mapped_column(String(8))
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AdmobMediationDaily(Base):
+    """R10: DATE × APP × AD_SOURCE × MEDIATION_GROUP × FORMAT × PLATFORM."""
+    __tablename__ = "admob_mediation_daily"
+
+    date: Mapped[date] = mapped_column(Date, primary_key=True)
+    app_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    ad_source_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    mediation_group_id: Mapped[str] = mapped_column(String(96), primary_key=True)
+    format: Mapped[str] = mapped_column(String(32), primary_key=True)
+    platform: Mapped[str] = mapped_column(String(16), primary_key=True)
+    ad_source_name: Mapped[str | None] = mapped_column(Text)
+    mediation_group_name: Mapped[str | None] = mapped_column(Text)
+    requests: Mapped[int] = mapped_column(BigInteger, default=0)
+    matched: Mapped[int] = mapped_column(BigInteger, default=0)
+    impressions: Mapped[int] = mapped_column(BigInteger, default=0)
+    clicks: Mapped[int] = mapped_column(BigInteger, default=0)
+    earnings: Mapped[Decimal] = mapped_column(Numeric(18, 6), default=0)
+    observed_ecpm: Mapped[Decimal | None] = mapped_column(Numeric(18, 6))
+    ad_load_latency: Mapped[float | None] = mapped_column(Float)
+    currency: Mapped[str | None] = mapped_column(String(8))
+    synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AdmobIntradaySnapshot(Base):
+    """Foto de cada corrida horaria: totales del día de AdMob por app (para 'ayer a la misma hora')."""
+    __tablename__ = "admob_intraday_snapshots"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    taken_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    report_date: Mapped[date] = mapped_column(Date, index=True)
+    app_id: Mapped[str] = mapped_column(String(64))
+    platform: Mapped[str | None] = mapped_column(String(16))
+    earnings: Mapped[Decimal] = mapped_column(Numeric(18, 6), default=0)
+    impressions: Mapped[int] = mapped_column(BigInteger, default=0)
+    clicks: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
+class AdmobSyncRun(Base):
+    __tablename__ = "admob_sync_runs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    kind: Mapped[str] = mapped_column(String(32), index=True)   # hourly | daily | initial | inventory
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(16), default="running")  # running | ok | error | auth_error
+    range_from: Mapped[date | None] = mapped_column(Date)
+    range_to: Mapped[date | None] = mapped_column(Date)
+    rows: Mapped[int | None] = mapped_column(Integer)
+    error: Mapped[str | None] = mapped_column(Text)
+    detail: Mapped[dict | None] = mapped_column(JSONB)

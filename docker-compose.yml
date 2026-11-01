@@ -73,6 +73,10 @@ services:
       CHECKER_API_KEY: ${CHECKER_API_KEY}
       IMPACT_REPORTS_ACCOUNT_SID: ${IMPACT_REPORTS_ACCOUNT_SID}
       IMPACT_REPORTS_AUTH_TOKEN: ${IMPACT_REPORTS_AUTH_TOKEN}
+      ADMOB_CLIENT_ID: ${ADMOB_CLIENT_ID}
+      ADMOB_CLIENT_SECRET: ${ADMOB_CLIENT_SECRET}
+      ADMOB_REFRESH_TOKEN: ${ADMOB_REFRESH_TOKEN}
+      ADMOB_PUBLISHER_ID: ${ADMOB_PUBLISHER_ID}
     volumes:
       - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     depends_on:
