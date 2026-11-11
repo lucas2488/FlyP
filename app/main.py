@@ -29,6 +29,7 @@ from app.services.cleanup_service import purge_old_queue_items
 from app.services import impact_sync
 from app.services import admob_sync
 from app.services.price_alert_results import send_scheduled_pushes
+from app.services import alert_hygiene
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -130,6 +131,16 @@ async def lifespan(app: FastAPI):
         "interval",
         minutes=15,
         id="price_alert_scheduled_pushes",
+        replace_existing=True,
+    )
+    # Pausa alertas de quien desinstaló o no mira los avisos, y copia qué avisos se leyeron.
+    scheduler.add_job(
+        alert_hygiene.run_job,
+        "cron",
+        hour=11,
+        minute=0,
+        timezone="America/Argentina/Buenos_Aires",
+        id="price_alert_hygiene",
         replace_existing=True,
     )
     scheduler.add_job(

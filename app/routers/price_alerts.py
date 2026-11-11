@@ -197,3 +197,16 @@ async def checker_overview(days: int = Query(14, ge=1, le=90), _: str = Depends(
     """Búsquedas por día (FlyAdmin vs. app), reservas, bajadas raras, aparatos y comparación de precios."""
     from app.services import checker_overview
     return await checker_overview.overview(days)
+
+
+@router.post("/analytics/price-alerts/hygiene")
+async def price_alert_hygiene(dry_run: bool = Query(True, alias="dryRun"), _: str = Depends(verify_api_key)):
+    """
+    Corre a mano la pausa automática (la misma que el job diario). Por defecto dryRun=true:
+    devuelve qué alertas pausaría, sin tocar nada.
+    """
+    from app.services import alert_hygiene
+    try:
+        return await alert_hygiene.run(dry_run)
+    except FirestoreUnavailable as e:
+        raise HTTPException(503, str(e))

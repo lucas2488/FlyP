@@ -224,6 +224,10 @@ def build(raw: dict, now: datetime) -> dict:
         alerts.append({
             "id": alert_id,
             "status": a.get("status") or None,
+            # Pausa automática del servidor (alert_hygiene); la app vuelve a "active" al reactivarla.
+            "paused_by": a.get("pausedBy") if a.get("status") == "paused" else None,
+            "paused_reason": a.get("pausedReason") if a.get("status") == "paused" else None,
+            "paused_at": _iso(a.get("pausedAt")) if a.get("status") == "paused" else None,
             "expired": expired,
             "created_at": _iso(a.get("createdAt")),
             "updated_at": _iso(a.get("updatedAt")),

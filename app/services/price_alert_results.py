@@ -76,6 +76,7 @@ class AlertOutcome:
     body: str | None = None
     copy_source: str | None = None      # llm | template
     push_scheduled_for: str | None = None   # horario de silencio: cuándo sale el push
+    user_paused: bool = False               # el push lo dejó sin aparatos: se pausaron sus alertas
 
 
 @dataclass
@@ -291,10 +292,14 @@ def _send_push(db, uid: str, notice_id: str, title: str, body: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def _apply(results: list[ResultIn], groups: dict, last_prices: dict[str, float], dry_run: bool,
-           now: datetime, copies: dict[str, tuple[str, str]]) -> list[ResultOut]:
+           now: datetime, copies: dict[str, tuple[str, str]], auto_pause: bool = False,
+           pauses: list | None = None) -> list[ResultOut]:
     """Escribe en Firestore y manda pushes. Bloqueante (SDK sync)."""
+    from app.services.alert_hygiene import pause_user_alerts
+
     db = None if dry_run else firestore.client()
     out: list[ResultOut] = []
+    paused_uids: set[str] = set()
     for r in results:
         if r.error:
             out.append(ResultOut(r.search_key, "error", r.error[:300]))
@@ -315,6 +320,8 @@ def _apply(results: list[ResultIn], groups: dict, last_prices: dict[str, float],
         for uid, alert_id, a in alerts:
             path = f"users/{uid}/alerts/{alert_id}"
             reason, why_not = decide(a, r.price, last_prices.get(path), now)
+            if uid in paused_uids:
+                reason, why_not = None, "paused"      # se pausó en esta misma tanda: sin aparatos
             lowest = min(x for x in (_num(a.get("lowestPrice")), r.price) if x is not None)
             oc = AlertOutcome(alert_id=alert_id, action="updated", reason=reason or why_not)
 
@@ -343,6 +350,14 @@ def _apply(results: list[ResultIn], groups: dict, last_prices: dict[str, float],
                     else:
                         p = _send_push(db, uid, notice_ref.id, title, body)
                         oc.devices, oc.pushes_sent, oc.devices_removed, oc.push_errors = p["devices"], p["sent"], p["removed"], p["errors"]
+                        if auto_pause and p["removed"] and p["removed"] == p["devices"]:
+                            # FCM dio por muertos todos sus tokens: desinstaló. No hay a quién avisarle.
+                            found = pause_user_alerts(db, uid, "no_devices",
+                                                      "Al avisar, FCM dio por muertos todos sus tokens (desinstaló o reinstaló).", now)
+                            if pauses is not None:
+                                pauses.extend(found)
+                            paused_uids.add(uid)
+                            oc.user_paused = True
                     # 2c. Anti-spam.
                     ref.update({"lastNotifiedAt": now})
                     oc.action = "notified"
@@ -478,12 +493,17 @@ async def process(results: list[ResultIn], worker_id: str | None, dry_run: bool 
         last_prices = await _last_notified_prices(paths)
         if not dry_run:
             copies = await _generate_copies(passed, groups, last_prices, now)
-    applied = iter(await asyncio.to_thread(_apply, passed, groups, last_prices, dry_run, now, copies)) if passed else iter([])
+    pauses: list[dict] = []
+    applied = iter(await asyncio.to_thread(_apply, passed, groups, last_prices, dry_run, now, copies,
+                                           bool(cfg["auto_pause_enabled"]), pauses)) if passed else iter([])
     out = [gated[i] if i in gated else next(applied) for i in range(len(results))]
     if dry_run:
         return out
 
     await finish_claims(claim_status, now)
+    if pauses:
+        from app.services.alert_hygiene import record_pauses
+        await record_pauses(pauses, now)
     async with AsyncSessionLocal() as db:
         for i, (r, o) in enumerate(zip(results, out)):
             m = info[i]
@@ -677,6 +697,12 @@ async def dashboard_history(days: int, limit: int) -> dict:
 
     since = _now() - timedelta(days=days)
     N, C = PriceAlertNotification, PriceAlertCheck
+    # Trae de Firestore qué avisos se abrieron desde la última vez (pocos documentos: solo los sin leer).
+    try:
+        from app.services.alert_hygiene import sync_reads
+        await sync_reads(min(days, 60))
+    except Exception:
+        logger.warning("dashboard_history: no se pudo sincronizar la lectura de avisos", exc_info=True)
     async with AsyncSessionLocal() as db:
         nd = cast(func.timezone(AR_TZ, N.created_at), Date)
         daily = (await db.execute(
@@ -696,6 +722,13 @@ async def dashboard_history(days: int, limit: int) -> dict:
             select(N).where(N.created_at >= since).order_by(N.created_at.desc()).limit(limit)
         )).scalars().all()
         last_check = await db.scalar(select(func.max(C.checked_at)))
+        reads = (await db.execute(
+            select(func.count(), func.count().filter(N.read_at.isnot(None))).where(N.created_at >= since)
+        )).one()
+        from app.models import PriceAlertPause as P
+        pauses = (await db.execute(
+            select(P).where(P.paused_at >= since).order_by(P.paused_at.desc()).limit(200)
+        )).scalars().all()
 
     # Nombre / email / invitado del dueño desde Firestore (caché de 60 s); si la alerta se borró, queda la foto.
     users: dict[str, dict] = {}
@@ -712,6 +745,11 @@ async def dashboard_history(days: int, limit: int) -> dict:
     return {
         "days": days,
         "last_check_at": last_check.isoformat() if last_check else None,
+        "read": {"notices": reads[0], "read": reads[1],
+                 "rate_pct": round(reads[1] / reads[0] * 100, 1) if reads[0] else None},
+        "pauses": [{"paused_at": p.paused_at.isoformat(), "alert_id": p.alert_path.rsplit("/", 1)[-1],
+                    "reason": p.reason, "detail": p.detail, "route": p.route,
+                    "user_ref": price_alerts._user_ref(p.uid)} for p in pauses],
         "daily": [{"date": d.isoformat(), "notified": n, "drop": dr, "target": tg, "scheduled": sc,
                    "cancelled": ca, "pushes_sent": int(ps), "llm": llm} for d, n, dr, tg, sc, ca, ps, llm in daily],
         "checks_daily": [{"date": d.isoformat(), "checks": n, "errors": e, "alerts_updated": int(u), "workers": w}
@@ -725,6 +763,7 @@ async def dashboard_history(days: int, limit: int) -> dict:
             "push_sent_at": r.push_sent_at.isoformat() if r.push_sent_at else None,
             "devices": r.devices, "pushes_sent": r.pushes_sent, "devices_removed": r.devices_removed,
             "push_errors": r.push_errors or [],
+            "read_at": r.read_at.isoformat() if r.read_at else None,
             "user": users.get(r.alert_path.rsplit("/", 1)[-1]),
         } for r in rows],
     }

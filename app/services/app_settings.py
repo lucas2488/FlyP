@@ -48,6 +48,12 @@ SPECS: dict[str, Spec] = {
                                  "Prendido: una bajada mayor al umbral no avisa hasta que otro aparato la confirme."),
     "double_check_threshold_pct": Spec(30, "Umbral de bajada rara (%)", _int(5, 95),
                                        "Bajada respecto del último precio conocido a partir de la cual es 'rara'."),
+    "auto_pause_enabled": Spec(True, "Pausar alertas que nadie mira", _bool,
+                               "Prendido: se pausan las alertas de quien desinstaló o no mira los avisos."),
+    "pause_unread_notices": Spec(3, "Avisos seguidos sin abrir", _int(1, 50),
+                                 "Cantidad de avisos seguidos sin abrir (junto con los días sin abrir la app) para pausar."),
+    "pause_inactive_days": Spec(21, "Días sin abrir la app", _int(3, 365),
+                                "Días sin abrir la app (junto con los avisos sin abrir) para pausar."),
 }
 
 _cache: dict[str, Any] = {"at": 0.0, "values": None}

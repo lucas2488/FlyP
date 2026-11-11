@@ -720,7 +720,21 @@ class PriceAlertNotification(Base):
     push_status: Mapped[str | None] = mapped_column(String(16), index=True)  # sent | scheduled | cancelled | failed
     push_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))   # horario de silencio
     push_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))   # lo abrió en la app (copiado de Firestore)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+
+class PriceAlertPause(Base):
+    """Alertas que pausó el servidor: el usuario desinstaló (sin aparatos) o no mira los avisos."""
+    __tablename__ = "price_alert_pauses"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    alert_path: Mapped[str] = mapped_column(String(256), index=True)
+    uid: Mapped[str] = mapped_column(String(128), index=True)
+    reason: Mapped[str] = mapped_column(String(32))          # no_devices | inactive
+    detail: Mapped[str | None] = mapped_column(String(300))
+    route: Mapped[str | None] = mapped_column(String(160))
+    paused_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
 
 
 
