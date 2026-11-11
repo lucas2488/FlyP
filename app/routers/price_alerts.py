@@ -14,7 +14,7 @@ La lectura y el armado están en app/services/price_alerts.py.
 import asyncio
 import logging
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Body, Depends, Header, HTTPException, Query, Security
 from firebase_admin import app_check
@@ -87,10 +87,11 @@ async def get_checker_searches(
     limit: int = Query(50, ge=1, le=500),
     _: str = Depends(verify_checker_key),
 ):
-    """Búsquedas únicas pendientes de consultar (no revisadas en las últimas 10 h)."""
+    """Búsquedas únicas pendientes de consultar (no revisadas en las últimas recheck_hours horas)."""
     data = await _load()
     now = datetime.now(timezone.utc)
-    searches, total = price_alerts.pending_searches(data["searches"], now, limit)
+    hours = (await app_settings.get_all())["recheck_hours"]
+    searches, total = price_alerts.pending_searches(data["searches"], now, limit, timedelta(hours=hours))
     return {
         "generated_at": price_alerts._iso(now),
         "total_pending": total,

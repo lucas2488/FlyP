@@ -36,7 +36,7 @@ no está buscando, su app puede ir consultando en segundo plano búsquedas de al
 
 - Body: `{ "limit": 1 }` (la app de usuarios pide 1; FlyAdmin puede pedir un lote, p. ej. 6).
 - Elige primero las bajadas raras esperando verificación (nunca al aparato que la informó) y
-  después las búsquedas pendientes más viejas (no consultadas en `RECHECK_AFTER`, hoy 10 h,
+  después las búsquedas pendientes más viejas (no consultadas en `recheck_hours` horas, ajuste editable, default 10,
   y sin reserva vigente). Las reserva de forma atómica con un índice único parcial
   (`search_key` WHERE `status='open'`) + `INSERT … ON CONFLICT DO NOTHING`: dos pedidos
   simultáneos nunca reciben la misma.

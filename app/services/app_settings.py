@@ -36,6 +36,8 @@ def _bool(v: Any) -> bool:
 SPECS: dict[str, Spec] = {
     "crowd_checker_enabled": Spec(True, "Búsquedas desde los celulares de usuarios", _bool,
                                   "Interruptor general: apagado, /checker/claim no reparte búsquedas a la app."),
+    "recheck_hours": Spec(10, "Revisar cada (horas)", _int(1, 72),
+                          "Horas mínimas entre dos consultas de la misma búsqueda. Antes de eso no se vuelve a repartir."),
     "claim_minutes": Spec(10, "Duración de la reserva (minutos)", _int(2, 60),
                           "Cuánto tiempo queda bloqueada una búsqueda para quien la reservó."),
     "poll_interval_seconds": Spec(45, "Pausa entre búsquedas (segundos)", _int(10, 3600),

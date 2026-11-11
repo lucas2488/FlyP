@@ -111,8 +111,9 @@ async def claim(worker: Worker, limit: int, session_id: str | None) -> dict:
         if key in by_key and key not in seen and not (worker.source == "app" and reporter == worker.device_id):
             candidates.append((key, "verify"))
             seen.add(key)
-    # 2) Búsquedas sin consultar hace RECHECK_AFTER, las más viejas primero.
-    pending, total_pending = price_alerts.pending_searches(list(by_key.values()), now, len(by_key))
+    # 2) Búsquedas sin consultar hace recheck_hours, las más viejas primero.
+    pending, total_pending = price_alerts.pending_searches(
+        list(by_key.values()), now, len(by_key), timedelta(hours=cfg["recheck_hours"]))
     for s in pending:
         if s["search_key"] not in seen:
             candidates.append((s["search_key"], "check"))

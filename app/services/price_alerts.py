@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 CACHE_TTL_SECONDS = 60
 # Una búsqueda consultada hace menos que esto no se vuelve a ofrecer al checker.
-RECHECK_AFTER = timedelta(hours=10)   # permite buscar dos veces por día
+RECHECK_AFTER = timedelta(hours=10)   # default; el valor real es el ajuste recheck_hours (app_settings)
 # "A punto de dispararse": el objetivo está a menos de este % del precio de referencia.
 NEAR_TARGET_RATIO = 0.02
 
@@ -307,9 +307,10 @@ def build_searches(alerts: list[dict]) -> list[dict]:
     return searches
 
 
-def pending_searches(searches: list[dict], now: datetime, limit: int) -> tuple[list[dict], int]:
-    """Lo que el checker tiene que consultar: no revisadas en RECHECK_AFTER, viejas primero."""
-    cutoff = now - RECHECK_AFTER
+def pending_searches(searches: list[dict], now: datetime, limit: int,
+                     recheck_after: timedelta = RECHECK_AFTER) -> tuple[list[dict], int]:
+    """Lo que el checker tiene que consultar: no revisadas en recheck_after, viejas primero."""
+    cutoff = now - recheck_after
     pending = []
     for s in searches:
         if not s["searchable"]:
